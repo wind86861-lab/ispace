@@ -1,1 +1,636 @@
 @import "tailwindcss";
+
+/* =========================================================================
+   iSpace dizayn tizimi — barcha rang/shrift/harakat tokenlari shu yerda.
+   Komponentlarda xom hex yozilmaydi.
+   Rang intizomi: ~70% krem · ~20% espresso · ≤10% oltin.
+   ========================================================================= */
+@theme {
+  /*
+   * TIPOGRAFIK SHKALA — Tailwind sukutidan bir pog'ona kattaroq.
+   *
+   * Sukut qiymatlar (14px `text-sm`, 16px `text-base`) ekran sinovida
+   * mayda chiqdi: sayt uzun matnli va uni odam qo'lda telefondan ham,
+   * kattaroq monitordan ham o'qiydi. Shkalani bir joyda surish har bir
+   * komponentni qo'lda tuzatishdan ishonchli — nisbatlar saqlanadi.
+   *
+   * Qatorlar orasi ham qayta belgilangan: shrift kattalashganda eski
+   * `line-height` matnni siqib qo'yadi.
+   */
+  --text-xs: 0.8125rem;          /* 13px */
+  --text-xs--line-height: 1.45;
+  --text-sm: 0.9375rem;          /* 15px */
+  --text-sm--line-height: 1.6;
+  --text-base: 1.0625rem;        /* 17px */
+  --text-base--line-height: 1.65;
+  --text-lg: 1.1875rem;          /* 19px */
+  --text-lg--line-height: 1.5;
+  --text-xl: 1.375rem;           /* 22px */
+  --text-xl--line-height: 1.4;
+  --text-2xl: 1.625rem;          /* 26px */
+  --text-2xl--line-height: 1.3;
+
+  --color-cream: #f6f1e9;
+  --color-warm-white: #fcfaf6;
+  --color-espresso: #29221e;
+  --color-espresso-soft: #4a403a;
+  /* Taupe — chegara va bezak uchun; matn uchun kontrasti yetmaydi (2.2:1). */
+  --color-taupe: #b9a88c;
+  --color-taupe-soft: #e2d9c9;
+  /* Kichik matndagi taupe — krem fonda 4.8:1. */
+  --color-taupe-text: #77694f;
+  /*
+   * Matn rangiga ALFA qo'shish kontrastni kamaytiradi, va qancha
+   * kamaytirishi ostidagi sirtga bog'liq. `espresso-soft/75` kremda
+   * 4.55:1, alabasterda 4.44:1, filial kartasida esa 4.04:1 chiqdi
+   * (o'lchangan) — ya'ni sirt o'zgarishi bilan AA dan tushib ketardi.
+   * Shuning uchun kichik matnda alfa 0.85 dan past bo'lmasin: u kremda
+   * 5.9:1 beradi va sirt qanday bo'lishidan qat'i nazar zaxira qoladi.
+   */
+
+  /*
+   * Oltin ikki qatlamda (WCAG 2.1 AA bo'yicha o'lchangan):
+   *   gold      — bezak, ikon, chegara va KATTA matn (krem fonda 3.7:1 ≥ 3.0)
+   *   gold-deep — KICHIK matn va oltin tugma foni (4.8:1 / oq matn 5.2:1)
+   *   gold-hover— tugmaning hover holati, hamon 4.6:1
+   *   gold-light— TO'Q fonda oltin matn (espresso ustida 4.9:1)
+   * Logotipdagi oltin istisno: WCAG brend belgilariga kontrast talab qo'ymaydi.
+   */
+  --color-gold: #9a7540;
+  --color-gold-deep: #856434;
+  --color-gold-hover: #8f6c3a;
+  --color-gold-light: #b08a4e;
+  /*
+   * gold-ink — oltin matnning YARIM-SHAFFOF sirtdagi varianti.
+   *
+   * `gold-deep` ning 4.8:1 i sof krem foni uchun o'lchangan. Frosted
+   * header (`bg-cream/90`) yoki hero hisoblagichi (`bg-warm-white/95`)
+   * kabi sirtlarda esa fon ostidagi kontentga bog'liq: to'q bo'lim
+   * header ostidan o'tganda sirt o'rta tonga aylanadi va gold-deep
+   * 3.3:1 gacha tushadi (o'lchangan). gold-ink kremda 6.4:1 beradi —
+   * ya'ni sirt qanchalik qorayishidan qat'i nazar zaxira yetarli.
+   */
+  --color-gold-ink: #6f5229;
+
+  /*
+   * Kengaytirilgan palitra — bo'limlar bir xil krem-oltinda zerikarli
+   * bo'lib qolmasligi uchun. Asosiy nisbat saqlanadi; bular urg'u va
+   * sirt ranglari sifatida ishlatiladi.
+   */
+  --color-alabaster: #f1ece6;  /* yumshoq krem sirt */
+  --color-greige: #ddd5cd;     /* iliq kulrang-bej, chegara va sirt */
+  /*
+   * Rosewood — IKKINCHI urg'u, fon emas.
+   *
+   * U bir vaqtlar butun bo'lim foni edi va sahifada yolg'iz "qizil
+   * plita" bo'lib turardi. Endi u element rangi: narx tushishi,
+   * saralanganlar va sharh belgilari — ya'ni "his-tuyg'u" signallari.
+   * Oltin esa harakat rangi bo'lib qoladi (CTA, faol holat).
+   *
+   * Kontrast (o'lchangan): kremda 6.9:1, alabasterda 6.6:1 — ya'ni u
+   * KICHIK matn uchun ham xavfsiz. `gold-deep` bu o'rinda atigi 4.8:1
+   * beradi, shuning uchun rosewood mayda yozuvda ishonchliroq.
+   */
+  --color-rosewood: #7d4047;
+  --color-rosewood-soft: #9a5a60;
+  --color-charcoal: #2e2e2e;   /* neytral to'q */
+
+  --font-display: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  --font-sans: var(--font-manrope), "Manrope", ui-sans-serif, system-ui, sans-serif;
+
+  /* Yagona "hashamatli" ease — barcha kirish animatsiyalari shundan. */
+  --ease-lux: cubic-bezier(0.2, 0.7, 0.3, 1);
+
+  /* Fixed header balandligi — hero balandligini hisoblashda ishlatiladi. */
+  --header-h: 5.5rem;
+
+  --animate-marquee: marquee var(--marquee-duration, 45s) linear infinite;
+  --animate-shimmer: shimmer 2.6s var(--ease-lux) infinite;
+
+  --animate-marquee-reverse: marquee-reverse var(--marquee-duration, 45s) linear infinite;
+
+  @keyframes marquee {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(-50%, 0, 0); }
+  }
+  /* Teskari yo'nalish — o'rtadagi qator uchun. */
+  @keyframes marquee-reverse {
+    from { transform: translate3d(-50%, 0, 0); }
+    to { transform: translate3d(0, 0, 0); }
+  }
+  --animate-kenburns: kenburns 16s ease-out forwards;
+
+  /*
+   * Ken Burns ataylab juda sekin va tor: rasm endi tor ustunda turadi,
+   * kuchli zoom uni kesib, aniqligini yo'qotardi.
+   */
+  @keyframes kenburns {
+    from { transform: scale(1); }
+    to { transform: scale(1.06); }
+  }
+  @keyframes shimmer {
+    0%, 60% { transform: translateX(-120%); }
+    100% { transform: translateX(220%); }
+  }
+}
+
+/* -------------------------------------------------------------------------
+   Base
+   ------------------------------------------------------------------------- */
+@layer base {
+  html {
+    /* Lenis momentum scroll'ni boshqaradi; native smooth ziddiyat qiladi. */
+    scroll-behavior: auto;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-cream);
+    color: var(--color-espresso-soft);
+    font-family: var(--font-sans);
+    font-feature-settings: "kern", "liga";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    color: var(--color-espresso);
+    font-weight: 500;
+    letter-spacing: 0.005em;
+  }
+
+  ::selection {
+    background-color: var(--color-gold);
+    color: var(--color-warm-white);
+  }
+
+  /* Klaviatura fokusi hamma joyda ko'rinadi (§ a11y). */
+  :focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Preloader qarori bo'yashdan oldin inline skriptda qabul qilinadi (§4). */
+  html[data-preloader="skip"] .preloader { display: none; }
+
+  /* Lenis faol bo'lganda */
+  html.lenis, html.lenis body { height: auto; }
+  .lenis.lenis-smooth { scroll-behavior: auto !important; }
+  .lenis.lenis-stopped { overflow: hidden; }
+}
+
+/* -------------------------------------------------------------------------
+   Yordamchi qatlamlar
+   ------------------------------------------------------------------------- */
+@utility container-lux {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+  max-width: 84rem;
+  @media (min-width: 768px) { padding-inline: 2rem; }
+  @media (min-width: 1280px) { padding-inline: 2.5rem; }
+}
+
+/*
+ * Hero fotosining kremga "erishi".
+ *
+ * Ikki muhim qaror:
+ *
+ * 1. Ko'p bosqichli gradient. Oddiy `linear-gradient(cream, transparent)`
+ *    chiziqli o'tish beradi va o'rtada ko'zga tashlanadigan "sutli tasma"
+ *    hosil qiladi. Bu yerdagi bosqichlar ease egrisiga yaqinlashtirilgan —
+ *    o'tish sezilmaydi.
+ *
+ * 2. Ranglar oldindan hisoblangan `rgba` — `color-mix` emas. O'nta
+ *    bosqichli gradient ustida `color-mix` har rasterizatsiyada qayta
+ *    hisoblanadi, bu esa ostidagi Ken Burns harakati tufayli tez-tez
+ *    takrorlanadi.
+ *
+ * 3. Bu — ustki qatlam (`background`), `mask-image` emas. Maska vizual
+ *    jihatdan aynan shu natijani beradi, ammo u Ken Burns va parallaks
+ *    bilan harakatlanayotgan katta elementni har kadrda qayta niqoblashga
+ *    majbur qiladi: o'lchov TBT ni 480 ms dan 1290 ms ga ko'targanini
+ *    ko'rsatdi. Karta foni ham krem bo'lgani uchun ustki gradient piksel
+ *    darajasida bir xil natija beradi — lekin bepul.
+ */
+/*
+ * Hero fotosining chap yarmidagi parda.
+ *
+ * Foto endi kartaning BUTUN kengligini egallaydi (ilgari u faqat o'ng
+ * yarmida turardi va chap yarim tekis warm-white edi). Matn esa o'sha
+ * joyida qoldi — demak u foto USTIDA yotadi va o'qilishi uchun asos
+ * kerak.
+ *
+ * Chiziqli gradient tik, to'g'ri chiziqli chegara beradi — u ko'zga
+ * "yopishtirilgan ikki yarim" bo'lib tashlanadi. Bu yerda RADIAL gradient
+ * ishlatiladi va uning markazi kadrning chap chekkasida: natijada
+ * chegara yumshoq YOY bo'lib egiladi — parda fotoga tabiiy "quyilib"
+ * o'tadi.
+ *
+ * Rang warm-white (#FCFAF6) — kartaning o'z foni bilan aynan bir xil,
+ * shuning uchun matn zonasi ilgarigidek ko'rinadi.
+ *
+ * MUHIM: parda HECH QAYERDA qattiq emas — eng qalin joyi 0.9. Dastlab
+ * u chap yarmida 1.0 edi va foto u yerda butunlay o'lib qolardi: karta
+ * "yarmi foto, yarmi bo'sh krem" bo'lib ikkiga bo'linib ko'rinardi.
+ * Endi foto butun kenglik bo'ylab sezilib turadi, chapda esa shunchaki
+ * susayadi.
+ *
+ * Kontrast: 0.9 va 0.83 qatlam ostida eng qorong'i foto ham 209+
+ * yorqinlikka chiqadi, ya'ni espresso matn uchun ≥7:1. Matn ustuni
+ * aynan shu zonada tugaydi — undan o'ngda parda tez so'nadi va
+ * kartaning o'ng choragida foto qatlamsiz qoladi.
+ */
+@utility hero-veil {
+  background-image: radial-gradient(
+    78% 150% at -2% 50%,
+    rgba(252, 250, 246, 0.9) 0%,
+    rgba(252, 250, 246, 0.88) 38%,
+    rgba(252, 250, 246, 0.83) 50%,
+    rgba(252, 250, 246, 0.72) 60%,
+    rgba(252, 250, 246, 0.54) 69%,
+    rgba(252, 250, 246, 0.34) 78%,
+    rgba(252, 250, 246, 0.16) 87%,
+    rgba(252, 250, 246, 0.05) 94%,
+    rgba(252, 250, 246, 0) 100%
+  );
+}
+
+/*
+ * Parda cheti "yonib" turadi — foto to'satdan boshlanmaydi.
+ * Yorug'lik markazi pardaning so'nish zonasiga to'g'rilangan, ya'ni
+ * kartaning o'ng uchdan biriga TEGMAYDI: u yerda foto o'z yorqinligida
+ * qoladi.
+ */
+@utility hero-veil-glow {
+  background-image: radial-gradient(
+    34% 62% at 40% 50%,
+    rgba(196, 161, 101, 0.14) 0%,
+    rgba(196, 161, 101, 0.05) 48%,
+    transparent 78%
+  );
+}
+
+/*
+ * Foto ustidagi matn uchun asos ("scrim").
+ *
+ * Nega kartaning BUTUN balandligiga emas, matn blokining O'ZIGA
+ * qo'yiladi: karta balandligi turlicha (asosiy 442px, kichigi 224px),
+ * shuning uchun foizli gradient har kartada matnni boshqa nuqtaga
+ * tushiradi va kontrast oldindan aytib bo'lmaydigan bo'lib qoladi.
+ * Blokning o'ziga bog'langanda esa matn HAR DOIM bir xil qorong'ulikda
+ * turadi — karta qanday o'lchamda bo'lishidan qat'i nazar.
+ *
+ * Qiymatlar o'lchab tanlangan: eng yomon holatda (sof oq foto) matn
+ * turgan yo'lakda alfa ≥ 0.70, bu esa krem matn uchun 4.6:1 beradi.
+ * Ilgarigi `from-espresso/75 via-espresso/20` esa aynan matn yo'lagida
+ * ~0.2 ga tushib qolardi — o'lchov 1.35:1 ko'rsatdi.
+ *
+ * Bosqichlar ease egrisiga yaqinlashtirilgan: chiziqli gradient foto
+ * ustida ko'zga tashlanadigan tasma hosil qiladi (`hero-veil` dagi
+ * bilan bir xil sabab).
+ */
+@utility card-scrim {
+  background-image: linear-gradient(
+    to top,
+    rgba(41, 34, 30, 0.93) 0%,
+    rgba(41, 34, 30, 0.9) 30%,
+    rgba(41, 34, 30, 0.84) 48%,
+    rgba(41, 34, 30, 0.7) 62%,
+    rgba(41, 34, 30, 0.5) 73%,
+    rgba(41, 34, 30, 0.3) 83%,
+    rgba(41, 34, 30, 0.14) 91%,
+    rgba(41, 34, 30, 0.04) 96%,
+    rgba(41, 34, 30, 0) 100%
+  );
+}
+
+/*
+ * «Kompaniya haqida» bo'limining foni.
+ *
+ * Bo'lim tekis krem sirtda turardi va sahifaning qolgan qismidan
+ * ajralmasdi. Endi ostida ikkita yumshoq yorug'lik dog'i bor: biri
+ * media ustuni ortida (oltin, iliq), ikkinchisi matn ortida (och
+ * alabaster) — kompozitsiya "xonaga" o'xshab qoladi.
+ *
+ * Gradientlar RADIAL va juda past alfada: ular fon bo'lib qolishi
+ * kerak, bezak bo'lib emas. Rang sonlari oldindan hisoblangan `rgba` —
+ * `color-mix` har rasterizatsiyada qayta hisoblanardi, bu esa dog'
+ * sekin siljib turgani uchun tez-tez takrorlanadi.
+ */
+@utility about-aura {
+  background-image:
+    radial-gradient(
+      42% 52% at 76% 32%,
+      rgba(196, 161, 101, 0.18) 0%,
+      rgba(196, 161, 101, 0.07) 42%,
+      rgba(196, 161, 101, 0) 72%
+    ),
+    radial-gradient(
+      40% 46% at 10% 20%,
+      rgba(252, 250, 246, 0.95) 0%,
+      rgba(252, 250, 246, 0.35) 45%,
+      rgba(252, 250, 246, 0) 75%
+    );
+}
+
+/*
+ * Dog' sekin "nafas oladi" — 22 soniyalik to'liq davr, oldinga-orqaga.
+ * Faqat `transform`: u kompozitorda bajariladi, ya'ni scroll paytida
+ * asosiy oqimga tegmaydi. Harakat kamaytirilgan bo'lsa umuman
+ * ulanmaydi (`html[data-motion="on"]` sharti).
+ */
+@keyframes about-aura-drift {
+  from {
+    transform: translate3d(-1.5%, -1%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(1.5%, 1.5%, 0) scale(1.08);
+  }
+}
+
+html[data-motion="on"] .about-aura {
+  animation: about-aura-drift 22s var(--ease-lux) infinite alternate;
+}
+
+/*
+ * Blog bo'limi fonidagi parda.
+ *
+ * Parda YENGIL: foto ochiq ko'rinsin. Dastlab u 0.88–0.985 edi va
+ * fotoni sutli tumanga aylantirardi — bo'lim "hira" bo'lib qolgandi.
+ *
+ * Faqat SARLAVHA yo'lagida (yuqori ~18%) kuchayadi: u yerda katta
+ * matn to'g'ridan-to'g'ri foto ustida yotadi. Kartalar esa o'z qattiq
+ * `warm-white` sirtida — ularga parda kerak emas.
+ *
+ * Pastki chekkada yengil qalinlashish qoladi: karusel o'qlari va
+ * "Barcha maqolalar" tugmasi shu yerda turadi.
+ */
+@utility blog-veil {
+  background-image: linear-gradient(
+    to bottom,
+    rgba(241, 236, 230, 0.66) 0%,
+    rgba(241, 236, 230, 0.44) 10%,
+    rgba(241, 236, 230, 0.26) 22%,
+    rgba(241, 236, 230, 0.2) 55%,
+    rgba(241, 236, 230, 0.28) 84%,
+    rgba(241, 236, 230, 0.46) 100%
+  );
+}
+
+/*
+ * Fonga "mixlangan" foto: sahifa siljiydi, rasm qimirlamaydi
+ * (`background-attachment: fixed` ning next/image bilan ishlaydigan varianti).
+ *
+ * Ikki qatlam kerak:
+ *  · RAMKA (`bg-pinned-frame`) — bandning o'z chegarasi, foto shu
+ *    to'rtburchakdan tashqariga chiqmaydi;
+ *  · QATLAM (`bg-pinned-layer`) — ekran o'lchamidagi `fixed` yuza,
+ *    foto shu yerda yotadi.
+ *
+ * Kesish ATAYLAB eskirgan `clip` xossasi bilan: `overflow: hidden`
+ * `fixed` bolani umuman kesmaydi, `clip-path` esa uni kesadi, lekin
+ * ayni paytda ramkani "containing block" ga aylantiradi — natijada
+ * qatlam ekranga emas, bandning o'ziga bog'lanib qoladi va mixlash
+ * yo'qoladi. `clip` esa faqat kesadi — bizga aynan shu kerak.
+ */
+@utility bg-pinned-frame {
+  position: absolute;
+  inset: 0;
+  clip: rect(0, auto, auto, 0);
+}
+
+/*
+ * Kichik ekranda mixlash YO'Q: u yerda foto ustidagi parda deyarli
+ * qattiq (rasm ko'rinmaydi ham), momentum-scroll paytida `fixed`
+ * qatlamni qayta chizish esa qimmatga tushadi va iOS'da titraydi.
+ */
+@utility bg-pinned-layer {
+  position: absolute;
+  inset: 0;
+
+  @media (min-width: 64rem) {
+    position: fixed;
+    inset: auto;
+    top: 0;
+    left: 0;
+    width: 100%;
+    /* `100vh` ataylab: `dvh` bo'lsa mobil brauzerda manzil paneli
+       yig'ilganda rasm sakraydi. */
+    height: 100vh;
+  }
+}
+
+/*
+ * Lead bandidagi foto pardasi.
+ *
+ * Foto endi butun fonni egallaydi, matn esa uning USTIDA turadi —
+ * shuning uchun chekkadagi "chok" emas, butun yuzani qoplaydigan
+ * parda kerak. Chapda u deyarli qattiq (matn shu yerda), o'ngga
+ * borgan sari so'nadi va foto ochiladi.
+ *
+ * Bosqichlar ease egrisiga yaqinlashtirilgan: chiziqli gradient foto
+ * ustida ko'zga tashlanadigan tasma hosil qiladi.
+ *
+ * Ranglar oldindan hisoblangan `rgba` — `color-mix` emas: o'nta
+ * bosqichli gradient ustida u har rasterizatsiyada qayta hisoblanardi.
+ */
+@utility lead-veil {
+  background-image: linear-gradient(
+    to right,
+    rgba(241, 236, 230, 1) 0%,
+    rgba(241, 236, 230, 0.995) 26%,
+    rgba(241, 236, 230, 0.97) 36%,
+    rgba(241, 236, 230, 0.9) 44%,
+    rgba(241, 236, 230, 0.76) 51%,
+    rgba(241, 236, 230, 0.56) 58%,
+    rgba(241, 236, 230, 0.34) 66%,
+    rgba(241, 236, 230, 0.16) 75%,
+    rgba(241, 236, 230, 0.05) 85%,
+    rgba(241, 236, 230, 0) 100%
+  );
+}
+
+/*
+ * Tor ekranda matn fotoning USTIDA yotadi — u yerda gorizontal gradient
+ * ish bermaydi, chunki matn butun kenglikni egallaydi.
+ *
+ * Parda kontent tugagunicha DEYARLI QATTIQ turadi va faqat pastki
+ * chekkada so'nadi. Ilgari u 45% dan boshlab shaffoflashardi va
+ * formadan keyingi rozilik yozuvi fotoga tushib qolardi — o'lchov
+ * 1.68:1 ko'rsatdi (kerak 4.5). Foto baribir ko'rinadi, lekin fon
+ * to'qimasi sifatida, matn ostida emas.
+ */
+@utility lead-veil-narrow {
+  background-image: linear-gradient(
+    to bottom,
+    rgba(241, 236, 230, 0.985) 0%,
+    rgba(241, 236, 230, 0.98) 62%,
+    rgba(241, 236, 230, 0.965) 78%,
+    rgba(241, 236, 230, 0.88) 87%,
+    rgba(241, 236, 230, 0.6) 94%,
+    rgba(241, 236, 230, 0.25) 100%
+  );
+}
+
+@utility hero-pad {
+  padding-inline: clamp(1.5rem, 8vw, 7.5rem);
+}
+
+/* Matn qatori 70 belgidan oshmasin — tipografik o'qish qulayligi. */
+/*
+ * `ScrollText variant="sweep"` uchun: matnning o'zi gradient bilan
+ * bo'yaladi (`background-clip: text`), gradient esa scroll bilan siljiydi —
+ * natijada harflar bo'ylab oltin yorug'lik yugurib o'tadi.
+ *
+ * Asosiy rang `--sweep-base` orqali beriladi, `currentColor` orqali EMAS:
+ * `background-clip: text` uchun `color: transparent` qo'yiladi, va o'sha
+ * lahzada `currentColor` ham shaffofga aylanib, matn butunlay ko'rinmay
+ * qoladi. Chaqiruvchi komponent fonga qarab qiymat beradi.
+ *
+ * `background-size` 300% — yorug'lik dog'i matndan uzunroq bo'lsin.
+ */
+@utility scroll-sweep {
+  background-image: linear-gradient(
+    100deg,
+    var(--sweep-base, var(--color-espresso)) 0%,
+    var(--sweep-base, var(--color-espresso)) 38%,
+    var(--color-gold-light) 50%,
+    var(--sweep-base, var(--color-espresso)) 62%,
+    var(--sweep-base, var(--color-espresso)) 100%
+  );
+  background-size: 300% 100%;
+  background-position: 150% 0;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Harakat o'chirilgan bo'lsa matn oddiy rangda qolsin. */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-sweep {
+    background-image: none;
+    color: var(--sweep-base, var(--color-espresso));
+    -webkit-text-fill-color: var(--sweep-base, var(--color-espresso));
+  }
+}
+
+@utility measure {
+  max-width: 62ch;
+  /*
+   * Bo'sh joysiz uzun satr (masalan yopishtirilgan havola) `max-width`
+   * ni MENSIMAYDI: u bo'linmaydi va konteynerdan chiqib ketadi, butun
+   * sahifada esa gorizontal scroll paydo bo'ladi. Matn admin
+   * kiritadigan joylarda bu real holat.
+   *
+   * `anywhere` — `break-word` dan farqli o'laroq, satrni ixtiyoriy
+   * joyda uza oladi va shu bilan konteyner kengligini hisoblashga ham
+   * ta'sir qiladi, ya'ni oqim buzilmaydi.
+   */
+  overflow-wrap: anywhere;
+}
+
+/* -------------------------------------------------------------------------
+   Kirish animatsiyasi — CSS transition, ishga tushirish umumiy
+   IntersectionObserver'da (`useRevealObserver`).
+
+   `html[data-motion="on"]` sharti muhim: JS o'chgan yoki hali yuklanmagan
+   bo'lsa, kontent hech qachon yashirilmaydi.
+   ------------------------------------------------------------------------- */
+@layer utilities {
+  /*
+   * Yashirin holat kechikishsiz qaytadi: element ekrandan chiqqanda
+   * `--reveal-delay` qo'llanmaydi, aks holda u ko'rinmay bo'lgandan keyin
+   * ham "kutib" turgandek tuyulardi. Kechikish faqat ochilishda kerak.
+   */
+  /*
+   * Sukut bo'yicha kirish: pastdan ko'tarilish.
+   * Turlar `data-reveal` qiymati orqali beriladi va hammasi BIR XIL
+   * kuzatuvchidan boshqariladi — ya'ni yangi tur qo'shish qo'shimcha
+   * JS ishiga olib kelmaydi.
+   */
+  html[data-motion="on"] [data-reveal],
+  html[data-motion="on"] [data-reveal-group] > * {
+    opacity: 0;
+    transform: translate3d(0, var(--reveal-y, 38px), 0);
+    transition:
+      opacity 1s var(--ease-lux),
+      transform 1s var(--ease-lux);
+  }
+
+  /*
+   * "Tutun" — matn xiralikdan tiniqlashib chiqadi: blur + yengil kattalik.
+   * Uzun paragraflar va yumshoq bo'limlar uchun; `blur` GPU'da
+   * kompozitsiya qilinadi, shuning uchun o'tish davomida arzon.
+   */
+  html[data-motion="on"] [data-reveal="smoke"] {
+    opacity: 0;
+    /* Blur ataylab sezilarli: 9px da effekt "bor-yo'qligi bilinmasdi". */
+    filter: blur(16px);
+    transform: translate3d(0, 20px, 0) scale(1.03);
+    transition:
+      opacity 1.15s var(--ease-lux),
+      filter 1.15s var(--ease-lux),
+      transform 1.15s var(--ease-lux);
+  }
+
+  html[data-motion="on"] [data-reveal="smoke"][data-revealed] {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+    transition-delay: var(--reveal-delay, 0s);
+  }
+
+  /*
+   * "Parda" — element pastdan ochiladi, siljimaydi. Rasm va yaxlit
+   * bloklar uchun mos: kompozitsiya joyida qoladi, faqat ochiladi.
+   */
+  html[data-motion="on"] [data-reveal="mask"] {
+    opacity: 1;
+    clip-path: inset(0 0 100% 0);
+    transform: none;
+    transition: clip-path 1.1s var(--ease-lux);
+  }
+
+  html[data-motion="on"] [data-reveal="mask"][data-revealed] {
+    clip-path: inset(0 0 0% 0);
+    transition-delay: var(--reveal-delay, 0s);
+  }
+
+  html[data-motion="on"] [data-reveal][data-revealed],
+  html[data-motion="on"] [data-reveal-group][data-revealed] > * {
+    opacity: 1;
+    transform: none;
+    transition-delay: var(--reveal-delay, 0s);
+  }
+}
+
+/* -------------------------------------------------------------------------
+   prefers-reduced-motion — bitta markaziy to'siq (§14).
+   JS tomonda ham o'chiriladi; bu CSS zaxira qatlami.
+   ------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Hech qanday kontent ko'rinmay qolmasin. */
+  html[data-motion="on"] [data-reveal],
+  html[data-motion="on"] [data-reveal-group] > *,
+  [data-reveal],
+  [data-reveal-group] > * {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    clip-path: none !important;
+    transition: none !important;
+  }
+}

@@ -39,3 +39,18 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+
+# Playwright
+test-results/
+playwright-report/
+
+# TS incremental
+*.tsbuildinfo
+
+# Admin orqali yuklangan rasmlar va tahrirlangan kontent — runtime
+# ma'lumoti, build artefakti emas. Saqlab qolmoqchi bo'lsangiz bu
+# qatorlarni o'chiring (masalan kontentni repoda versiyalash uchun).
+data/uploads/
+data/image-overrides.json
+data/content/

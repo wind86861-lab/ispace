@@ -1,0 +1,317 @@
+{
+  "meta": {
+    "title": "iSpace — O‘zbekistondagi premium massaj kreslolari",
+    "description": "iSpace massaj va ofis kreslolari, yugurish yo‘lakchalari va trenajyorlar. 6 shourum, 3 yil kafolat, bo‘lib to‘lash, O‘zbekiston bo‘ylab yetkazish va o‘rnatish.",
+    "siteName": "iSpace"
+  },
+  "common": {
+    "close": "Yopish",
+    "back": "Orqaga",
+    "next": "Keyingi",
+    "prev": "Oldingi",
+    "loading": "Yuklanmoqda",
+    "toHome": "Bosh sahifaga",
+    "skipToContent": "Asosiy qismga o‘tish"
+  },
+  "header": {
+    "logoAria": "iSpace — bosh sahifaga",
+    "menuAria": "Asosiy navigatsiya",
+    "openMenu": "Menyuni ochish",
+    "closeMenu": "Menyuni yopish",
+    "search": "Qidiruv",
+    "searchPlaceholder": "Katalog bo‘ylab qidirish",
+    "cart": "Savat",
+    "cartCount": "Savat, mahsulot: {count}",
+    "wishlist": "Saralanganlar",
+    "wishlistCount": "Saralanganlar, mahsulot: {count}",
+    "callUs": "Qo‘ng‘iroq qilish",
+    "language": "Til",
+    "languageAria": "Tilni tanlash",
+    "compare": "Solishtirish",
+    "compareCount": "Solishtirish, {count} ta tovar"
+  },
+  "preloader": {
+    "label": "iSpace yuklanmoqda"
+  },
+  "hero": {
+    "carouselAria": "Asosiy slayder",
+    "goToSlide": "{index}-slayd",
+    "prevSlide": "Oldingi slayd",
+    "nextSlide": "Keyingi slayd"
+  },
+  "categories": {
+    "title": "O‘z toifangizni tanlang",
+    "subtitle": "Qulaylik va faol turmush tarzi uchun premium yechimlar",
+    "viewAll": "Barcha toifalarni ko‘rish",
+    "goTo": "O‘tish"
+  },
+  "products": {
+    "eyebrow": "Eng ko‘p sotilgan",
+    "title": "Ommabop modellar",
+    "subtitle": "Mijozlarimiz eng ko‘p tanlaydigan saralangan modellar",
+    "new": "yangi",
+    "sortLabel": "Saralash",
+    "sort": {
+      "popular": "Ommaboplik bo‘yicha",
+      "priceAsc": "Avval arzoni",
+      "priceDesc": "Avval qimmati",
+      "newest": "Avval yangilari"
+    },
+    "addToCart": "Savatga",
+    "inCart": "Savatda",
+    "addToWishlist": "Saralanganlarga qo‘shish",
+    "removeFromWishlist": "Saralanganlardan olib tashlash",
+    "viewAll": "Barcha modellarni ko‘rish",
+    "oldPriceAria": "Eski narx"
+  },
+  "advantages": {
+    "eyebrow": "Afzalliklar",
+    "title": "Nega iSpace’ni tanlashadi?",
+    "subtitle": "Har bir tafsilotda qulaylik, texnologiya va g‘amxo‘rlik — kundalik qulayligingiz uchun"
+  },
+  "about": {
+    "playVideo": "Shourum haqidagi videoni ko‘rish",
+    "closeVideo": "Videoni yopish",
+    "galleryAria": "iSpace shourumlari suratlari"
+  },
+  "lead": {
+    "title": "Kerakli mahsulotni topmadingizmi?",
+    "text": "Biz bilan bog‘laning — mutaxassislarimiz aynan sizga keragini tanlashga yordam beradi yoki buyurtma asosida keltiradi.",
+    "query": "Nima qidiryapsiz?",
+    "queryPlaceholder": "Masalan: isitish funksiyali massaj kreslosi",
+    "phone": "Telefon raqami",
+    "phonePlaceholder": "+998 (__) ___-__-__",
+    "submit": "Biz bilan bog‘lanish",
+    "sending": "Yuborilmoqda",
+    "sent": "Yuborildi",
+    "successText": "Rahmat! Tez orada siz bilan bog‘lanamiz.",
+    "orCall": "Yoki to‘g‘ridan-to‘g‘ri bog‘laning",
+    "telegram": "Telegram’da yozish",
+    "consent": "Formani yuborish orqali shaxsiy ma’lumotlarni qayta ishlash siyosatiga rozilik bildirasiz.",
+    "errors": {
+      "queryMin": "Mahsulotni hech bo‘lmasa ikki so‘z bilan yozing",
+      "phoneInvalid": "Raqamni +998 XX XXX-XX-XX ko‘rinishida kiriting"
+    }
+  },
+  "partners": {
+    "title": "Hamkorlarimiz",
+    "subtitle": "Sizga faqat sinovdan o‘tgan va sifatli yechimlarni taklif qilish uchun yetakchi jahon ishlab chiqaruvchilari bilan hamkorlik qilamiz",
+    "marqueeAria": "Hamkorlar logotiplari"
+  },
+  "branches": {
+    "eyebrow": "Do‘konlarimiz",
+    "title": "O‘zbekistondagi iSpace filiallari",
+    "subtitle": "iSpace’da {count} ta faoliyat yuritayotgan filial bor",
+    "chooseCity": "Manzil va kontaktlarni bilish uchun shaharni tanlang",
+    "allCities": "Barcha shaharlar",
+    "route": "Yo‘nalish qurish",
+    "hours": "Ish vaqti",
+    "phone": "Telefon",
+    "mapAria": "iSpace filiallari bilan O‘zbekiston xaritasi",
+    "selectBranch": "Filialni xaritada ko‘rsatish: {name}"
+  },
+  "blog": {
+    "eyebrow": "Blog haqida",
+    "title": "iSpace blogi",
+    "subtitle": "Massaj, salomatlik va texnologiyalar haqida foydali maqolalar, sharhlar va maslahatlar",
+    "searchPlaceholder": "Blog bo‘ylab qidirish",
+    "searchAria": "Blog maqolalari bo‘ylab qidirish",
+    "readMore": "Batafsil o‘qish",
+    "viewAll": "Barcha maqolalarni ko‘rish",
+    "empty": "So‘rovingiz bo‘yicha hech narsa topilmadi",
+    "readingTime": "{minutes} daqiqa o‘qish",
+    "tabs": {
+      "all": "Barcha maqolalar",
+      "massage": "Massaj va salomatlik",
+      "reviews": "Sharhlar",
+      "health": "Vazn nazorati",
+      "tips": "Maslahatlar",
+      "news": "Yangiliklar"
+    }
+  },
+  "reviews": {
+    "title": "Mijozlarimiz sharhlari",
+    "subtitle": "Biz haqimizda nima deyishadi",
+    "ratingAria": "Baho: 5 dan {rating}",
+    "carouselAria": "Mijozlar sharhlari",
+    "cta": {
+      "title": "O‘zingiz ishonch hosil qiling!",
+      "text": "Shourumimizga keling, kreslolarni sinab ko‘ring va qulaylikni shaxsan his qiling",
+      "button": "Test-drayvga yozilish"
+    },
+    "verified": "Tasdiqlangan xarid",
+    "photosCount": "{count} ta foto",
+    "watchVideo": "Video sharh"
+  },
+  "faq": {
+    "title": "Ko‘p beriladigan savollar",
+    "subtitle": "Eng ko‘p so‘raladigan savollarga qisqacha javob beramiz"
+  },
+  "footer": {
+    "about": "iSpace — 2007-yildan beri qulaylik, salomatlik va faol hayot uchun zamonaviy yechimlar ekotizimi.",
+    "catalog": "Katalog",
+    "company": "Kompaniya",
+    "contacts": "Kontaktlar",
+    "social": "Ijtimoiy tarmoqlarda",
+    "rights": "© {year} iSpace. Barcha huquqlar himoyalangan.",
+    "toTop": "Yuqoriga"
+  },
+  "cart": {
+    "title": "Savatingiz",
+    "items": "{count, plural, other {# mahsulot}}",
+    "empty": "Savat hozircha bo‘sh",
+    "emptyHint": "Yoqqan modelni qo‘shing — u shu yerda paydo bo‘ladi",
+    "total": "Jami",
+    "checkout": "Buyurtma berish",
+    "remove": "Savatdan olib tashlash",
+    "increase": "Sonini oshirish",
+    "decrease": "Sonini kamaytirish",
+    "quantity": "Soni"
+  },
+  "wishlist": {
+    "title": "Saralanganlar",
+    "items": "{count, plural, other {# mahsulot}}",
+    "empty": "Saralanganlar hozircha bo‘sh",
+    "emptyHint": "Saqlash uchun model yonidagi yurakchani bosing",
+    "addToCart": "Savatga qo‘shish",
+    "remove": "Saralanganlardan olib tashlash"
+  },
+  "consult": {
+    "title": "Konsultatsiya olish",
+    "text": "Ariza qoldiring — ideal kresloni tanlab beramiz va barcha savollaringizga javob beramiz.",
+    "name": "Ismingiz",
+    "namePlaceholder": "Sizga qanday murojaat qilaylik",
+    "phone": "Telefon raqami",
+    "phonePlaceholder": "+998 (__) ___-__-__",
+    "submit": "Konsultatsiya olish",
+    "sending": "Yuborilmoqda",
+    "sent": "Ariza yuborildi",
+    "successText": "Rahmat! Konsultantimiz tez orada qo‘ng‘iroq qiladi.",
+    "errors": {
+      "nameMin": "Ismni kiriting, kamida 2 harf",
+      "phoneInvalid": "Raqamni +998 XX XXX-XX-XX ko‘rinishida kiriting"
+    },
+    "benefits": {
+      "free": "Konsultatsiya bepul",
+      "fast": "Tez orada javob beramiz",
+      "safe": "Ma’lumotlaringiz xavfsiz"
+    }
+  },
+  "error": {
+    "title": "Nimadir noto‘g‘ri ketdi",
+    "text": "Biz allaqachon ko‘rib chiqyapmiz. Sahifani yangilab ko‘ring yoki bosh sahifaga qayting.",
+    "retry": "Sahifani yangilash",
+    "notFoundTitle": "Sahifa topilmadi",
+    "notFoundText": "Havola eskirgan yoki manzilda xatolik bo‘lishi mumkin."
+  },
+  "catalog": {
+    "title": "Mahsulotlar katalogi",
+    "home": "Bosh sahifa",
+    "all": "Hammasi",
+    "found": "{count} ta mahsulot topildi",
+    "filters": "Filtrlar",
+    "price": "Narx",
+    "from": "dan",
+    "to": "gacha",
+    "brand": "Brend",
+    "colorLabel": "Rang",
+    "reset": "Tozalash",
+    "apply": "Ko‘rsatish",
+    "empty": "So‘rovingiz bo‘yicha hech narsa topilmadi",
+    "emptyHint": "Filtrlarni o‘zgartirib yoki tozalab ko‘ring.",
+    "details": "Batafsil",
+    "gridView": "To‘r ko‘rinishi",
+    "listView": "Ro‘yxat ko‘rinishi"
+  },
+  "compare": {
+    "title": "Tovarlarni solishtirish",
+    "subtitle": "Faqat bir xil kategoriyadagi tovarlar solishtiriladi — xarakteristikalar bir-biriga mos tushadi.",
+    "empty": "Hozircha solishtirish uchun tovar yo‘q",
+    "emptyText": "Katalogdan tovar qo‘shing: solishtirish tugmasi har kartada yurakcha yonida turadi.",
+    "toCatalog": "Katalogga o‘tish",
+    "add": "Solishtirishga qo‘shish",
+    "remove": "Solishtirishdan olib tashlash",
+    "inCompare": "Solishtirishda",
+    "open": "Solishtirish",
+    "count": "{count} ta solishtirishda",
+    "clear": "Hammasini tozalash",
+    "removeGroup": "Bu kategoriyani olib tashlash",
+    "onlyDiff": "Faqat farqlar",
+    "noDiff": "Ko‘rsatilgan xarakteristikalar bo‘yicha tovarlar bir xil.",
+    "limit": "Ko‘pi bilan {count} ta tovarni solishtirish mumkin — eng birinchisi olib tashlandi.",
+    "rows": {
+      "price": "Narxi",
+      "brand": "Brend",
+      "rating": "Reyting",
+      "stock": "Mavjudligi",
+      "colors": "Ranglar",
+      "inStock": "Mavjud",
+      "outOfStock": "Mavjud emas"
+    },
+    "dash": "—"
+  },
+  "product": {
+    "inStock": "Mavjud",
+    "outOfStock": "Buyurtma asosida",
+    "colorLabel": "Rang",
+    "bundle": "Komplektatsiya",
+    "quantity": "Miqdori",
+    "addToCart": "Savatga qo‘shish",
+    "inCart": "Savatda",
+    "buyNow": "Hoziroq sotib olish",
+    "testDrive": "Sinov uchun yozilish",
+    "tabs": {
+      "description": "Tavsif",
+      "specs": "Xarakteristikalar",
+      "reviews": "Sharhlar",
+      "delivery": "Yetkazish va to‘lov"
+    },
+    "reviewsCount": "{count} ta sharh",
+    "rating": "Reyting: 5 dan {value}",
+    "gallery": "Mahsulot fotolari",
+    "prevImage": "Oldingi foto",
+    "nextImage": "Keyingi foto",
+    "consultTitle": "Maslahat oling",
+    "consultText": "Ariza qoldiring — bepul maslahat uchun siz bilan bog‘lanamiz.",
+    "name": "Ism",
+    "related": "O‘xshash modellar",
+    "notFound": "Mahsulot topilmadi",
+    "notFoundText": "Ehtimol, model sotuvdan olingan. Katalogni ko‘ring — mos keladigani albatta bor.",
+    "buyOnMarketplaces": "Savdo maydonchalarida sotib olish"
+  },
+  "blogPage": {
+    "home": "Bosh sahifa",
+    "title": "iSpace blogi",
+    "subtitle": "Massaj, salomatlik va texnologiyalar haqida foydali maqolalar, sharhlar va maslahatlar",
+    "found": "{count} ta maqola topildi"
+  },
+  "post": {
+    "backToBlog": "Barcha maqolalar",
+    "published": "Chop etilgan",
+    "share": "Ulashish",
+    "linkCopied": "Havola nusxalandi",
+    "related": "Shuni ham o‘qing",
+    "author": "Muallif",
+    "notFound": "Maqola topilmadi",
+    "toc": "Maqola mundarijasi"
+  },
+  "aboutPage": {
+    "home": "Bosh sahifa",
+    "title": "iSpace kompaniyasi haqida",
+    "certificates": "Sertifikatlar va yutuqlar",
+    "gallery": "Bizning maydonlarimiz",
+    "videoTitle": "Shourum bo‘ylab sayr",
+    "videoText": "iSpace shourumi qanday tashkil etilganini ko‘ring: sinov zonalari, servis va mutaxassis bilan model tanlash."
+  },
+  "branchesPage": {
+    "home": "Bosh sahifa",
+    "title": "O‘zbekistondagi iSpace filiallari",
+    "subtitle": "Istalgan shourumga keling — kreslolarni sinab ko‘ring va mutaxassisdan maslahat oling.",
+    "chooseCity": "Manzil va kontaktlarni bilish uchun shaharni tanlang",
+    "info": "Kontaktlar",
+    "photo": "Shourum fotosi",
+    "onMap": "Xaritada",
+    "route": "Yo‘nalish qurish",
+    "openMap": "Google Maps’da ochish"
+  }
+}
