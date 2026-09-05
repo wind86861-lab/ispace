@@ -33,9 +33,20 @@ say "1/4 · Build (lokal)"
 npm run build
 
 say "2/4 · Yuborish"
-# MUHIM: `data/` HECH QACHON yuborilmaydi va o'chirilmaydi — saytning
-# butun kontenti va admin yuklagan fayllari o'sha yerda yashaydi.
-rsync -az --delete --exclude 'data/' -e "${SSH[*]}" .next/standalone/ "$HOST:$DIR/"
+# MUHIM: bu ikki narsa HECH QACHON yuborilmaydi va o'chirilmaydi —
+# ular serverda YASHAYDI, repoda esa yo'q:
+#
+#   data/  — saytning butun kontenti va admin yuklagan fayllari;
+#   .env   — admin paroli va sessiya kaliti.
+#
+# `--delete` manbada yo'q faylni nishonda o'chiradi, ya'ni bu ro'yxatga
+# qo'shilmagan har qanday server fayli deploy paytida yo'qoladi.
+# Aynan shu bir marta `.env` ni o'chirib yuborgan va admin paneli
+# "Admin sozlanmagan" deb ishlamay qolgan edi.
+rsync -az --delete \
+  --exclude 'data/' \
+  --exclude '.env' \
+  -e "${SSH[*]}" .next/standalone/ "$HOST:$DIR/"
 rsync -az --delete -e "${SSH[*]}" .next/static/ "$HOST:$DIR/.next/static/"
 rsync -az --delete -e "${SSH[*]}" public/ "$HOST:$DIR/public/"
 
