@@ -1,11 +1,9 @@
 import { hero } from "@/content/hero";
-import { products as seedProducts } from "@/content/products";
 import { about } from "@/content/about";
 import { partners } from "@/content/partners";
 import { lead } from "@/content/lead";
 import { blogSection } from "@/content/blog";
-import type { LocaleString, Product } from "@/content/types";
-import { readCollection } from "@/lib/store";
+import type { LocaleString } from "@/content/types";
 import type { ImageSlot } from "./image-slot-types";
 
 export type { ImageSlot };
@@ -29,7 +27,7 @@ const RU = (v: LocaleString) => v.ru;
  * Ilgari bu modul darajasidagi massiv edi — admin yangi mahsulot
  * qo'shganda uning rasm uyalari paydo bo'lmay qolardi.
  */
-function build(products: Product[]): ImageSlot[] {
+function build(): ImageSlot[] {
   return [
   ...hero.map((slide, i) => ({
     id: `hero-${slide._id}`,
@@ -47,34 +45,16 @@ function build(products: Product[]): ImageSlot[] {
 
 
   /*
-   * Mahsulot sahifasidagi hikoya bloklarining rasmlari.
+   * Mahsulot hikoyasi bloklarining rasmlari BU YERDA YO'Q.
    *
-   * Bu uyalar bo'sh turishi MUMKIN va bu normal holat: rasm yuklanmaguncha
-   * blok saytda umuman chizilmaydi (`Media.uploaded`). Ya'ni admin
-   * qaysi bloklarni yoqishini o'zi hal qiladi — kodga tegilmaydi.
+   * Ular «Mahsulotlar» muharririning ichida, har blokning o'z media
+   * maydonida yuklanadi — u yerda blok yaratiladi, matni yoziladi va
+   * rasmi/videosi qo'yiladi. Bu yerda ikkinchi nusxa qoldirilsa,
+   * bir narsa ikki joydan boshqarilardi va qaysi biri ustun ekani
+   * tushunarsiz bo'lardi. Ustiga-ustak ular kontentdagi DASTLABKI
+   * yo'llardan hosil bo'lardi, ya'ni admin qo'shgan yangi bloklarga
+   * umuman aloqasi yo'q edi.
    */
-  ...products.flatMap((p) =>
-    (p.story ?? []).flatMap((block) => [
-      ...block.media.map((m, i) => ({
-        id: `story-${p._id}-${block._id}-${i}`,
-        group: "Mahsulot sahifalari",
-        label: `${RU(p.title)} — ${block.title ? RU(block.title) : block._id}${block.media.length > 1 ? ` (${i + 1})` : ""}`,
-        path: m.src,
-        width: m.width ?? 1200,
-        height: m.height ?? 900,
-        hint: "Yuklanmasa bu blok sahifada ko'rsatilmaydi.",
-      })),
-      ...(block.thumbs ?? []).map((m, i) => ({
-        id: `story-${p._id}-${block._id}-t${i}`,
-        group: "Mahsulot sahifalari",
-        label: `${RU(p.title)} — ${block.title ? RU(block.title) : block._id}, kichik ${i + 1}`,
-        path: m.src,
-        width: m.width ?? 400,
-        height: m.height ?? 300,
-        hint: "Ixtiyoriy. Yuklanganlari qatorda ko'rinadi.",
-      })),
-    ]),
-  ),
 
   ...about.gallery.map((m, i) => ({
     id: `about-gallery-${i}`,
@@ -173,11 +153,17 @@ function build(products: Product[]): ImageSlot[] {
   ];
 }
 
-/** Joriy uyalar — har chaqiruvda ombordan o'qiladi. */
+/**
+ * Joriy uyalar.
+ *
+ * Ro'yxat endi FAQAT statik kontentdan hosil bo'ladi — ombordan
+ * o'qish kerak emas, chunki tahrirlanadigan kolleksiyalarning
+ * (mahsulot, kategoriya, maqola) rasmlari o'z muharrirlarida
+ * yuklanadi. Funksiya `async` bo'lib qoldi: uni chaqiruvchilar
+ * allaqachon `await` qiladi va kelajakda manba yana o'zgarishi mumkin.
+ */
 export async function getImageSlots(): Promise<ImageSlot[]> {
-  // Faqat mahsulotlar kerak: qolgan uyalar statik kontentdan.
-  const products = await readCollection("products", seedProducts);
-  return build(products);
+  return build();
 }
 
 /** Uya `id` bo'yicha — yozish yo'lini tekshirishda ishlatiladi. */

@@ -31,16 +31,21 @@ export type ImageSlot = {
 /**
  * Bo'limlar tartibi.
  *
- * Kategoriya, mahsulot va maqola rasmlari bu yerda YO'Q: ular endi
- * o'z muharrirlarida yuklanadi ("Rasm yuklash" tugmasi). Bu sahifada
- * faqat muharriri bo'lmagan, saytning qat'iy joylaridagi rasmlar
- * qoladi — shuning uchun ro'yxat qisqa va tushunarli.
+ * Bu sahifada FAQAT o'z muharriri bo'lmagan rasmlar qoladi: hero
+ * slaydlari, bo'lim fonlari, sertifikatlar, hamkor logotiplari va
+ * brend fayllari.
+ *
+ * Kategoriya, mahsulot, mahsulot hikoyasi va maqola rasmlari bu
+ * yerda YO'Q — ular o'z muharrirlarida yuklanadi. Bir narsa ikki
+ * joydan boshqarilmasligi kerak.
+ *
+ * Ro'yxat o'zi ham DINAMIK: bo'sh guruh (uyasi yo'q) admin sahifasida
+ * umuman chizilmaydi — `AdminImages` uni o'tkazib yuboradi.
  */
 export const slotGroups = [
   "Hero",
   "Bosh sahifa",
   "Blog",
-  "Mahsulot sahifalari",
   "Kompaniya",
   "Hamkorlar",
   "Brend",
