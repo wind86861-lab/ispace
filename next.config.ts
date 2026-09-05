@@ -5,6 +5,22 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
+  /*
+   * `standalone` — deploy uchun serverga faqat KERAKLI fayllar
+   * ko'chiriladi: `.next/standalone` ichida server bundle va
+   * `node_modules` ning tanlangan bo'lagi bo'ladi (~200 MB, to'liq
+   * `node_modules` esa 930 MB).
+   *
+   * Nega shu kerak: maqsad server — 1 GB RAM, 1 yadro. U yerda
+   * `next build` umuman ishlamaydi (build 1-2 GB talab qiladi) va
+   * disk ham yetmaydi. Shuning uchun build LOKALDA bajariladi,
+   * serverga esa tayyor natija tashlanadi.
+   *
+   * `public/` va `.next/static` `server.js` tomonidan avtomatik
+   * ko'chirilmaydi — ularni deploy skripti alohida yuboradi
+   * (`scripts/deploy.sh`).
+   */
+  output: "standalone",
   // Loyiha git ildizi tashqarisidagi lock-fayllarni Turbopack o'z ildizi
   // deb o'ylab qolmasligi uchun ildizni aniq ko'rsatamiz.
   turbopack: { root: path.resolve(process.cwd()) },
