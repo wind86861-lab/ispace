@@ -2,6 +2,7 @@ import type { SiteContent } from "@/content/types";
 import type { Locale } from "@/i18n/routing";
 import { htmlLang } from "@/i18n/routing";
 import { t as pick } from "@/lib/locale";
+import { firstImage } from "@/lib/media";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ispace.uz";
 
@@ -62,7 +63,7 @@ export function JsonLd({ locale, content }: { locale: Locale; content: SiteConte
       "@type": "Product",
       "@id": `${SITE}#product-${p.slug}`,
       name: pick(p.title, locale),
-      image: `${SITE}${p.images[0].src}`,
+      image: `${SITE}${firstImage(p.images)?.src ?? ""}`,
       brand: { "@type": "Brand", name: "iSpace" },
       offers: {
         "@type": "Offer",

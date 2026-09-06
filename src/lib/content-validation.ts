@@ -35,10 +35,19 @@ const fail = (msg: string): never => {
   throw new ValidationError(msg);
 };
 
-const str = (v: unknown, field: string, max = 400): string => {
-  if (typeof v !== "string") fail(`${field}: matn kutilgan`);
+const str = (
+  v: unknown,
+  field: string,
+  max = 400,
+  { allowEmpty = false }: { allowEmpty?: boolean } = {},
+): string => {
+  if (typeof v !== "string") {
+    // Bo'sh ruxsat etilgan joyda maydonning umuman bo'lmasligi ham normal.
+    if (allowEmpty && v == null) return "";
+    fail(`${field}: matn kutilgan`);
+  }
   const t = (v as string).trim();
-  if (t.length === 0) fail(`${field}: bo‘sh bo‘lmasin`);
+  if (t.length === 0 && !allowEmpty) fail(`${field}: bo‘sh bo‘lmasin`);
   if (t.length > max) fail(`${field}: ${max} belgidan uzun`);
   return t;
 };
@@ -82,10 +91,17 @@ export function localeString(v: unknown, field: string, max = 400): LocaleString
 function media(v: unknown, field: string, fallbackAlt?: LocaleString): Media {
   if (!v || typeof v !== "object") fail(`${field}: rasm obyekti kutilgan`);
   const m = v as Record<string, unknown>;
-  const src = str(m.src, `${field}.src`, 300);
-  // Yo'l faqat ichki bo'lsin: tashqi URL kiritish orqali sahifaga begona
-  // manba ulash imkoni bo'lmasin.
-  if (!src.startsWith("/")) fail(`${field}.src: "/" bilan boshlanishi kerak`);
+  const youtubeId = parseYouTubeId(typeof m.youtubeId === "string" ? m.youtubeId : "") ?? undefined;
+
+  const src = str(m.src, `${field}.src`, 300, { allowEmpty: Boolean(youtubeId) });
+  /*
+   * Yo'l faqat ichki bo'lsin: tashqi URL kiritish orqali sahifaga begona
+   * manba ulash imkoni bo'lmasin.
+   *
+   * YouTube berilgan bo'lsa yo'l BO'SH bo'lishi mumkin — u holda media
+   * fayl emas, video havolasi.
+   */
+  if (src && !src.startsWith("/")) fail(`${field}.src: "/" bilan boshlanishi kerak`);
   if (src.includes("..")) fail(`${field}.src: noto‘g‘ri yo‘l`);
 
   /*
@@ -100,6 +116,7 @@ function media(v: unknown, field: string, fallbackAlt?: LocaleString): Media {
 
   return {
     src,
+    youtubeId,
     alt,
     width: m.width == null ? undefined : num(m.width, `${field}.width`, 1, 10000),
     height: m.height == null ? undefined : num(m.height, `${field}.height`, 1, 10000),

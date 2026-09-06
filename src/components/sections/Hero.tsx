@@ -436,8 +436,38 @@ export function Hero({ slides, trust }: { slides: HeroSlide[]; trust: TrustItem[
             */
             <li
               key={item._id}
-              className="group bg-warm-white transition-colors duration-500 ease-[cubic-bezier(0.2,0.7,0.3,1)] hover:bg-alabaster"
+              className="group relative overflow-hidden bg-warm-white transition-colors duration-500 ease-[cubic-bezier(0.2,0.7,0.3,1)]"
             >
+              {/*
+                Hover pardasi — PASTDAN ko'tariladigan iliq yuza.
+
+                `background-color` bilan almashtirish keskin: rang bir
+                zumda o'zgaradi va bo'lak "yonib" ketadi. Bu yerda esa
+                qatlam `scaleY` bilan o'sadi, ya'ni harakat kompozitorda
+                bajariladi va bo'lak to'lganday tuyuladi.
+
+                `origin-bottom` — u pastdan, ya'ni sahifa oqimi
+                yo'nalishidan keladi.
+              */}
+              <span
+                aria-hidden="true"
+                className={[
+                  "pointer-events-none absolute inset-0 origin-bottom scale-y-0 bg-gradient-to-t",
+                  "from-gold/[0.14] via-gold/[0.06] to-transparent",
+                  "transition-transform duration-500 ease-[cubic-bezier(0.2,0.7,0.3,1)]",
+                  "group-hover:scale-y-100",
+                ].join(" ")}
+              />
+
+              {/* Pastdagi oltin chiziq — markazdan ikki tomonga o'sadi. */}
+              <span
+                aria-hidden="true"
+                className={[
+                  "pointer-events-none absolute inset-x-0 bottom-0 h-px origin-center scale-x-0 bg-gold/70",
+                  "transition-transform duration-500 ease-[cubic-bezier(0.2,0.7,0.3,1)]",
+                  "group-hover:scale-x-100",
+                ].join(" ")}
+              />
               {/*
                 Telefonda panjara ikki ustunli, ya'ni bo'lak ~170px:
                 ikon va yorliq yonma-yon turganda matnga 110px qoladi va
@@ -447,20 +477,44 @@ export function Hero({ slides, trust }: { slides: HeroSlide[]; trust: TrustItem[
               */}
               <span
                 data-trust-item
-                className="flex flex-col items-center gap-2.5 px-3 py-5 text-center sm:flex-row sm:justify-center sm:gap-3.5 sm:px-5 sm:py-6 sm:text-start"
+                className={[
+                  "relative flex flex-col items-center gap-2.5 px-3 py-5 text-center",
+                  "sm:flex-row sm:justify-center sm:gap-3.5 sm:px-5 sm:py-6 sm:text-start",
+                  // Mazmun bir tishlam ko'tariladi — bo'lak javob berayotgandek.
+                  "transition-transform duration-500 ease-[cubic-bezier(0.2,0.7,0.3,1)]",
+                  "group-hover:-translate-y-0.5",
+                ].join(" ")}
               >
                 {/* Ikon oltin halqa ichida — bo'limlar bo'ylab takrorlanadigan
                     "medalyon" shakli; oltin faqat shu yerda, ≤10% qoidasi. */}
                 <span
                   className={[
-                    "grid size-9 shrink-0 place-items-center rounded-full text-gold sm:size-10",
-                    "border border-gold/25 bg-gold/[0.06]",
-                    "transition-colors duration-500 group-hover:border-gold/55 group-hover:bg-gold/[0.1]",
+                    "relative grid size-9 shrink-0 place-items-center rounded-full sm:size-10",
+                    "border border-gold/25 bg-gold/[0.06] text-gold",
+                    // Medalyon to'ladi va ikon oq bo'ladi — eng aniq javob.
+                    "transition-[border-color,background-color,color,transform] duration-500",
+                    "ease-[cubic-bezier(0.2,0.7,0.3,1)]",
+                    "group-hover:scale-105 group-hover:border-gold-deep group-hover:bg-gold-deep",
+                    "group-hover:text-warm-white",
                   ].join(" ")}
                 >
+                  {/*
+                    Halqa medalyondan tarqaladigan to'lqin. `scale` va
+                    `opacity` — ikkalasi ham kompozitor xossalari, ya'ni
+                    hover paytida qayta joylashuv (layout) bo'lmaydi.
+                  */}
+                  <span
+                    aria-hidden="true"
+                    className={[
+                      "pointer-events-none absolute inset-0 scale-100 rounded-full opacity-0",
+                      "ring-1 ring-gold/50",
+                      "transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.2,0.7,0.3,1)]",
+                      "group-hover:scale-[1.45] group-hover:opacity-100",
+                    ].join(" ")}
+                  />
                   <DrawIcon immediate name={item.icon} size={18} delay={0.7 + i * 0.1} />
                 </span>
-                <span className="text-[14px] leading-snug font-medium text-espresso">
+                <span className="text-[14px] leading-snug font-medium text-espresso transition-colors duration-500 group-hover:text-gold-ink">
                   {pick(item.label, locale)}
                 </span>
               </span>

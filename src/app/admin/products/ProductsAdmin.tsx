@@ -373,6 +373,7 @@ function ProductEditor({
                     media={m}
                     prefix="product"
                     allowVideo
+                    youtube
                     onChange={(next) => setImage(i, next)}
                     recommend={{ width: 900, height: 900 }}
                     hint={

@@ -11,6 +11,7 @@ import { t as pick } from "@/lib/locale";
 import { mediaFit, IMAGE_QUALITY } from "@/lib/media";
 import { DUR, EASE_LUX } from "@/lib/motion";
 import { isVideoSrc } from "@/components/ui/SmartMedia";
+import { youTubeEmbed } from "@/lib/youtube";
 import { ProductBadges } from "@/components/catalog/ProductBadges";
 
 /**
@@ -95,7 +96,12 @@ export function ProductGallery({
                   i === index ? "border-gold/70" : "border-taupe/30 hover:border-gold/40",
                 ].join(" ")}
               >
-                {isVideoSrc(m.src) ? (
+                {m.youtubeId ? (
+                  /* Fayl yo'q — shuning uchun rasm o'rniga belgi. */
+                  <span className="grid size-full place-items-center bg-espresso text-cream">
+                    <Play size={16} strokeWidth={1.8} fill="currentColor" aria-hidden="true" />
+                  </span>
+                ) : isVideoSrc(m.src) ? (
                   <>
                     <video
                       src={m.src}
@@ -172,7 +178,21 @@ export function ProductGallery({
                 surishi kerak. Fon videolaridan farqi ham shu —
                 u yerda boshqaruv yo'q.
               */}
-              {isVideoSrc(current.src) ? (
+              {current.youtubeId ? (
+                /*
+                  YouTube — `loading="lazy"`: pleyer sahifa ochilishida
+                  emas, ko'rish maydoniga yaqinlashganda yuklanadi.
+                  `nocookie` domeni kuzatuv cookie'larini qo'ymaydi.
+                */
+                <iframe
+                  src={youTubeEmbed(current.youtubeId)}
+                  title={pick(current.alt, locale)}
+                  loading="lazy"
+                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="size-full border-0 bg-espresso"
+                />
+              ) : isVideoSrc(current.src) ? (
                 <video
                   src={current.src}
                   controls

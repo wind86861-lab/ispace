@@ -9,7 +9,7 @@ import type { Locale } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import { t as pick } from "@/lib/locale";
 import { formatPrice } from "@/lib/format";
-import { mediaFit, IMAGE_QUALITY } from "@/lib/media";
+import { IMAGE_QUALITY, firstImage, mediaFit } from "@/lib/media";
 import { useShop } from "@/store/useShop";
 
 /**
@@ -263,7 +263,7 @@ export function CompareBoard({
               </th>
 
               {active.items.map((product) => {
-                const image = product.images[0];
+                const image = firstImage(product.images) ?? product.images[0];
                 return (
                   <th
                     key={product._id}

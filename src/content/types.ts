@@ -41,6 +41,18 @@ export type Media = {
   alt: LocaleString;
   width?: number;
   height?: number;
+  /**
+   * YouTube video ID si — fayl o'rniga.
+   *
+   * Berilgan bo'lsa galereyada shu video ko'rsatiladi va `src` bo'sh
+   * bo'lishi mumkin. Og'ir rolikni serverda saqlash shart emas: 8.7 GB
+   * diskda bir nechta video butun joyni yeb qo'yadi, YouTube esa uni
+   * turli sifatlarda o'zi beradi.
+   *
+   * Kontentda HAVOLA emas, ajratib olingan ID saqlanadi — chizishda
+   * qayta tahlil qilinmaydi va noto'g'ri havola omborga tushmaydi.
+   */
+  youtubeId?: string;
 };
 
 export type Cta = {

@@ -9,7 +9,7 @@ import type { Badge, Product } from "@/content/types";
 import type { Locale } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import { t as pick } from "@/lib/locale";
-import { mediaFit, IMAGE_QUALITY } from "@/lib/media";
+import { IMAGE_QUALITY, firstImage, mediaFit } from "@/lib/media";
 import { formatPrice } from "@/lib/format";
 import { SPRING } from "@/lib/motion";
 import { useMediaTier } from "@/hooks/useMediaTier";
@@ -75,7 +75,7 @@ export function ProductCard({
   const inWishlist = useShop((s) => s.wishlist.includes(product._id));
   const inCompare = useShop((s) => s.compare.includes(product._id));
 
-  const image = product.images[0];
+  const image = firstImage(product.images) ?? product.images[0];
 
   return (
     <Reveal delay={(index % 3) * 0.07} y={24} className="h-full">

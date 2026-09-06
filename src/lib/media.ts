@@ -22,6 +22,18 @@ export const IMAGE_QUALITY = 90;
  * o'z fon rangi bilan to'ldiriladi — shuning uchun oq fonli mahsulot
  * fotosi maydonda yaxlit ko'rinadi, "letterbox" qora chiziq chiqmaydi.
  */
+/**
+ * Ro'yxatdagi birinchi HAQIQIY rasm.
+ *
+ * Mahsulot mediasi orasida YouTube yozuvi bo'lishi mumkin va uning
+ * `src` i bo'sh — kartada, savatda va JSON-LD da bunday yozuv
+ * `<Image src="">` ga aylanib xato berardi. Shuning uchun rasm
+ * kerak bo'lgan har joyda birinchi to'ldirilgan yozuv olinadi.
+ */
+export function firstImage<T extends { src: string }>(list: T[]): T | undefined {
+  return list.find((m) => m.src.trim() !== "");
+}
+
 export function mediaFit(media: Pick<Media, "fit" | "bg">): {
   className: string;
   style?: CSSProperties;

@@ -9,7 +9,7 @@ import { Check, ChevronDown, Heart, Scale, ShoppingBag } from "lucide-react";
 import type { Badge, Product } from "@/content/types";
 import type { Locale } from "@/i18n/routing";
 import { t as pick } from "@/lib/locale";
-import { mediaFit, IMAGE_QUALITY } from "@/lib/media";
+import { IMAGE_QUALITY, firstImage, mediaFit } from "@/lib/media";
 import { formatPrice } from "@/lib/format";
 import { DUR, EASE_LUX, SPRING } from "@/lib/motion";
 import { useMediaTier } from "@/hooks/useMediaTier";
@@ -222,7 +222,7 @@ function ProductCard({
       >
         <div className="relative aspect-square overflow-hidden bg-cream">
           <Image
-            src={product.images[0].src}
+            src={(firstImage(product.images)?.src ?? "")}
             alt={pick(product.images[0].alt, locale)}
             fill
             quality={IMAGE_QUALITY}

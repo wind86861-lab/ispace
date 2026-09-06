@@ -8,6 +8,7 @@ import { Search } from "lucide-react";
 import type { Product } from "@/content/types";
 import type { Locale } from "@/i18n/routing";
 import { t as pick } from "@/lib/locale";
+import { firstImage } from "@/lib/media";
 import { formatPrice } from "@/lib/format";
 import { DUR, EASE_LUX } from "@/lib/motion";
 import { useUi } from "@/store/useUi";
@@ -78,8 +79,8 @@ export function SearchDrawer({ products }: { products: Product[] }) {
             >
               <div className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-cream">
                 <Image
-                  src={product.images[0].src}
-                  alt={pick(product.images[0].alt, locale)}
+                  src={(firstImage(product.images)?.src ?? "")}
+                  alt={pick((firstImage(product.images)?.alt ?? { ru: "", uz: "" }), locale)}
                   fill
                   sizes="64px"
                   className="object-cover"

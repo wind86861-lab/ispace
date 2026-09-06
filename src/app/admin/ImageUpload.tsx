@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import Image from "next/image";
-import { ImagePlus, LoaderCircle, Trash2 } from "lucide-react";
+import { ImagePlus, LoaderCircle, MonitorPlay, Trash2 } from "lucide-react";
 import type { Media } from "@/content/types";
 
 /**
@@ -24,6 +24,7 @@ export function ImageUpload({
   hint,
   recommend,
   allowVideo = false,
+  youtube = false,
 }: {
   label: string;
   media: Media;
@@ -49,6 +50,14 @@ export function ImageUpload({
    * o'rnida u foydasiz og'irlik bo'lardi.
    */
   allowVideo?: boolean;
+  /**
+   * `true` — fayl yuklash yoniga YouTube havolasi maydoni qo'shiladi.
+   *
+   * Havola berilgan bo'lsa u FAYLDAN ustun turadi: og'ir rolikni
+   * serverda saqlash shart emas, YouTube uni turli sifatlarda o'zi
+   * beradi va disk band qilmaydi.
+   */
+  youtube?: boolean;
 }) {
   const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
@@ -127,7 +136,11 @@ export function ImageUpload({
 
       <div className="flex flex-wrap items-start gap-4">
         <span className="relative size-24 shrink-0 overflow-hidden rounded-xl border border-taupe/40 bg-cream">
-          {hasImage && /\.(mp4|webm)$/i.test(media.src) ? (
+          {media.youtubeId ? (
+            <span className="grid size-full place-items-center bg-espresso text-cream">
+              <MonitorPlay size={22} strokeWidth={1.5} aria-hidden="true" />
+            </span>
+          ) : hasImage && /\.(mp4|webm)$/i.test(media.src) ? (
             /* Ko'rish uchun — boshqaruvsiz, birinchi kadr yetarli. */
             <video src={media.src} muted playsInline preload="metadata" className="size-full object-cover" />
           ) : hasImage ? (
@@ -200,6 +213,25 @@ export function ImageUpload({
               {media.width && media.height ? ` · yuklangani ${media.width}×${media.height}` : ""}
             </p>
           )}
+          {youtube && (
+            <label className="block">
+              <span className="mb-1 block text-[12px] font-medium text-espresso">
+                YouTube havolasi (ixtiyoriy)
+              </span>
+              <input
+                type="url"
+                value={media.youtubeId ?? ""}
+                onChange={(e) => onChange({ ...media, youtubeId: e.target.value })}
+                placeholder="https://youtu.be/…"
+                className="w-full rounded-xl border border-taupe/45 bg-cream px-3.5 py-2 text-[13px] text-espresso outline-none focus:border-gold"
+              />
+              <span className="mt-1 block text-[11px] text-espresso-soft/85">
+                Berilsa galereyada shu video ko‘rsatiladi va fayl yuklash shart emas. Saqlashda
+                havoladan ID ajratib olinadi; noto‘g‘ri havola jimgina tashlanadi.
+              </span>
+            </label>
+          )}
+
           {hint && <p className="text-[11px] text-espresso-soft/85">{hint}</p>}
           {tooSmall && (
             <p className="text-[12px] text-rosewood">{tooSmall}</p>
