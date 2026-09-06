@@ -9,6 +9,7 @@ import { getContent } from "@/content";
 import { LenisProvider } from "@/components/providers/LenisProvider";
 import { StoreProvider } from "@/components/providers/StoreProvider";
 import { MotionBoot } from "@/components/layout/MotionBoot";
+import { ScrollReset } from "@/components/providers/ScrollReset";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Preloader } from "@/components/layout/Preloader";
@@ -112,6 +113,8 @@ export default async function LocaleLayout({
         <NextIntlClientProvider>
           <StoreProvider>
             <LenisProvider>
+              {/* Yangi sahifa doim tepadan ochiladi — izohi komponentda. */}
+              <ScrollReset />
               <a
                 href="#main"
                 className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-full focus:bg-espresso focus:px-5 focus:py-3 focus:text-cream"
