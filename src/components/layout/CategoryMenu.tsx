@@ -1,12 +1,11 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { LayoutGrid } from "lucide-react";
 import type { Category } from "@/content/types";
 import type { Locale } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import { t as pick } from "@/lib/locale";
-import { ICONS } from "@/components/ui/icons";
+import { categoryIcon } from "@/components/ui/icons";
 import { EASE_LUX } from "@/lib/motion";
 import { useMediaTier } from "@/hooks/useMediaTier";
 
@@ -50,7 +49,7 @@ export function CategoryMenu({
         >
           <div className="overflow-hidden rounded-2xl border border-taupe/30 bg-warm-white p-1.5 shadow-[0_24px_50px_-24px_rgba(41,34,30,0.45)]">
             {categories.map((c, i) => {
-              const Icon = c.icon ? ICONS[c.icon] : LayoutGrid;
+              const Icon = categoryIcon(c);
               return (
                 <motion.li
                   key={c._id}

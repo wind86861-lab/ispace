@@ -12,7 +12,7 @@ import { formatPrice } from "@/lib/format";
 import { DUR, EASE_LUX } from "@/lib/motion";
 import { Reveal } from "@/components/ui/Reveal";
 import { ProductCard } from "./ProductCard";
-import { ICONS } from "@/components/ui/icons";
+import { categoryIcon } from "@/components/ui/icons";
 import { useMediaTier } from "@/hooks/useMediaTier";
 
 type Sort = "popular" | "priceAsc" | "priceDesc" | "newest";
@@ -88,11 +88,11 @@ export function CatalogView({
    */
   const chips = useMemo(
     () => [
-      { id: "all", label: t("all"), icon: undefined, count: products.length },
+      { id: "all", label: t("all"), icon: LayoutGrid, count: products.length },
       ...categories.map((c) => ({
         id: c.slug,
         label: pick(c.title, locale),
-        icon: c.icon,
+        icon: categoryIcon(c),
         count: products.filter((p) => p.category === c.slug).length,
       })),
     ],
@@ -135,7 +135,7 @@ export function CatalogView({
         <ul className="flex flex-wrap gap-2">
           {chips.map((c, i) => {
             const active = category === c.id;
-            const Icon = c.icon ? ICONS[c.icon] : LayoutGrid;
+            const Icon = c.icon;
             return (
               <motion.li
                 key={c.id}

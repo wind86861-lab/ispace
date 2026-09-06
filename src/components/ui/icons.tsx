@@ -112,3 +112,26 @@ export function YoutubeIcon({ className }: BrandProps) {
     </svg>
   );
 }
+
+/**
+ * Kategoriya belgisi.
+ *
+ * Uch bosqich, shu tartibda:
+ *  1. admin tanlagan `icon` — u doim ustun;
+ *  2. SLUG bo'yicha moslik — omborda saqlangan eski yozuvlarda `icon`
+ *     maydoni umuman yo'q (u keyinroq qo'shilgan) va ularning hammasi
+ *     umumiy belgi bilan chiqib qolardi;
+ *  3. umumiy belgi — admin yaratgan yangi, notanish kategoriya uchun.
+ */
+const BY_SLUG: Record<string, IconName> = {
+  "massage-chairs": "armchair",
+  "office-chairs": "sofa",
+  treadmills: "treadmill",
+  "exercise-bikes": "bike",
+  ellipticals: "elliptical",
+  vending: "vending",
+};
+
+export function categoryIcon(category: { icon?: IconName; slug: string }): LucideIcon {
+  return ICONS[category.icon ?? BY_SLUG[category.slug] ?? "grid"];
+}
