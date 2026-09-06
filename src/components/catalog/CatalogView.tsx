@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { LayoutGrid, SlidersHorizontal, X } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import type { Badge, Category, Product } from "@/content/types";
 import type { Locale } from "@/i18n/routing";
 import { t as pick } from "@/lib/locale";
@@ -41,7 +42,17 @@ export function CatalogView({
   const locale = useLocale() as Locale;
   const { reduced } = useMediaTier();
 
-  const [category, setCategory] = useState<string>("all");
+  /*
+   * Boshlang'ich kategoriya manzildan olinadi (`?category=…`) —
+   * header menyusidagi havolalar shu parametr bilan keladi. Qiymat
+   * mavjud kategoriyalar bilan tekshiriladi: manzilga qo'lda yozilgan
+   * noma'lum slug filtrni bo'sh natijaga tiqib qo'ymasin.
+   */
+  const params = useSearchParams();
+  const initial = params.get("category");
+  const [category, setCategory] = useState<string>(
+    initial && categories.some((c) => c.slug === initial) ? initial : "all",
+  );
   const [sort, setSort] = useState<Sort>("popular");
   const [openFilters, setOpenFilters] = useState(false);
 

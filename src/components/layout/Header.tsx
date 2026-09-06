@@ -6,7 +6,7 @@ import { Heart, Menu, Phone, Scale, Search, ShoppingBag } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { NavLink } from "./NavLink";
 import type { Locale } from "@/i18n/routing";
-import type { NavItem, SiteContact } from "@/content/types";
+import type { Category, NavItem, SiteContact } from "@/content/types";
 import { t as pick } from "@/lib/locale";
 import {
   useShop,
@@ -18,15 +18,32 @@ import { useUi } from "@/store/useUi";
 import { useLenis } from "@/components/providers/LenisProvider";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { MobileNav } from "./MobileNav";
+import { CategoryMenu } from "./CategoryMenu";
 
 /** Shu masofadan keyin header "frosted" holatga o'tadi. */
 const FROSTED_AFTER = 24;
 
-export function Header({ nav, contact }: { nav: NavItem[]; contact: SiteContact }) {
+export function Header({
+  nav,
+  contact,
+  categories = [],
+}: {
+  nav: NavItem[];
+  contact: SiteContact;
+  /**
+   * «Katalog» ustidan sichqoncha o'tganda ochiladigan ro'yxat.
+   *
+   * Menyu HEADER'da, chunki katalogga o'tishning eng qisqa yo'li shu:
+   * foydalanuvchi avval katalogni ochib, keyin filtr izlashi shart
+   * emas — kerakli bo'limni to'g'ridan-to'g'ri tanlaydi.
+   */
+  categories?: Category[];
+}) {
   const t = useTranslations("header");
   const locale = useLocale() as Locale;
   const lenis = useLenis();
   const open = useUi((s) => s.open);
+  const [menu, setMenu] = useState(false);
 
   const hydrated = useShop((s) => s.hydrated);
   const cartCount = useShop(selectCartCount);
@@ -71,7 +88,12 @@ export function Header({ nav, contact }: { nav: NavItem[]; contact: SiteContact 
         <nav aria-label={t("menuAria")} className="ml-8 hidden lg:block">
           <ul className="flex items-center gap-6">
             {nav.map((item) => (
-              <li key={item._id}>
+              <li
+                key={item._id}
+                className={item._id === "catalog" ? "relative" : undefined}
+                onMouseEnter={item._id === "catalog" ? () => setMenu(true) : undefined}
+                onMouseLeave={item._id === "catalog" ? () => setMenu(false) : undefined}
+              >
                 <NavLink
                   href={item.href}
                   onAnchorClick={goTo(item.href)}
@@ -84,6 +106,16 @@ export function Header({ nav, contact }: { nav: NavItem[]; contact: SiteContact 
                     className="absolute inset-x-0 -bottom-0.5 h-px origin-left scale-x-0 bg-gold transition-transform duration-400 ease-[cubic-bezier(0.2,0.7,0.3,1)] group-hover:scale-x-100"
                   />
                 </NavLink>
+
+                {/* Kategoriyalar ro'yxati — faqat «Katalog» ostida. */}
+                {item._id === "catalog" && categories.length > 0 && (
+                  <CategoryMenu
+                    open={menu}
+                    categories={categories}
+                    locale={locale}
+                    onPick={() => setMenu(false)}
+                  />
+                )}
               </li>
             ))}
           </ul>

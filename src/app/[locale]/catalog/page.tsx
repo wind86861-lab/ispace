@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -32,7 +33,9 @@ export async function generateMetadata({
     alternates: {
       canonical: `/${locale}/catalog`,
       languages: {
-        ...Object.fromEntries(routing.locales.map((l) => [htmlLang[l], `/${l}/catalog`])),
+        ...Object.fromEntries(
+          routing.locales.map((l) => [htmlLang[l], `/${l}/catalog`]),
+        ),
         "x-default": `/${routing.defaultLocale}/catalog`,
       },
     },
@@ -74,13 +77,23 @@ export default async function CatalogPage({
           </SplitHeading>
 
           <div className="mt-8">
-            <CatalogView
-              products={content.products}
-              badges={content.badges}
-              categories={content.categories.filter((c) =>
-                content.products.some((p) => p.category === c.slug),
-              )}
-            />
+            {/*
+              `Suspense` MAJBURIY: `CatalogView` manzil parametrini
+              (`?category=`) o'qiydi va bu sahifa statik yig'iladi.
+              Chegarasiz production build "Missing Suspense boundary"
+              bilan yiqiladi — Next hujjatida shunday yozilgan.
+            */}
+            <Suspense
+              fallback={<div className="min-h-[60vh]" aria-hidden="true" />}
+            >
+              <CatalogView
+                products={content.products}
+                badges={content.badges}
+                categories={content.categories.filter((c) =>
+                  content.products.some((p) => p.category === c.slug),
+                )}
+              />
+            </Suspense>
           </div>
         </div>
       </section>

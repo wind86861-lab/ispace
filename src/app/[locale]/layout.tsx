@@ -123,7 +123,7 @@ export default async function LocaleLayout({
               </a>
 
               <Preloader />
-              <Header nav={content.nav} contact={content.contact} />
+              <Header nav={content.nav} contact={content.contact} categories={content.categories} />
               <main id="main">{children}</main>
               <Footer nav={content.nav} contact={content.contact} branches={content.branches} />
               <FloatingActions contact={content.contact} />
