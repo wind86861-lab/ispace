@@ -9,6 +9,7 @@ import { t as pick } from "@/lib/locale";
 import { mediaFit, IMAGE_QUALITY } from "@/lib/media";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { SmartMedia } from "@/components/ui/SmartMedia";
+import { NetworkBackground } from "@/components/about/NetworkBackground";
 import { Reveal } from "@/components/ui/Reveal";
 import { AboutIntro } from "@/components/about/AboutIntro";
 import { MediaRow } from "@/components/about/MediaRow";
@@ -87,6 +88,14 @@ export default async function AboutPage({
 
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
           <div className="about-aura absolute inset-[-10%]" />
+
+          {/*
+            Nuqtalar to'ri — admin fon YUKLAMAGAN bo'lsa chiziladi.
+            Ikkalasi birga bo'lsa fon shovqinga aylanardi: video ham,
+            animatsiya ham harakatlanadi va matn ikkalasining ustida
+            qolardi.
+          */}
+          {!about.background?.uploaded && <NetworkBackground />}
         </div>
 
         <div className="container-lux">
