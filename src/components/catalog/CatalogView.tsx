@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { SlidersHorizontal, X } from "lucide-react";
+import { LayoutGrid, SlidersHorizontal, X } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import type { Badge, Category, Product } from "@/content/types";
 import type { Locale } from "@/i18n/routing";
@@ -11,6 +11,8 @@ import { formatPrice } from "@/lib/format";
 import { DUR, EASE_LUX } from "@/lib/motion";
 import { Reveal } from "@/components/ui/Reveal";
 import { ProductCard } from "./ProductCard";
+import { ICONS } from "@/components/ui/icons";
+import { useMediaTier } from "@/hooks/useMediaTier";
 
 type Sort = "popular" | "priceAsc" | "priceDesc" | "newest";
 
@@ -37,6 +39,7 @@ export function CatalogView({
   const t = useTranslations("catalog");
   const tp = useTranslations("products");
   const locale = useLocale() as Locale;
+  const { reduced } = useMediaTier();
 
   const [category, setCategory] = useState<string>("all");
   const [sort, setSort] = useState<Sort>("popular");
@@ -66,6 +69,25 @@ export function CatalogView({
     return sorted;
   }, [products, category, range, sort]);
 
+  /*
+   * Chiplar ro'yxati: "Hammasi" + kategoriyalar, har birida mahsulot
+   * soni. Son BUTUN katalogdan hisoblanadi, narx filtridan emas —
+   * aks holda ползунок surilganda raqamlar sakrab, chiplar
+   * o'lchamini o'zgartirib yuborardi.
+   */
+  const chips = useMemo(
+    () => [
+      { id: "all", label: t("all"), icon: undefined, count: products.length },
+      ...categories.map((c) => ({
+        id: c.slug,
+        label: pick(c.title, locale),
+        icon: c.icon,
+        count: products.filter((p) => p.category === c.slug).length,
+      })),
+    ],
+    [categories, products, locale, t],
+  );
+
   const dirty = category !== "all" || range[0] !== bounds.min || range[1] !== bounds.max;
 
   const reset = () => {
@@ -75,31 +97,84 @@ export function CatalogView({
 
   return (
     <>
-      {/* --- kategoriya chiplari --- */}
+      {/*
+        --- kategoriya chiplari ---
+
+        Har chipda uchta narsa: belgi, nom va SHU kategoriyadagi
+        mahsulotlar soni. Son muhim — foydalanuvchi bosishdan oldin
+        u yerda nima borligini biladi va bo'sh bo'limga tushmaydi.
+
+        Faol fonni `layoutId` ko'chiradi: u bir chipdan ikkinchisiga
+        suzib o'tadi. Har chipga alohida `background` berilsa, u
+        birida so'nib, ikkinchisida paydo bo'lardi — ko'z bog'lanishni
+        yo'qotadi.
+      */}
       <Reveal>
         <ul className="flex flex-wrap gap-2">
-          {[{ _id: "all", label: t("all") }, ...categories.map((c) => ({ _id: c.slug, label: pick(c.title, locale) }))].map(
-            (c) => {
-              const active = category === c._id;
-              return (
-                <li key={c._id}>
-                  <button
-                    type="button"
-                    onClick={() => setCategory(c._id)}
-                    aria-pressed={active}
+          {chips.map((c, i) => {
+            const active = category === c.id;
+            const Icon = c.icon ? ICONS[c.icon] : LayoutGrid;
+            return (
+              <motion.li
+                key={c.id}
+                initial={reduced ? false : { opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: i * 0.04, ease: EASE_LUX }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setCategory(c.id)}
+                  aria-pressed={active}
+                  className={[
+                    "group relative flex items-center gap-2.5 rounded-full border px-4 py-2.5",
+                    "transition-[border-color,color,transform,box-shadow] duration-300",
+                    "ease-[cubic-bezier(0.2,0.7,0.3,1)] hover:-translate-y-0.5",
+                    active
+                      ? "border-gold/60 text-gold-ink shadow-[0_10px_24px_-16px_rgba(41,34,30,0.5)]"
+                      : "border-taupe/40 bg-warm-white text-espresso-soft hover:border-gold/50 hover:text-espresso",
+                  ].join(" ")}
+                >
+                  {active && !reduced && (
+                    <motion.span
+                      layoutId="catalog-chip"
+                      aria-hidden="true"
+                      transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                      className="absolute inset-0 -z-10 rounded-full bg-gold/12"
+                    />
+                  )}
+                  {active && reduced && (
+                    <span aria-hidden="true" className="absolute inset-0 -z-10 rounded-full bg-gold/12" />
+                  )}
+
+                  <Icon
+                    size={18}
+                    strokeWidth={1.5}
+                    aria-hidden="true"
                     className={[
-                      "rounded-full border px-4 py-2 text-[14px] transition-colors duration-300",
+                      "shrink-0 transition-[color,transform] duration-300",
+                      "group-hover:scale-110",
+                      active ? "text-gold" : "text-taupe-text group-hover:text-gold",
+                    ].join(" ")}
+                  />
+
+                  <span className="text-[14px] whitespace-nowrap">{c.label}</span>
+
+                  {/* Son — chipning o'ng chekkasida, doim bir xil joyda. */}
+                  <span
+                    className={[
+                      "grid min-w-6 place-items-center rounded-full px-1.5 py-0.5",
+                      "text-[11px] font-medium tabular-nums transition-colors duration-300",
                       active
-                        ? "border-gold/60 bg-gold/12 text-gold-ink"
-                        : "border-taupe/40 bg-warm-white text-espresso-soft hover:border-gold/50 hover:text-espresso",
+                        ? "bg-gold-deep text-warm-white"
+                        : "bg-cream text-espresso-soft/85 group-hover:bg-gold/15",
                     ].join(" ")}
                   >
-                    {c.label}
-                  </button>
-                </li>
-              );
-            },
-          )}
+                    {c.count}
+                  </span>
+                </button>
+              </motion.li>
+            );
+          })}
         </ul>
       </Reveal>
 

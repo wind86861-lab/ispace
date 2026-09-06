@@ -6,7 +6,16 @@
 import type { Locale } from "@/i18n/routing";
 
 /** Sanity'dagi `localeString` obyektining aynan ekvivalenti. */
-export type LocaleString = Record<Locale, string>;
+/**
+ * Ko'p tilli matn.
+ *
+ * `en` ATAYLAB ixtiyoriy qoldirildi: ingliz versiyasi olib tashlandi,
+ * lekin kontent fayllarida `en:` maydonlari hamon yuzlab joyda uchraydi.
+ * Ularni qirqib chiqish minglab qatorni o'zgartirardi va hech qanday
+ * foyda bermasdi — maydon shunchaki e'tiborga olinmaydi va admin
+ * saqlaganda o'zi yo'qoladi.
+ */
+export type LocaleString = Record<Locale, string> & { en?: string };
 
 export type Media = {
   src: string;
@@ -81,6 +90,15 @@ export type Category = {
   _id: string;
   slug: string;
   title: LocaleString;
+  /**
+   * Katalog filtridagi ikon.
+   *
+   * Kategoriya RASMI (`image`) bu yerda ishlamaydi: u fotosurat va
+   * 20px li chipda tanib bo'lmas dog'ga aylanadi. Shuning uchun
+   * alohida belgi — hammasi bir xil qalinlikda chiziladi va qator
+   * yaxlit ko'rinadi.
+   */
+  icon?: IconName;
   text?: LocaleString;
   image: Media;
   /** `true` — asimmetrik gridda katta kartani egallaydi. */
@@ -427,6 +445,13 @@ export type IconName =
   | "headset"
   | "map-pin"
   | "award"
+  | "armchair"
+  | "sofa"
+  | "treadmill"
+  | "bike"
+  | "elliptical"
+  | "vending"
+  | "grid"
   | "sparkles";
 
 export type SiteContent = {

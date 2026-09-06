@@ -30,7 +30,7 @@ export function JsonLd({ locale, content }: { locale: Locale; content: SiteConte
           contactType: "sales",
           email: contact.email,
           areaServed: "UZ",
-          availableLanguage: ["ru", "uz", "en"],
+          availableLanguage: ["ru", "uz"],
         },
       ],
     },

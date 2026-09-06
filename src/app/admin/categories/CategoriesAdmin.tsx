@@ -19,6 +19,11 @@ const HEADERS = { "x-requested-with": "ispace-admin", "content-type": "applicati
  * kesilib, buyum yarim ko'rinib qoladi — shu sabab o'lcham muharrirda
  * oldindan aytiladi va yuklangandan keyin solishtiriladi.
  */
+/** Katalog filtriga mos belgilar — qolgan ikonlar bu yerda ma'nosiz. */
+const CATEGORY_ICONS = [
+  "armchair", "sofa", "treadmill", "bike", "elliptical", "vending", "grid",
+] as const;
+
 function recommendedSize(featured?: boolean, wide?: boolean) {
   if (wide) return { width: 1600, height: 600 };
   if (featured) return { width: 1200, height: 1400 };
@@ -185,6 +190,28 @@ function Editor({
 
         <div className="grid gap-5">
           <LocaleField label="Nomi" value={c.title} onChange={(v) => set("title", v)} />
+
+          <div>
+            <label className="mb-1.5 block text-[13px] font-medium text-espresso">
+              Katalog filtridagi ikon
+            </label>
+            <select
+              value={c.icon ?? ""}
+              onChange={(e) => set("icon", (e.target.value || undefined) as Category["icon"])}
+              className="w-full rounded-xl border border-taupe/45 bg-cream px-3.5 py-2.5 text-sm text-espresso outline-none focus:border-gold"
+            >
+              <option value="">— tanlanmagan —</option>
+              {CATEGORY_ICONS.map((ic) => (
+                <option key={ic} value={ic}>
+                  {ic}
+                </option>
+              ))}
+            </select>
+            <p className="mt-1.5 text-[11px] text-espresso-soft/85">
+              Kategoriya RASMI emas, alohida belgi: u 18px da chiziladi va foto u yerda tanib
+              bo‘lmas dog‘ga aylanardi. Tanlanmasa umumiy belgi ishlatiladi.
+            </p>
+          </div>
           <Field
             label="Slug (manzil)"
             value={c.slug}

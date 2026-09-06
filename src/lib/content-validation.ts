@@ -180,7 +180,7 @@ export function validateProduct(input: unknown, existing?: Product): Product {
           const name = str(m.name, `marketplaces[${i}].name`, 60);
           const url = str(m.url, `marketplaces[${i}].url`, 500);
           if (!/^https:\/\//.test(url)) fail(`marketplaces[${i}].url: https:// bilan boshlansin`);
-          const alt: LocaleString = { ru: name, uz: name, en: name };
+          const alt: LocaleString = { ru: name, uz: name };
           return {
             _id: typeof m._id === "string" && m._id ? m._id : `mp-${Date.now().toString(36)}-${i}`,
             name,
@@ -278,6 +278,13 @@ export function validateCategory(input: unknown, existing?: Category): Category 
   const title = localeString(c.title, "title", 120);
 
   return {
+    /*
+     * Ikon IXTIYORIY: noma'lum qiymat jimgina tashlanadi va katalog
+     * filtri zaxira belgini chizadi — saqlash rad etilmaydi.
+     */
+    icon: ICON_NAMES.includes(String(c.icon) as (typeof ICON_NAMES)[number])
+      ? (String(c.icon) as Category["icon"])
+      : undefined,
     _id: existing?._id ?? `cat-${slug(c.slug, "slug")}`,
     slug: slug(c.slug, "slug"),
     title,
@@ -392,6 +399,7 @@ export function validateReview(input: unknown, existing?: Review): Review {
 const ICON_NAMES = [
   "shield", "wrench", "credit-card", "truck",
   "layers", "hand", "headset", "map-pin", "award", "sparkles",
+  "armchair", "sofa", "treadmill", "bike", "elliptical", "vending", "grid",
 ] as const;
 
 export function validateBranch(input: unknown, existing?: Branch): Branch {
@@ -489,7 +497,7 @@ export function validateBadge(input: unknown, existing?: Badge): Badge {
 
   return {
     _id: existing?._id ?? `bg-${Date.now().toString(36)}`,
-    label: label ?? { ru: "", uz: "", en: "" },
+    label: label ?? { ru: "", uz: "" },
     sublabel,
     rank: num(b.rank ?? existing?.rank ?? 100, "rank", 0, 10000),
     image: media(b.image, "image", anyLabel),

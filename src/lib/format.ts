@@ -23,9 +23,9 @@ import type { Locale } from "@/i18n/routing";
  */
 
 /** Ming ajratgichi. Rus va o'zbek tilida — uzilmas bo'shliq. */
-const GROUP: Record<Locale, string> = { ru: " ", uz: " ", en: "," };
+const GROUP: Record<Locale, string> = { ru: " ", uz: " " };
 
-/** `1690000` → `1 690 000` (yoki `1,690,000`). */
+/** `1690000` → `1 690 000`. */
 function group(value: number, locale: Locale): string {
   const digits = Math.round(Math.abs(value)).toString();
   const sign = value < 0 ? "-" : "";
@@ -36,12 +36,9 @@ function group(value: number, locale: Locale): string {
  * Valyuta yorlig'i tilga bog'liq (§8):
  *   uz → "1 690 000 soʻm"
  *   ru → "1 690 000 сум"
- *   en → "UZS 1,690,000"
  */
 export function formatPrice(value: number, locale: Locale): string {
-  const number = group(value, locale);
-  if (locale === "en") return `UZS ${number}`;
-  return `${number} ${locale === "ru" ? "сум" : "soʻm"}`;
+  return `${group(value, locale)} ${locale === "ru" ? "сум" : "soʻm"}`;
 }
 
 /** Counter uchun: `50000` → `50 000`. */
@@ -64,10 +61,6 @@ const MONTHS: Record<Locale, readonly string[]> = {
     "yanvar", "fevral", "mart", "aprel", "may", "iyun",
     "iyul", "avgust", "sentabr", "oktabr", "noyabr", "dekabr",
   ],
-  en: [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December",
-  ],
 };
 
 /**
@@ -86,7 +79,6 @@ export function formatDate(iso: string, locale: Locale): string {
   const month = MONTHS[locale][d.getUTCMonth()];
   const year = d.getUTCFullYear();
 
-  if (locale === "en") return `${month} ${day}, ${year}`;
   if (locale === "uz") return `${day}-${month} ${year}`;
   return `${day} ${month} ${year}`;
 }

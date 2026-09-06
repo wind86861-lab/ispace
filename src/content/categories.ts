@@ -3,6 +3,7 @@ import type { Category } from "./types";
 export const categories: Category[] = [
   {
     _id: "cat-massage-chairs",
+    icon: "armchair",
     slug: "massage-chairs",
     featured: true,
     title: { ru: "Массажные кресла", uz: "Massaj kreslolari", en: "Massage chairs" },
@@ -19,6 +20,7 @@ export const categories: Category[] = [
   },
   {
     _id: "cat-office-chairs",
+    icon: "sofa",
     slug: "office-chairs",
     title: { ru: "Офисные кресла", uz: "Ofis kreslolari", en: "Office chairs" },
     image: {
@@ -29,6 +31,7 @@ export const categories: Category[] = [
   },
   {
     _id: "cat-treadmills",
+    icon: "treadmill",
     slug: "treadmills",
     title: { ru: "Беговые дорожки", uz: "Yugurish yo‘lakchalari", en: "Treadmills" },
     image: {
@@ -39,6 +42,7 @@ export const categories: Category[] = [
   },
   {
     _id: "cat-exercise-bikes",
+    icon: "bike",
     slug: "exercise-bikes",
     title: { ru: "Велотренажёры", uz: "Velotrenajyorlar", en: "Exercise bikes" },
     image: {
@@ -49,6 +53,7 @@ export const categories: Category[] = [
   },
   {
     _id: "cat-ellipticals",
+    icon: "elliptical",
     slug: "ellipticals",
     title: { ru: "Эллиптические тренажёры", uz: "Elliptik trenajyorlar", en: "Elliptical trainers" },
     image: {
@@ -59,6 +64,7 @@ export const categories: Category[] = [
   },
   {
     _id: "cat-vending",
+    icon: "vending",
     slug: "vending",
     // Pastda butun qatorni egallaydigan uzun karta.
     wide: true,

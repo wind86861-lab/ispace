@@ -7,7 +7,7 @@ import { Globe } from "lucide-react";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { routing, type Locale } from "@/i18n/routing";
 
-const LABELS: Record<Locale, string> = { ru: "RU", uz: "UZ", en: "EN" };
+const LABELS: Record<Locale, string> = { ru: "RU", uz: "UZ" };
 
 /**
  * Til almashtirgich. Marshrutni next-intl navigatsiyasi orqali almashtiradi,

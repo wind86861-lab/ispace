@@ -4,9 +4,9 @@ import { useId, useState } from "react";
 import type { LocaleString } from "@/content/types";
 import { locales, type Locale } from "@/i18n/routing";
 
-const LABELS: Record<Locale, string> = { ru: "Русский", uz: "O‘zbekcha", en: "English" };
+const LABELS: Record<Locale, string> = { ru: "Русский", uz: "O‘zbekcha" };
 
-export const emptyLocaleString = (): LocaleString => ({ ru: "", uz: "", en: "" });
+export const emptyLocaleString = (): LocaleString => ({ ru: "", uz: "" });
 
 /**
  * Uch tilli matn maydoni.
