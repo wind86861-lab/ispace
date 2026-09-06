@@ -78,40 +78,50 @@ export function AboutSlideshow({ slides, locale }: { slides: Media[]; locale: Lo
           </motion.div>
         </AnimatePresence>
 
-        {/* Pastki chekkadagi yengil parda — chiziqchalar o'qilishi uchun. */}
+        {/*
+          Pastki boshqaruv.
+
+          Chiziqchalar ilgari `h-0.5` edi va rasmning eng chekkasida
+          turardi: och fon ustida ular deyarli ko'rinmasdi va bosish
+          uchun ham juda ingichka edi. Endi parda balandroq, chiziqcha
+          qalinroq, bosish maydoni esa `py-3` bilan kengaytirilgan —
+          ko'rinishi o'zgarmaydi, lekin barmoq bilan ham tegiladi.
+        */}
         {slides.length > 1 && (
           <>
             <span
               aria-hidden="true"
-              className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-espresso/45 to-transparent"
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-espresso/65 via-espresso/25 to-transparent"
             />
 
-            <ul className="absolute inset-x-5 bottom-5 flex gap-2">
+            <ul className="absolute inset-x-6 bottom-4 flex items-center gap-2.5">
               {slides.map((s, i) => (
-                <li key={s.src} className="h-0.5 flex-1 overflow-hidden rounded-full bg-cream/35">
+                <li key={s.src} className="flex-1">
                   <button
                     type="button"
                     onClick={() => setIndex(i)}
                     aria-label={pick(s.alt, locale)}
                     aria-current={i === index ? "true" : undefined}
-                    className="block size-full"
+                    className="group block w-full py-3"
                   >
-                    {/*
-                      Faol chiziqcha TO'LIB boradi — qolgan vaqtni
-                      ko'rsatadi. `key` da `index` bor: har almashinuvda
-                      animatsiya boshidan qayta o'ynaydi.
-                    */}
-                    <motion.span
-                      key={`${i}-${index}`}
-                      initial={{ scaleX: i === index && !reduced ? 0 : i < index ? 1 : 0 }}
-                      animate={{ scaleX: i === index ? 1 : i < index ? 1 : 0 }}
-                      transition={
-                        i === index && !reduced
-                          ? { duration: INTERVAL / 1000, ease: "linear" }
-                          : { duration: 0.3 }
-                      }
-                      className="block h-full origin-left bg-gold"
-                    />
+                    <span className="block h-1 overflow-hidden rounded-full bg-cream/35 transition-colors duration-300 group-hover:bg-cream/55">
+                      {/*
+                        Faol chiziqcha TO'LIB boradi — qolgan vaqtni
+                        ko'rsatadi. `key` da `index` bor: har almashinuvda
+                        animatsiya boshidan qayta o'ynaydi.
+                      */}
+                      <motion.span
+                        key={`${i}-${index}`}
+                        initial={{ scaleX: i === index && !reduced ? 0 : i < index ? 1 : 0 }}
+                        animate={{ scaleX: i === index ? 1 : i < index ? 1 : 0 }}
+                        transition={
+                          i === index && !reduced
+                            ? { duration: INTERVAL / 1000, ease: "linear" }
+                            : { duration: 0.3 }
+                        }
+                        className="block h-full origin-left rounded-full bg-gold"
+                      />
+                    </span>
                   </button>
                 </li>
               ))}
