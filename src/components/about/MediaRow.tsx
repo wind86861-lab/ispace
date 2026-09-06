@@ -45,7 +45,12 @@ export function MediaRow({
           <li key={m.src}>
             <Reveal variant="mask" delay={(i % 4) * 0.06}>
               <span
-                className={`relative block ${ratio} overflow-hidden rounded-2xl border border-taupe/30 bg-cream`}
+                /*
+                  Hover — kartaning o'zi ko'tariladi, foto esa ichida
+                  yaqinlashadi. Ikkalasi `transform` da: qayta joylashuv
+                  bo'lmaydi va harakat kompozitorda bajariladi.
+                */
+                className={`group relative block ${ratio} overflow-hidden rounded-2xl border border-taupe/30 bg-cream transition-[transform,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.2,0.7,0.3,1)] hover:-translate-y-1 hover:border-gold/40 hover:shadow-[0_24px_44px_-24px_rgba(41,34,30,0.4)]`}
               >
                 <Image
                   src={m.src}
@@ -54,7 +59,7 @@ export function MediaRow({
                   quality={IMAGE_QUALITY}
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   style={mediaFit(m).style}
-                  className={mediaFit(m).className}
+                  className={`${mediaFit(m).className} transition-transform duration-[900ms] ease-[cubic-bezier(0.2,0.7,0.3,1)] group-hover:scale-[1.06]`}
                 />
               </span>
             </Reveal>

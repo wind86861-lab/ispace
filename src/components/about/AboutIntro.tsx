@@ -1,11 +1,10 @@
-import Image from "next/image";
 import type { About } from "@/content/types";
 import type { Locale } from "@/i18n/routing";
 import { t as pick } from "@/lib/locale";
-import { mediaFit, IMAGE_QUALITY } from "@/lib/media";
 import { SplitHeading } from "@/components/ui/SplitHeading";
 import { Reveal } from "@/components/ui/Reveal";
 import { Counter } from "@/components/ui/Counter";
+import { AboutSlideshow } from "./AboutSlideshow";
 
 /**
  * Sahifa boshi: chapda matn va raqamlar, o'ngda katta media.
@@ -77,20 +76,24 @@ export function AboutIntro({
         </Reveal>
       </div>
 
-      {/* O'ngdagi katta media — video muqovasi. */}
+      {/*
+        O'ngdagi katta media — AYLANIB turadigan.
+
+        Ilgari bu yerda faqat video muqovasi turardi va u yuklanmagan
+        bo'lsa sahifaning yarmi bo'sh krem to'rtburchak bo'lib qolardi
+        (aynan shunday bo'ldi). Endi mavjud fotolarning hammasi
+        navbatlashadi — muqova, galereya va sertifikatlar.
+
+        `uploaded` filtri: yuklanmagan o'rindosh (och gradient) slaydga
+        tushmaydi, ya'ni "bo'sh kadr" aylanmada paydo bo'lmaydi.
+      */}
       <Reveal variant="mask" className="lg:sticky lg:top-28 lg:self-start">
-        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-cream">
-          <Image
-            src={about.video.poster.src}
-            alt={pick(about.video.poster.alt, locale)}
-            fill
-            quality={IMAGE_QUALITY}
-            priority
-            sizes="(max-width: 1024px) 100vw, 46vw"
-            style={mediaFit(about.video.poster).style}
-            className={mediaFit(about.video.poster).className}
-          />
-        </div>
+        <AboutSlideshow
+          slides={[about.video.poster, ...about.gallery, ...(about.certificates ?? [])].filter(
+            (m) => m.uploaded === true,
+          )}
+          locale={locale}
+        />
       </Reveal>
     </div>
   );

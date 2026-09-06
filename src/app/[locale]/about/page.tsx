@@ -61,7 +61,16 @@ export default async function AboutPage({
 
   return (
     <>
-      <section className="pt-[calc(var(--header-h)+2rem)] pb-16">
+      {/*
+        Bo'lim ostidagi yumshoq yorug'lik — bosh sahifadagi «Kompaniya
+        haqida» bilan bir xil sirt. Usiz sahifa tekis krem varaq bo'lib
+        qolardi.
+      */}
+      <section className="relative isolate pt-[calc(var(--header-h)+2rem)] pb-16">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+          <div className="about-aura absolute inset-[-10%]" />
+        </div>
+
         <div className="container-lux">
           <Breadcrumbs items={[{ label: t("home"), href: "/" }, { label: t("title") }]} />
 
