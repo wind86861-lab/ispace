@@ -289,6 +289,14 @@ export type Stat = {
 };
 
 export type About = {
+  /**
+   * Sahifa foni — ixtiyoriy.
+   *
+   * RASM ham, VIDEO ham bo'lishi mumkin (`SmartMedia` kengaytmaga
+   * qarab hal qiladi). Yuklanmagan bo'lsa sahifa hozirgidek tekis
+   * krem sirtda qoladi — o'rindosh yaratilmagan.
+   */
+  background?: Media;
   eyebrow: LocaleString;
   title: LocaleString;
   paragraphs: LocaleString[];

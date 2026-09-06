@@ -74,6 +74,16 @@ function build(): ImageSlot[] {
     hint: "Yuklanmasa «О компании» sahifasida ko'rsatilmaydi.",
   })),
   {
+    id: "about-background",
+    group: "Kompaniya",
+    kind: "media" as const,
+    label: "«Kompaniya haqida» sahifasining foni",
+    path: about.background?.src ?? "/images/about/about-bg.webp",
+    width: about.background?.width ?? 2400,
+    height: about.background?.height ?? 1350,
+    hint: "RASM yoki VIDEO (masalan aylanma texnologik animatsiya). Butun ekranni egallaydi va scroll'da mixlanib turadi. Ustiga och parda tushadi — matn o'qilarli qoladi. Ixtiyoriy: yuklanmasa sahifa tekis krem fonda qoladi.",
+  },
+  {
     id: "about-video-file",
     group: "Kompaniya",
     kind: "video" as const,

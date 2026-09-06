@@ -1,6 +1,20 @@
 import type { About } from "./types";
 
 export const about: About = {
+  /*
+   * Fon — ixtiyoriy va o'rindoshsiz. Admin «Rasmlar» bo'limida
+   * yuklaganidan keyin paydo bo'ladi; unga video ham yaraydi
+   * (masalan aylanma texnologik animatsiya).
+   */
+  background: {
+    src: "/images/about/about-bg.webp",
+    width: 2400,
+    height: 1350,
+    alt: {
+      ru: "Фон страницы «О компании»",
+      uz: "«Kompaniya haqida» sahifasining foni",
+    },
+  },
   eyebrow: { ru: "О компании", uz: "Kompaniya haqida", en: "About us" },
   title: { ru: "О компании iSpace", uz: "iSpace kompaniyasi haqida", en: "About iSpace" },
   paragraphs: [

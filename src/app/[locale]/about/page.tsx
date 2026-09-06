@@ -3,11 +3,12 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { routing, htmlLang } from "@/i18n/routing";
+import { routing, htmlLang, type Locale } from "@/i18n/routing";
 import { getContent } from "@/content";
 import { t as pick } from "@/lib/locale";
 import { mediaFit, IMAGE_QUALITY } from "@/lib/media";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { SmartMedia } from "@/components/ui/SmartMedia";
 import { Reveal } from "@/components/ui/Reveal";
 import { AboutIntro } from "@/components/about/AboutIntro";
 import { MediaRow } from "@/components/about/MediaRow";
@@ -67,6 +68,23 @@ export default async function AboutPage({
         qolardi.
       */}
       <section className="relative isolate pt-[calc(var(--header-h)+2rem)] pb-16">
+        {/*
+          Fon: admin yuklagan rasm yoki video. Lead bandidagi bilan bir
+          xil mexanizm — ekran o'lchamidagi `fixed` qatlam va bo'lim
+          chegarasi bo'yicha `clip` (izohi `globals.css` da).
+
+          Faqat HAQIQATAN yuklangan bo'lsa chiziladi: yuklanmaguncha
+          sahifa hozirgidek tekis krem sirtda qoladi.
+        */}
+        {about.background?.uploaded && (
+          <div aria-hidden="true" className="bg-pinned-frame pointer-events-none -z-10">
+            <div className="bg-pinned-layer">
+              <SmartMedia media={about.background} locale={locale as Locale} sizes="100vw" />
+            </div>
+            <div className="page-veil absolute inset-0" />
+          </div>
+        )}
+
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
           <div className="about-aura absolute inset-[-10%]" />
         </div>

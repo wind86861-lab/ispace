@@ -57,6 +57,11 @@ Yangi mahsulot qo'shilsa: faylni shu yerga qo'ying va
 |---|---|---|
 | `showroom-1.webp` `showroom-2.webp` `team.webp` `service.webp` | 600×600 | Kvadrat galereya |
 | `video-poster.webp` | 1280×720 | Video muqovasi (16:9) |
+| `about-bg.webp` | 2400×1350 | Sahifa foni — **rasm yoki video** |
+
+Sahifa foni ixtiyoriy va o'rindoshsiz: yuklanmaguncha `/about` tekis
+krem sirtda qoladi. Unga **video** ham yuklash mumkin (MP4/WebM) —
+u ovozsiz, uzluksiz aylanadi va ustiga och parda tushadi.
 
 Video ID: `src/content/about.ts` → `video.youtubeId`. Hozir o'rindosh
 qiymat turibdi — **real ID bilan almashtirilishi shart**.
