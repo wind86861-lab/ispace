@@ -80,18 +80,21 @@ export function AboutIntro({
         O'ngdagi katta media — AYLANIB turadigan.
 
         Ilgari bu yerda faqat video muqovasi turardi va u yuklanmagan
-        bo'lsa sahifaning yarmi bo'sh krem to'rtburchak bo'lib qolardi
-        (aynan shunday bo'ldi). Endi mavjud fotolarning hammasi
-        navbatlashadi — muqova, galereya va sertifikatlar.
+        bo'lsa sahifaning yarmi bo'sh krem to'rtburchak bo'lib qolardi.
+        Endi bu — GALEREYA slaydshousi.
+
+        FAQAT galereya: video muqovasi va sertifikatlar bu yerga
+        qo'shilmaydi. Ular boshqa maqsad uchun — muqova pastdagi video
+        blokining sirti, sertifikatlar esa o'z qatorida chiziladi.
+        Aralashtirilganda aylanmada mutlaqo begona kadrlar (masalan
+        savdo maydonchasi logotipi) paydo bo'lardi.
 
         `uploaded` filtri: yuklanmagan o'rindosh (och gradient) slaydga
         tushmaydi, ya'ni "bo'sh kadr" aylanmada paydo bo'lmaydi.
       */}
       <Reveal variant="mask" className="lg:sticky lg:top-28 lg:self-start">
         <AboutSlideshow
-          slides={[about.video.poster, ...about.gallery, ...(about.certificates ?? [])].filter(
-            (m) => m.uploaded === true,
-          )}
+          slides={about.gallery.filter((m) => m.uploaded === true)}
           locale={locale}
         />
       </Reveal>
