@@ -16,6 +16,7 @@ import { reviews as seedReviews } from "./reviews";
 import { faq as seedFaq } from "./faq";
 import { lead } from "./lead";
 import { leadTrust as seedLeadTrust } from "./lead-trust";
+import { timeline as seedTimeline } from "./timeline";
 
 /**
  * Yagona kontent kirish nuqtasi.
@@ -40,6 +41,7 @@ export async function getContent(): Promise<SiteContent> {
     advantages,
     badges,
     leadTrust,
+    timeline,
   ] =
     await Promise.all([
       readOverrides(),
@@ -52,6 +54,7 @@ export async function getContent(): Promise<SiteContent> {
       readCollection("advantages", seedAdvantages),
       readCollection("badges", seedBadges),
       readCollection("leadTrust", seedLeadTrust),
+      readCollection("timeline", seedTimeline),
     ]);
 
   return applyOverrides<SiteContent>({
@@ -72,6 +75,7 @@ export async function getContent(): Promise<SiteContent> {
     contact,
     lead,
     leadTrust,
+    timeline,
   }, overrides);
 }
 

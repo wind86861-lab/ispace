@@ -10,6 +10,7 @@ import { mediaFit, IMAGE_QUALITY } from "@/lib/media";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { SmartMedia } from "@/components/ui/SmartMedia";
 import { NetworkBackground } from "@/components/about/NetworkBackground";
+import { AboutTimeline } from "@/components/about/AboutTimeline";
 import { Reveal } from "@/components/ui/Reveal";
 import { AboutIntro } from "@/components/about/AboutIntro";
 import { MediaRow } from "@/components/about/MediaRow";
@@ -108,6 +109,17 @@ export default async function AboutPage({
           <div className="mt-16 sm:mt-20">
             <MediaRow items={about.gallery} locale={locale} title={t("gallery")} />
           </div>
+        </div>
+      </section>
+
+      {/*
+        Tarix chizig'i — o'z bo'limi, chunki u ekranga MIXLANADI
+        (`pin`) va u uchun butun ekran balandligi kerak.
+      */}
+      <AboutTimeline points={content.timeline} locale={locale as Locale} title={t("timeline")} />
+
+      <section className="pb-16">
+        <div className="container-lux">
 
           {/*
             Sertifikatlar — faqat yuklanganlari. Bittasi ham yuklanmagan

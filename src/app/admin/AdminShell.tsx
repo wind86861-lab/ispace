@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { BadgeCheck, CircleHelp, FileText, Handshake, Image as ImageIcon, LayoutGrid, MapPin, MessageSquareQuote, Package, Sparkles } from "lucide-react";
+import { BadgeCheck, CircleHelp, FileText, Handshake, History, Image as ImageIcon, LayoutGrid, MapPin, MessageSquareQuote, Package, Sparkles } from "lucide-react";
 import { LogoutButton } from "./LogoutButton";
 
 /**
@@ -19,6 +19,7 @@ export const ADMIN_SECTIONS = [
   { key: "branches", href: "/admin/branches", label: "Filiallar", Icon: MapPin },
   { key: "badges", href: "/admin/badges", label: "Belgilar", Icon: BadgeCheck },
   { key: "lead-trust", href: "/admin/lead-trust", label: "Ishonch chizig‘i", Icon: Handshake },
+  { key: "timeline", href: "/admin/timeline", label: "Tarix", Icon: History },
   { key: "advantages", href: "/admin/advantages", label: "Afzalliklar", Icon: Sparkles },
   { key: "faq", href: "/admin/faq", label: "Savol-javob", Icon: CircleHelp },
   { key: "images", href: "/admin/images", label: "Rasmlar", Icon: ImageIcon },

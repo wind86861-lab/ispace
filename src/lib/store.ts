@@ -28,7 +28,8 @@ export type CollectionName =
   | "faq"
   | "advantages"
   | "badges"
-  | "leadTrust";
+  | "leadTrust"
+  | "timeline";
 
 const file = (name: CollectionName) => path.join(DIR, `${name}.json`);
 

@@ -13,6 +13,7 @@ import {
   validateAdvantage,
   validateBadge,
   validateTrustPoint,
+  validateTimelinePoint,
 } from "@/lib/content-validation";
 import { products as seedProducts } from "@/content/products";
 import { categories as seedCategories } from "@/content/categories";
@@ -23,6 +24,7 @@ import { faq as seedFaq } from "@/content/faq";
 import { advantages as seedAdvantages } from "@/content/advantages";
 import { badges as seedBadges } from "@/content/badges";
 import { leadTrust as seedLeadTrust } from "@/content/lead-trust";
+import { timeline as seedTimeline } from "@/content/timeline";
 import type {
   Advantage,
   Badge,
@@ -32,6 +34,7 @@ import type {
   Post,
   Product,
   Review,
+  TimelinePoint,
   TrustPoint,
 } from "@/content/types";
 
@@ -55,7 +58,8 @@ type Entity =
   | FaqItem
   | Advantage
   | Badge
-  | TrustPoint;
+  | TrustPoint
+  | TimelinePoint;
 
 /**
  * `slug` — faqat manzilga tushadigan yozuvlarda bor (mahsulot,
@@ -102,6 +106,10 @@ const COLLECTIONS: Record<string, { seed: Entity[]; validate: (i: unknown, e?: n
   leadTrust: {
     seed: seedLeadTrust,
     validate: (i, e) => validateTrustPoint(i, e as TrustPoint | undefined),
+  },
+  timeline: {
+    seed: seedTimeline,
+    validate: (i, e) => validateTimelinePoint(i, e as TimelinePoint | undefined),
   },
 };
 

@@ -14,6 +14,7 @@ import type {
   PostBlock,
   Product,
   Review,
+  TimelinePoint,
   TrustPoint,
 } from "@/content/types";
 
@@ -491,6 +492,32 @@ export function validateTrustPoint(input: unknown, existing?: TrustPoint): Trust
     title: localeString(t.title, "title", 60),
     text: localeString(t.text, "text", 60),
     rank: num(t.rank ?? existing?.rank ?? 100, "rank", 0, 10000),
+  };
+}
+
+export function validateTimelinePoint(
+  input: unknown,
+  existing?: TimelinePoint,
+): TimelinePoint {
+  if (!input || typeof input !== "object") fail("Tarix nuqtasi obyekti kutilgan");
+  const t = input as Record<string, unknown>;
+  const title = localeString(t.title, "title", 80);
+
+  return {
+    _id: existing?._id ?? `tl-${Date.now().toString(36)}`,
+    /*
+     * Yil oralig'i ataylab keng: kompaniya tarixi bo'lgani uchun
+     * o'tmish ham, rejalashtirilgan kelajak ham yozilishi mumkin.
+     */
+    year: num(t.year, "year", 1900, 2200),
+    title,
+    text: localeString(t.text, "text", 400),
+    /* Rasm ixtiyoriy — bo'sh `src` bilan saqlanadi va sahifada matn kengayadi. */
+    image:
+      t.image && typeof t.image === "object" &&
+      String((t.image as Record<string, unknown>).src ?? "").trim()
+        ? media(t.image, "image", title)
+        : { src: "", alt: title },
   };
 }
 

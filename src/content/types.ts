@@ -279,6 +279,23 @@ export type TrustPoint = {
   rank: number;
 };
 
+/**
+ * Tarix chizig'idagi bitta nuqta — «2007 · tashkil topdi» kabi.
+ *
+ * `/about` sahifasida ular gorizontal chiziqda turadi va sahifa
+ * aylantirilganda birin-ketin ochiladi. Har nuqtaning o'z rasmi va
+ * matni bor; ikkalasi ham admin tomonidan to'ldiriladi.
+ */
+export type TimelinePoint = {
+  _id: string;
+  /** Yil — chiziqda shu son ko'rinadi. */
+  year: number;
+  title: LocaleString;
+  text: LocaleString;
+  /** Ixtiyoriy: yuklanmagan bo'lsa o'ng tomon bo'sh qolmaydi, matn kengayadi. */
+  image: Media;
+};
+
 export type Stat = {
   _id: string;
   /** Counter shu songacha sanaydi. */
@@ -487,6 +504,7 @@ export type SiteContent = {
   posts: Post[];
   blog: BlogSection;
   leadTrust: TrustPoint[];
+  timeline: TimelinePoint[];
   reviews: Review[];
   faq: FaqItem[];
   contact: SiteContact;
