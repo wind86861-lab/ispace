@@ -127,18 +127,16 @@ export default async function LocaleLayout({
                 nav={content.nav}
                 contact={content.contact}
                 /*
-                  Menyu HAQIQIY katalogni ko'rsatadi: mahsuloti yo'q
-                  kategoriya ro'yxatga tushmaydi, aks holda foydalanuvchi
-                  bosib bo'sh sahifaga tushardi.
+                  Menyu adminda nechta kategoriya bo'lsa, shunchasini
+                  ko'rsatadi — ro'yxat "yo'qolib qolmaydi". Mahsuloti
+                  yo'qlari so'ndirilgan va bosilmaydi (`CategoryMenu`).
                 */
-                categories={content.categories
-                  .map((c) => ({
-                    slug: c.slug,
-                    title: c.title,
-                    icon: c.icon,
-                    count: content.products.filter((p) => p.category === c.slug).length,
-                  }))
-                  .filter((c) => c.count > 0)}
+                categories={content.categories.map((c) => ({
+                  slug: c.slug,
+                  title: c.title,
+                  icon: c.icon,
+                  count: content.products.filter((p) => p.category === c.slug).length,
+                }))}
               />
               <main id="main">{children}</main>
               <Footer nav={content.nav} contact={content.contact} branches={content.branches} />

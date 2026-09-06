@@ -89,9 +89,14 @@ export default async function CatalogPage({
               <CatalogView
                 products={content.products}
                 badges={content.badges}
-                categories={content.categories.filter((c) =>
-                  content.products.some((p) => p.category === c.slug),
-                )}
+              /*
+                BARCHA kategoriyalar uzatiladi — adminda nechta bo'lsa,
+                filtrda ham shuncha. Ilgari mahsuloti yo'qlari
+                chiqarilardi va ro'yxat admin ko'rgan ro'yxatdan farq
+                qilib, "yo'qolgan" bo'lib tuyulardi. Bo'shlari
+                `CatalogView` da so'ndirilgan holda chiziladi.
+              */
+                categories={content.categories}
               />
             </Suspense>
           </div>

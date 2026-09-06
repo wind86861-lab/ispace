@@ -160,13 +160,22 @@ export function CatalogView({
                   type="button"
                   onClick={() => selectCategory(c.id)}
                   aria-pressed={active}
+                  /*
+                    Bo'sh kategoriya KO'RINADI, lekin bosilmaydi: ro'yxat
+                    adminnikiga mos qoladi va hech kim bo'sh sahifaga
+                    tushmaydi.
+                  */
+                  disabled={c.count === 0}
+                  title={c.count === 0 ? t("emptyCategory") : undefined}
                   className={[
                     "group relative flex items-center gap-2.5 rounded-full border px-4 py-2.5",
                     "transition-[border-color,color,transform,box-shadow] duration-300",
-                    "ease-[cubic-bezier(0.2,0.7,0.3,1)] hover:-translate-y-0.5",
-                    active
-                      ? "border-gold/60 text-gold-ink shadow-[0_10px_24px_-16px_rgba(41,34,30,0.5)]"
-                      : "border-taupe/40 bg-warm-white text-espresso-soft hover:border-gold/50 hover:text-espresso",
+                    "ease-[cubic-bezier(0.2,0.7,0.3,1)] enabled:hover:-translate-y-0.5",
+                    c.count === 0
+                      ? "cursor-not-allowed border-taupe/25 bg-warm-white/60 text-espresso-soft/45"
+                      : active
+                        ? "border-gold/60 text-gold-ink shadow-[0_10px_24px_-16px_rgba(41,34,30,0.5)]"
+                        : "border-taupe/40 bg-warm-white text-espresso-soft hover:border-gold/50 hover:text-espresso",
                   ].join(" ")}
                 >
                   {active && !reduced && (

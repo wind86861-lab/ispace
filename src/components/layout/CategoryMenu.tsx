@@ -57,6 +57,39 @@ export function CategoryMenu({
           <div className="overflow-hidden rounded-2xl border border-taupe/30 bg-warm-white p-1.5 shadow-[0_24px_50px_-24px_rgba(41,34,30,0.45)]">
             {categories.map((c, i) => {
               const Icon = categoryIcon(c);
+              const empty = c.count === 0;
+
+              // Ichki mazmun ikkala tarmoqda ham bir xil.
+              const body = (
+                <>
+                  <span
+                    className={[
+                      "grid size-9 shrink-0 place-items-center rounded-lg",
+                      "border border-gold/25 bg-gold/[0.06] text-gold",
+                      "transition-[background-color,border-color,color,transform] duration-300",
+                      empty
+                        ? ""
+                        : "group-hover:scale-105 group-hover:border-gold-deep group-hover:bg-gold-deep group-hover:text-warm-white",
+                    ].join(" ")}
+                  >
+                    <Icon size={18} strokeWidth={1.5} aria-hidden="true" />
+                  </span>
+                  <span
+                    className={[
+                      "flex-1 text-[14px] leading-snug text-espresso transition-colors duration-300",
+                      empty ? "" : "group-hover:text-gold-ink",
+                    ].join(" ")}
+                  >
+                    {pick(c.title, locale)}
+                  </span>
+                  <span className="text-[12px] tabular-nums text-espresso-soft/70">{c.count}</span>
+                </>
+              );
+
+              const cls = [
+                "group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors duration-300",
+                empty ? "cursor-not-allowed opacity-45" : "hover:bg-cream",
+              ].join(" ");
               return (
                 <motion.li
                   key={c.slug}
@@ -64,31 +97,20 @@ export function CategoryMenu({
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.3, delay: 0.03 * i, ease: EASE_LUX }}
                 >
-                  <Link
-                    href={`/catalog?category=${c.slug}`}
-                    onClick={onPick}
-                    className="group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors duration-300 hover:bg-cream"
-                  >
-                    <span
-                      className={[
-                        "grid size-9 shrink-0 place-items-center rounded-lg",
-                        "border border-gold/25 bg-gold/[0.06] text-gold",
-                        "transition-[background-color,border-color,color,transform] duration-300",
-                        "group-hover:scale-105 group-hover:border-gold-deep",
-                        "group-hover:bg-gold-deep group-hover:text-warm-white",
-                      ].join(" ")}
-                    >
-                      <Icon size={18} strokeWidth={1.5} aria-hidden="true" />
+                  {/*
+                    Mahsuloti yo'q bo'lim KO'RINADI, lekin havola emas:
+                    ro'yxat adminnikiga mos qoladi va hech kim bo'sh
+                    katalogga tushmaydi.
+                  */}
+                  {empty ? (
+                    <span aria-disabled="true" className={cls}>
+                      {body}
                     </span>
-                    <span className="flex-1 text-[14px] leading-snug text-espresso transition-colors duration-300 group-hover:text-gold-ink">
-                      {pick(c.title, locale)}
-                    </span>
-
-                    {/* Soni — katalogdagi chiplar bilan bir xil ma'lumot. */}
-                    <span className="text-[12px] tabular-nums text-espresso-soft/70">
-                      {c.count}
-                    </span>
-                  </Link>
+                  ) : (
+                    <Link href={`/catalog?category=${c.slug}`} onClick={onPick} className={cls}>
+                      {body}
+                    </Link>
+                  )}
                 </motion.li>
               );
             })}

@@ -221,7 +221,8 @@
     "emptyHint": "Filtrlarni o‘zgartirib yoki tozalab ko‘ring.",
     "details": "Batafsil",
     "gridView": "To‘r ko‘rinishi",
-    "listView": "Ro‘yxat ko‘rinishi"
+    "listView": "Ro‘yxat ko‘rinishi",
+    "emptyCategory": "Bu bo‘limda hozircha mahsulot yo‘q"
   },
   "compare": {
     "title": "Tovarlarni solishtirish",
