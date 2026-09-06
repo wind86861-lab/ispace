@@ -123,7 +123,23 @@ export default async function LocaleLayout({
               </a>
 
               <Preloader />
-              <Header nav={content.nav} contact={content.contact} categories={content.categories} />
+              <Header
+                nav={content.nav}
+                contact={content.contact}
+                /*
+                  Menyu HAQIQIY katalogni ko'rsatadi: mahsuloti yo'q
+                  kategoriya ro'yxatga tushmaydi, aks holda foydalanuvchi
+                  bosib bo'sh sahifaga tushardi.
+                */
+                categories={content.categories
+                  .map((c) => ({
+                    slug: c.slug,
+                    title: c.title,
+                    icon: c.icon,
+                    count: content.products.filter((p) => p.category === c.slug).length,
+                  }))
+                  .filter((c) => c.count > 0)}
+              />
               <main id="main">{children}</main>
               <Footer nav={content.nav} contact={content.contact} branches={content.branches} />
               <FloatingActions contact={content.contact} />

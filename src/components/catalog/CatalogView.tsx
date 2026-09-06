@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { LayoutGrid, SlidersHorizontal, X } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { Badge, Category, Product } from "@/content/types";
 import type { Locale } from "@/i18n/routing";
 import { t as pick } from "@/lib/locale";
@@ -43,16 +43,29 @@ export function CatalogView({
   const { reduced } = useMediaTier();
 
   /*
-   * Boshlang'ich kategoriya manzildan olinadi (`?category=…`) —
-   * header menyusidagi havolalar shu parametr bilan keladi. Qiymat
-   * mavjud kategoriyalar bilan tekshiriladi: manzilga qo'lda yozilgan
-   * noma'lum slug filtrni bo'sh natijaga tiqib qo'ymasin.
+   * Kategoriya filtri MANZILDA yashaydi, alohida holatda emas.
+   *
+   * Ilgari u `useState` da edi va manzildan faqat BOSHLANG'ICH qiymat
+   * olinardi. Natijada foydalanuvchi allaqachon katalogda turib header
+   * menyusidan boshqa bo'limni tanlasa, komponent qayta yaratilmasdi va
+   * filtr eski qiymatda qotib qolardi — menyu "ishlamayotgandek"
+   * tuyulardi.
+   *
+   * Yagona manba qilib manzil tanlandi: u ulashsa bo'ladigan holat
+   * beradi va brauzerning "orqaga" tugmasi ham o'zidan to'g'ri ishlaydi.
    */
   const params = useSearchParams();
-  const initial = params.get("category");
-  const [category, setCategory] = useState<string>(
-    initial && categories.some((c) => c.slug === initial) ? initial : "all",
-  );
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const fromUrl = params.get("category");
+  const category = fromUrl && categories.some((c) => c.slug === fromUrl) ? fromUrl : "all";
+
+  /** `scroll: false` — foydalanuvchi filtr qatorida turibdi, sahifa sakramasin. */
+  const selectCategory = (id: string) => {
+    router.replace(`${pathname}${id === "all" ? "" : `?category=${id}`}`, { scroll: false });
+  };
+
   const [sort, setSort] = useState<Sort>("popular");
   const [openFilters, setOpenFilters] = useState(false);
 
@@ -113,7 +126,7 @@ export function CatalogView({
   const dirty = category !== "all" || range[0] !== bounds.min || range[1] !== bounds.max;
 
   const reset = () => {
-    setCategory("all");
+    selectCategory("all");
     setRange([bounds.min, bounds.max]);
   };
 
@@ -145,7 +158,7 @@ export function CatalogView({
               >
                 <button
                   type="button"
-                  onClick={() => setCategory(c.id)}
+                  onClick={() => selectCategory(c.id)}
                   aria-pressed={active}
                   className={[
                     "group relative flex items-center gap-2.5 rounded-full border px-4 py-2.5",

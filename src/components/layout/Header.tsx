@@ -6,7 +6,7 @@ import { Heart, Menu, Phone, Scale, Search, ShoppingBag } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { NavLink } from "./NavLink";
 import type { Locale } from "@/i18n/routing";
-import type { Category, NavItem, SiteContact } from "@/content/types";
+import type { IconName, LocaleString, NavItem, SiteContact } from "@/content/types";
 import { t as pick } from "@/lib/locale";
 import {
   useShop,
@@ -37,7 +37,7 @@ export function Header({
    * foydalanuvchi avval katalogni ochib, keyin filtr izlashi shart
    * emas — kerakli bo'limni to'g'ridan-to'g'ri tanlaydi.
    */
-  categories?: Category[];
+  categories?: { slug: string; title: LocaleString; icon?: IconName; count: number }[];
 }) {
   const t = useTranslations("header");
   const locale = useLocale() as Locale;

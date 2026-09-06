@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import type { Category } from "@/content/types";
+import type { IconName, LocaleString } from "@/content/types";
 import type { Locale } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import { t as pick } from "@/lib/locale";
@@ -26,7 +26,14 @@ export function CategoryMenu({
   onPick,
 }: {
   open: boolean;
-  categories: Category[];
+  /**
+   * FAQAT mahsuloti bor kategoriyalar, har birida soni bilan.
+   *
+   * Ro'yxat katalog sahifasidagi chiplar bilan bir xil manbadan
+   * hisoblanadi: ilgari menyu oltitasini ko'rsatib, katalog esa
+   * uchtasini chizardi va foydalanuvchi bo'sh bo'limga tushardi.
+   */
+  categories: { slug: string; title: LocaleString; icon?: IconName; count: number }[];
   locale: Locale;
   onPick: () => void;
 }) {
@@ -52,7 +59,7 @@ export function CategoryMenu({
               const Icon = categoryIcon(c);
               return (
                 <motion.li
-                  key={c._id}
+                  key={c.slug}
                   initial={reduced ? false : { opacity: 0, x: -8 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.3, delay: 0.03 * i, ease: EASE_LUX }}
@@ -73,8 +80,13 @@ export function CategoryMenu({
                     >
                       <Icon size={18} strokeWidth={1.5} aria-hidden="true" />
                     </span>
-                    <span className="text-[14px] leading-snug text-espresso transition-colors duration-300 group-hover:text-gold-ink">
+                    <span className="flex-1 text-[14px] leading-snug text-espresso transition-colors duration-300 group-hover:text-gold-ink">
                       {pick(c.title, locale)}
+                    </span>
+
+                    {/* Soni — katalogdagi chiplar bilan bir xil ma'lumot. */}
+                    <span className="text-[12px] tabular-nums text-espresso-soft/70">
+                      {c.count}
                     </span>
                   </Link>
                 </motion.li>
