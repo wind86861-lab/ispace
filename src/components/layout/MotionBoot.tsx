@@ -44,6 +44,10 @@ const MOTION_BOOT = `try{
 var d=document.documentElement,r=matchMedia("(prefers-reduced-motion: reduce)").matches;
 d.dataset.motion=r?"off":"on";
 d.dataset.preloader=(r||sessionStorage.getItem("ispace-preloaded"))?"skip":"show";
+/* Brauzer eski scroll holatini TIKLAMASIN: sahifada mixlangan
+   (pin) bloklar bor va ular yuklanish paytida balandlikni
+   o'zgartiradi — tiklangan nuqta boshqa joyga tushib qolardi. */
+if("scrollRestoration" in history)history.scrollRestoration="manual";
 setTimeout(function(){
 if(d.dataset.motion!=="on")return;
 if(document.querySelector("[data-revealed]"))return;

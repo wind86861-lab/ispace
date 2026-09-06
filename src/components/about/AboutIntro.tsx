@@ -165,7 +165,7 @@ export function AboutIntro({
       qoldirardi va joylashuvni o'zgartirardi.
     */
     <div ref={root}>
-      <div className="grid gap-10 lg:grid-cols-[1fr_minmax(0,30rem)] lg:items-center lg:gap-14">
+      <div className="grid gap-10 lg:grid-cols-[1fr_minmax(0,36rem)] lg:items-center lg:gap-12 xl:gap-16">
         <div>
           <p className="inline-block rounded-full border border-taupe/45 px-3.5 py-1.5 text-[11px] tracking-[0.16em] text-espresso-soft/85 uppercase">
             {pick(about.eyebrow, locale)}
@@ -174,7 +174,7 @@ export function AboutIntro({
           <SplitHeading
             as="h1"
             label={title}
-            className="mt-4 text-[clamp(1.75rem,3.4vw,2.75rem)] leading-[1.1]"
+            className="mt-5 text-[clamp(2rem,4vw,3.25rem)] leading-[1.08]"
           >
             {title}
           </SplitHeading>
@@ -184,7 +184,7 @@ export function AboutIntro({
             har almashinuvda balandligini o'zgartirib, ostidagi raqamlar
             va chiziqni sakratardi.
           */}
-          <div className="mt-6 min-h-[9.5rem]">
+          <div className="mt-7 min-h-[10.5rem]">
             <AnimatePresence mode="wait">
               <motion.div
                 key={current?._id ?? "intro"}
@@ -195,17 +195,17 @@ export function AboutIntro({
               >
                 {current ? (
                   <>
-                    <p className="font-display text-[15px] tracking-[0.16em] text-gold-deep">
+                    <p className="font-display text-[17px] tracking-[0.18em] text-gold-deep">
                       {current.year}
                     </p>
-                    <h2 className="font-display mt-2 text-[clamp(1.3rem,2.4vw,1.85rem)] leading-[1.15] text-espresso">
+                    <h2 className="font-display mt-2.5 text-[clamp(1.5rem,2.9vw,2.15rem)] leading-[1.15] text-espresso">
                       {pick(current.title, locale)}
                     </h2>
 
                     {/* Harfma-harf ochilish — izohi komponent boshida. */}
                     <p
                       ref={textRef}
-                      className="measure mt-3 text-[16px] leading-relaxed text-espresso-soft"
+                      className="measure mt-4 text-[18px] leading-relaxed text-espresso-soft"
                     >
                       {/*
                         So'z butun bo'lib o'raladi (`inline-block`):
@@ -231,7 +231,7 @@ export function AboutIntro({
                 ) : (
                   <div className="flex flex-col gap-4">
                     {about.paragraphs.map((p, i) => (
-                      <p key={i} className="measure text-[16px] leading-relaxed text-espresso-soft">
+                      <p key={i} className="measure text-[18px] leading-relaxed text-espresso-soft">
                         {pick(p, locale)}
                       </p>
                     ))}
@@ -242,7 +242,7 @@ export function AboutIntro({
           </div>
 
           {/* ---------- raqamlar: har yilga o'ziniki ---------- */}
-          <div className="mt-8 grid min-h-[4.5rem] grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4">
+          <div className="mt-9 grid min-h-[4.75rem] grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4">
             <AnimatePresence mode="wait">
               <motion.div
                 key={current?._id ?? "intro-stats"}
@@ -259,9 +259,9 @@ export function AboutIntro({
                       suffix={stat.suffix}
                       /* `2007` yil bo'lib qolsin, "2 007" emas. */
                       grouped={stat.value > 9999}
-                      className="font-display text-[clamp(1.35rem,2.6vw,1.85rem)] leading-none text-gold-deep"
+                      className="font-display text-[clamp(1.5rem,2.9vw,2.1rem)] leading-none text-gold-deep"
                     />
-                    <p className="mt-1.5 text-[13px] leading-snug text-espresso-soft">
+                    <p className="mt-2 text-[14px] leading-snug text-espresso-soft">
                       {pick(stat.label, locale)}
                     </p>
                   </div>
@@ -289,7 +289,7 @@ export function AboutIntro({
                   fill
                   quality={IMAGE_QUALITY}
                   priority
-                  sizes="(max-width: 1024px) 100vw, 30rem"
+                  sizes="(max-width: 1024px) 100vw, 36rem"
                   style={mediaFit(media).style}
                   className={mediaFit(media).className}
                 />
@@ -312,49 +312,86 @@ export function AboutIntro({
 
       {/* ---------- yillar chizig'i: BUTUN KENGLIKDA ---------- */}
       {points.length > 0 && (
-        <div className="relative mt-12 lg:mt-14">
-          <span aria-hidden="true" className="absolute inset-x-0 top-2 h-px bg-taupe/35" />
+        <div className="relative mt-14 pb-1 lg:mt-16">
+          {/*
+            Yo'lakcha nuqtalarning MARKAZIDAN o'tadi: nuqta 20px, ya'ni
+            markaz 10px da. Chiziq 2px bo'lgani uchun u `top-[9px]` ga
+            qo'yiladi — usiz u nuqtalarni kesib o'tgandek ko'rinardi.
+          */}
+          <span
+            aria-hidden="true"
+            className="absolute inset-x-0 top-[9px] h-0.5 rounded-full bg-taupe/25"
+          />
           <span
             data-fill
             aria-hidden="true"
-            className="absolute inset-x-0 top-2 h-px origin-left bg-gold-deep"
+            className="absolute inset-x-0 top-[9px] h-0.5 origin-left rounded-full bg-gradient-to-r from-gold/60 via-gold to-gold-deep shadow-[0_0_12px_-2px_var(--color-gold)]"
             style={{ transform: `scaleX(${pinned ? 0 : 1})` }}
           />
 
           <ul className="relative flex items-start justify-between">
             {points.map((p, i) => {
               const on = i === active;
+              const passed = i <= active;
               return (
-                <li key={p._id} className="flex flex-col items-center gap-3">
+                <li key={p._id} className="flex flex-col items-center gap-4">
                   <button
                     type="button"
                     onClick={() => setActive(i)}
                     aria-current={on ? "true" : undefined}
                     aria-label={String(p.year)}
-                    className="grid place-items-center"
+                    className="group relative grid size-5 place-items-center"
                   >
                     {/*
+                      Faol nuqtadan tarqaladigan halqa. `scale` va
+                      `opacity` — ikkalasi ham kompozitor xossalari,
+                      ya'ni scroll paytida qayta joylashuv bo'lmaydi.
+                    */}
+                    {on && !reduced && (
+                      <motion.span
+                        key={`halo-${p._id}-${done}`}
+                        aria-hidden="true"
+                        initial={{ scale: 0.6, opacity: 0.55 }}
+                        animate={{ scale: 2.4, opacity: 0 }}
+                        transition={{ duration: 1.1, ease: EASE_LUX }}
+                        className="absolute inset-0 rounded-full bg-gold/60"
+                      />
+                    )}
+
+                    {/*
                       Nuqta yilga YETGANDA emas, matn O'QIB BO'LINGANDA
-                      pulsatsiya qiladi (`done`) — shunda harakat
-                      "yakunlandi" degan ma'no beradi.
+                      pulsatsiya qiladi — harakat "yakunlandi" degan
+                      ma'no beradi.
                     */}
                     <motion.span
                       key={`${p._id}-${on && done}`}
-                      animate={on && done && !reduced ? { scale: [1, 2, 1.35] } : { scale: 1 }}
+                      animate={on && done && !reduced ? { scale: [1, 1.45, 1.15] } : { scale: 1 }}
                       transition={{ duration: 0.55, times: [0, 0.45, 1], ease: EASE_LUX }}
                       className={[
-                        "block size-3 rounded-full transition-colors duration-300",
-                        i <= active ? "bg-gold-deep" : "bg-taupe/50",
+                        "relative block size-5 rounded-full ring-4 ring-cream",
+                        "transition-[background-color,box-shadow] duration-500",
+                        passed
+                          ? "bg-gold-deep shadow-[0_0_14px_-2px_var(--color-gold)]"
+                          : "bg-taupe/45",
                       ].join(" ")}
-                    />
+                    >
+                      {/* Ichki oq yadro — nuqta "medalyon" bo'lib ko'rinadi. */}
+                      <span
+                        aria-hidden="true"
+                        className={[
+                          "absolute inset-[5px] rounded-full transition-colors duration-500",
+                          passed ? "bg-warm-white/85" : "bg-cream",
+                        ].join(" ")}
+                      />
+                    </motion.span>
                   </button>
 
                   <motion.span
-                    animate={on && done && !reduced ? { scale: [1, 1.2, 1] } : { scale: 1 }}
+                    animate={on && done && !reduced ? { scale: [1, 1.22, 1] } : { scale: 1 }}
                     transition={{ duration: 0.55, ease: EASE_LUX }}
                     className={[
-                      "font-display text-[14px] tabular-nums transition-colors duration-300",
-                      on ? "text-gold-deep" : "text-espresso-soft/70",
+                      "font-display text-[17px] tabular-nums transition-colors duration-500",
+                      on ? "text-gold-deep" : passed ? "text-espresso" : "text-espresso-soft/60",
                     ].join(" ")}
                   >
                     {p.year}
