@@ -88,6 +88,17 @@ export function CatalogView({
     [categories, products, locale, t],
   );
 
+  /*
+   * Ползунок qadami — 100 000 so'm. Mahsulot narxlari million
+   * darajasida, ya'ni bir so'mlik qadam foydasiz va tutqichni
+   * boshqarib bo'lmas qilardi.
+   */
+  const STEP = 100_000;
+
+  /** Qiymatni yo'lakchadagi foizga o'giradi. */
+  const pct = (v: number) =>
+    bounds.max === bounds.min ? 0 : ((v - bounds.min) / (bounds.max - bounds.min)) * 100;
+
   const dirty = category !== "all" || range[0] !== bounds.min || range[1] !== bounds.max;
 
   const reset = () => {
@@ -238,24 +249,79 @@ export function CatalogView({
                 {t("price")}
               </legend>
 
-              <div className="mt-3 flex flex-wrap items-center gap-4">
-                <NumberField
-                  label={t("from")}
-                  value={range[0]}
-                  min={bounds.min}
-                  max={range[1]}
-                  onChange={(v) => setRange([Math.min(v, range[1]), range[1]])}
-                />
-                <NumberField
-                  label={t("to")}
-                  value={range[1]}
-                  min={range[0]}
-                  max={bounds.max}
-                  onChange={(v) => setRange([range[0], Math.max(v, range[0])])}
-                />
-                <p className="text-[13px] text-espresso-soft/85">
-                  {formatPrice(bounds.min, locale)} — {formatPrice(bounds.max, locale)}
-                </p>
+              {/*
+                Ikki tomonlama ползунок.
+
+                Ikkita xom `<input type="range">` ustma-ust turadi —
+                tayyor kutubxona olinmadi, chunki ular klaviatura va
+                ekran o'quvchi qo'llab-quvvatlashini qayta yozadi.
+                Xom `range` da o'q tugmalari, Home/End va PageUp
+                brauzerdan tekin keladi.
+
+                Tutqichlar bir-birini bosib o'tmasligi uchun `onChange`
+                da qiymat qo'shni tutqich bilan cheklanadi: chap hech
+                qachon o'ngdan oshmaydi.
+              */}
+              <div className="mt-4">
+                <div className="relative h-6">
+                  {/* Yo'lakcha */}
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-taupe/30"
+                  />
+                  {/* Tanlangan oraliq */}
+                  <span
+                    aria-hidden="true"
+                    className="absolute top-1/2 h-1 -translate-y-1/2 rounded-full bg-gold-deep transition-[left,right] duration-150"
+                    style={{ left: `${pct(range[0])}%`, right: `${100 - pct(range[1])}%` }}
+                  />
+
+                  <input
+                    type="range"
+                    className="range-dual"
+                    aria-label={t("from")}
+                    min={bounds.min}
+                    max={bounds.max}
+                    step={STEP}
+                    value={range[0]}
+                    onChange={(e) =>
+                      setRange([Math.min(Number(e.target.value), range[1] - STEP), range[1]])
+                    }
+                  />
+                  <input
+                    type="range"
+                    className="range-dual"
+                    aria-label={t("to")}
+                    min={bounds.min}
+                    max={bounds.max}
+                    step={STEP}
+                    value={range[1]}
+                    onChange={(e) =>
+                      setRange([range[0], Math.max(Number(e.target.value), range[0] + STEP)])
+                    }
+                  />
+                </div>
+
+                {/* Raqamlar — ползунок ostida, aniq qiymat kiritish uchun. */}
+                <div className="mt-4 flex flex-wrap items-center gap-4">
+                  <NumberField
+                    label={t("from")}
+                    value={range[0]}
+                    min={bounds.min}
+                    max={range[1]}
+                    onChange={(v) => setRange([Math.min(v, range[1]), range[1]])}
+                  />
+                  <NumberField
+                    label={t("to")}
+                    value={range[1]}
+                    min={range[0]}
+                    max={bounds.max}
+                    onChange={(v) => setRange([range[0], Math.max(v, range[0])])}
+                  />
+                  <p className="text-[13px] text-espresso-soft/85">
+                    {formatPrice(range[0], locale)} — {formatPrice(range[1], locale)}
+                  </p>
+                </div>
               </div>
             </fieldset>
           </motion.div>

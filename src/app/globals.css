@@ -518,6 +518,76 @@ html[data-motion="on"] .about-aura {
   }
 }
 
+/*
+ * Ikki tomonlama narx ползунок'i.
+ *
+ * Ikkita xom `<input type="range">` bir-birining USTIGA qo'yiladi.
+ * Tayyor kutubxona olinmadi: ular klaviatura va ekran o'quvchi
+ * qo'llab-quvvatlashini qayta yozadi, xom `range` da esa bularning
+ * hammasi brauzerdan tekin keladi (o'q tugmalari, Home/End, PageUp).
+ *
+ * Hiyla: yo'lakcha bosishni O'TKAZIB YUBORADI (`pointer-events: none`),
+ * faqat tutqichlar ushlanadi. Usiz ustki input pastkisini butunlay
+ * qoplab, ikkinchi tutqichni bosib bo'lmasdi.
+ */
+@utility range-dual {
+  -webkit-appearance: none;
+  appearance: none;
+  position: absolute;
+  inset-inline: 0;
+  width: 100%;
+  height: 1.5rem;
+  margin: 0;
+  background: transparent;
+  pointer-events: none;
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    pointer-events: auto;
+    width: 1.15rem;
+    height: 1.15rem;
+    border-radius: 9999px;
+    background: var(--color-warm-white);
+    border: 2px solid var(--color-gold-deep);
+    box-shadow: 0 2px 8px -2px rgba(41, 34, 30, 0.35);
+    cursor: grab;
+    transition:
+      transform 0.2s var(--ease-lux),
+      box-shadow 0.2s var(--ease-lux);
+  }
+
+  &::-webkit-slider-thumb:hover {
+    transform: scale(1.12);
+  }
+
+  &::-webkit-slider-thumb:active {
+    cursor: grabbing;
+    transform: scale(1.05);
+  }
+
+  &::-moz-range-thumb {
+    pointer-events: auto;
+    width: 1.15rem;
+    height: 1.15rem;
+    border-radius: 9999px;
+    background: var(--color-warm-white);
+    border: 2px solid var(--color-gold-deep);
+    box-shadow: 0 2px 8px -2px rgba(41, 34, 30, 0.35);
+    cursor: grab;
+  }
+
+  /* Fokus faqat klaviaturada ko'rinadi — sichqoncha bilan ushlaganda emas. */
+  &:focus-visible::-webkit-slider-thumb {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 2px;
+  }
+  &:focus-visible::-moz-range-thumb {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 2px;
+  }
+}
+
 @utility measure {
   max-width: 62ch;
   /*
