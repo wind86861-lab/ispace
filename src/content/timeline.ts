@@ -17,6 +17,10 @@ export const timeline: TimelinePoint[] = [
       uz: "Birinchi qadam: kichik jamoa va bitta maqsad — tana haqidagi g‘amxo‘rlikni uyga olib kirish.",
     },
     image: { src: "", alt: { ru: "2007", uz: "2007" } },
+    stats: [
+      { _id: "st-07-team", value: 4, label: { ru: "Инженеры в команде", uz: "Jamoadagi muhandis" } },
+      { _id: "st-07-models", value: 3, label: { ru: "Модели в каталоге", uz: "Katalogdagi model" } },
+    ],
   },
   {
     _id: "tl-2012",
@@ -27,6 +31,11 @@ export const timeline: TimelinePoint[] = [
       uz: "Kreslolar katalogdagi rasm bo‘lishdan to‘xtadi — ularni jonli sinab ko‘rish mumkin bo‘ldi.",
     },
     image: { src: "", alt: { ru: "2012", uz: "2012" } },
+    stats: [
+      { _id: "st-12-showroom", value: 1, label: { ru: "Шоурум", uz: "Shourum" } },
+      { _id: "st-12-clients", value: 2000, suffix: "+", label: { ru: "Довольных клиентов", uz: "Mamnun mijozlar" } },
+      { _id: "st-12-models", value: 12, label: { ru: "Моделей", uz: "Model" } },
+    ],
   },
   {
     _id: "tl-2018",
@@ -37,6 +46,11 @@ export const timeline: TimelinePoint[] = [
       uz: "Kafolat qog‘oz bo‘lishdan to‘xtadi: ta’mir va xizmat ko‘rsatish o‘z qo‘limizda, vositachisiz.",
     },
     image: { src: "", alt: { ru: "2018", uz: "2018" } },
+    stats: [
+      { _id: "st-18-showroom", value: 3, label: { ru: "Шоурума", uz: "Shourum" } },
+      { _id: "st-18-clients", value: 18000, suffix: "+", label: { ru: "Довольных клиентов", uz: "Mamnun mijozlar" } },
+      { _id: "st-18-service", value: 1, label: { ru: "Сервисная служба", uz: "Servis xizmati" } },
+    ],
   },
   {
     _id: "tl-2026",
@@ -47,5 +61,11 @@ export const timeline: TimelinePoint[] = [
       uz: "Massaj va ofis kreslolari, fitnes va vending — yagona iSpace maydonida.",
     },
     image: { src: "", alt: { ru: "2026", uz: "2026" } },
+    stats: [
+      { _id: "st-26-year", value: 2007, label: { ru: "Год основания", uz: "Tashkil topgan yil" } },
+      { _id: "st-26-clients", value: 50000, suffix: "+", label: { ru: "Довольных клиентов", uz: "Mamnun mijozlar" } },
+      { _id: "st-26-years", value: 18, suffix: "+", label: { ru: "Лет на рынке", uz: "Yillik tajriba" } },
+      { _id: "st-26-showroom", value: 6, label: { ru: "Шоурума", uz: "Shourum" } },
+    ],
   },
 ];

@@ -279,6 +279,15 @@ export type TrustPoint = {
   rank: number;
 };
 
+export type Stat = {
+  _id: string;
+  /** Counter shu songacha sanaydi. */
+  value: number;
+  /** `50 000+` dagi `+` kabi qo'shimcha. */
+  suffix?: string;
+  label: LocaleString;
+};
+
 /**
  * Tarix chizig'idagi bitta nuqta — «2007 · tashkil topdi» kabi.
  *
@@ -292,18 +301,18 @@ export type TimelinePoint = {
   year: number;
   title: LocaleString;
   text: LocaleString;
-  /** Ixtiyoriy: yuklanmagan bo'lsa o'ng tomon bo'sh qolmaydi, matn kengayadi. */
+  /** Ixtiyoriy: yuklanmagan bo'lsa o'ng tomonda yil raqami chiziladi. */
   image: Media;
+  /**
+   * Shu yilgi raqamlar — «6 shourum», «50 000+ mijoz» kabi.
+   *
+   * Ular yildan yilga o'zgaradi: tarixning ma'nosi ham shunda —
+   * o'quvchi kompaniya qanday o'sganini raqamlarda ko'radi.
+   * Bo'sh qoldirilsa, shu yil uchun raqamlar qatori chizilmaydi.
+   */
+  stats: Stat[];
 };
 
-export type Stat = {
-  _id: string;
-  /** Counter shu songacha sanaydi. */
-  value: number;
-  /** `50 000+` dagi `+` kabi qo'shimcha. */
-  suffix?: string;
-  label: LocaleString;
-};
 
 export type About = {
   /**

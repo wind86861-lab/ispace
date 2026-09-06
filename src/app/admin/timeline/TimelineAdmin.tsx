@@ -25,6 +25,7 @@ export function TimelineAdmin({ items }: { items: TimelinePoint[] }) {
         title: emptyLocaleString(),
         text: emptyLocaleString(),
         image: { src: "", alt: emptyLocaleString() },
+        stats: [],
       })}
       addLabel="Yil qo‘shish"
       newTitle="Yangi yil"
@@ -71,6 +72,82 @@ export function TimelineAdmin({ items }: { items: TimelinePoint[] }) {
             value={d.text}
             onChange={(text) => set({ ...d, text })}
           />
+
+          {/*
+            Raqamlar har yil uchun O'ZINIKI: tarixning ma'nosi ham
+            shunda — o'quvchi kompaniya qanday o'sganini ko'radi.
+            Bo'sh qoldirilsa, shu yilda raqamlar qatori chizilmaydi.
+          */}
+          <fieldset className="rounded-xl border border-taupe/30 p-4">
+            <legend className="px-1 text-[13px] font-medium text-espresso">
+              Shu yilgi raqamlar
+            </legend>
+
+            <div className="grid gap-3">
+              {d.stats.map((st, i) => (
+                <div key={st._id || i} className="grid gap-3 rounded-xl border border-taupe/25 p-3">
+                  <div className="grid gap-3 sm:grid-cols-[1fr_8rem]">
+                    <Field
+                      label="Qiymat"
+                      type="number"
+                      value={st.value}
+                      onChange={(v) =>
+                        set({
+                          ...d,
+                          stats: d.stats.map((x, j) => (j === i ? { ...x, value: Number(v) } : x)),
+                        })
+                      }
+                    />
+                    <Field
+                      label="Qo‘shimcha"
+                      value={st.suffix ?? ""}
+                      onChange={(v) =>
+                        set({
+                          ...d,
+                          stats: d.stats.map((x, j) =>
+                            j === i ? { ...x, suffix: v || undefined } : x,
+                          ),
+                        })
+                      }
+                      hint="Masalan «+»"
+                    />
+                  </div>
+
+                  <LocaleField
+                    label="Izoh"
+                    value={st.label}
+                    onChange={(label) =>
+                      set({ ...d, stats: d.stats.map((x, j) => (j === i ? { ...x, label } : x)) })
+                    }
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => set({ ...d, stats: d.stats.filter((_, j) => j !== i) })}
+                    className="justify-self-start text-[12px] text-rosewood hover:underline"
+                  >
+                    O‘chirish
+                  </button>
+                </div>
+              ))}
+
+              <button
+                type="button"
+                onClick={() =>
+                  set({
+                    ...d,
+                    stats: [
+                      ...d.stats,
+                      { _id: `st-${Date.now().toString(36)}`, value: 0, label: emptyLocaleString() },
+                    ],
+                  })
+                }
+                className="justify-self-start text-[12px] text-gold-ink hover:underline"
+              >
+                + Raqam qo‘shish
+              </button>
+            </div>
+          </fieldset>
 
           <ImageUpload
             label="Rasm (ixtiyoriy)"

@@ -512,7 +512,23 @@ export function validateTimelinePoint(
     year: num(t.year, "year", 1900, 2200),
     title,
     text: localeString(t.text, "text", 400),
-    /* Rasm ixtiyoriy — bo'sh `src` bilan saqlanadi va sahifada matn kengayadi. */
+    /*
+     * Raqamlar — har yil uchun o'ziniki. Ro'yxat bo'sh bo'lishi
+     * mumkin: u holda shu yilda raqamlar qatori chizilmaydi.
+     */
+    stats: Array.isArray(t.stats)
+      ? t.stats.map((raw, i) => {
+          const st = (raw ?? {}) as Record<string, unknown>;
+          return {
+            _id: typeof st._id === "string" && st._id ? st._id : `st-${Date.now().toString(36)}-${i}`,
+            value: num(st.value, `stats[${i}].value`, 0, 1e12),
+            suffix: optionalStr(st.suffix, `stats[${i}].suffix`, 8),
+            label: localeString(st.label, `stats[${i}].label`, 60),
+          };
+        })
+      : (existing?.stats ?? []),
+
+    /* Rasm ixtiyoriy — bo'sh `src` bilan saqlanadi va sahifada yil raqami chiziladi. */
     image:
       t.image && typeof t.image === "object" &&
       String((t.image as Record<string, unknown>).src ?? "").trim()
