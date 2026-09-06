@@ -454,6 +454,13 @@ function ProductEditor({
                         <option value="split">Matn va media yonma-yon</option>
                         <option value="pair">Ikkita media yonma-yon</option>
                       </select>
+                      <p className="mt-1.5 text-[11px] text-espresso-soft/85">
+                        {block.layout === "wide"
+                          ? "Sarlavha va matn banner USTIDA, markazda."
+                          : block.layout === "split"
+                            ? "Matn bir tomonda, media ikkinchisida."
+                            : "Ikkita media yonma-yon; sarlavha va matn ularning ustida."}
+                      </p>
                     </div>
 
                     <LocaleField
@@ -498,6 +505,111 @@ function ProductEditor({
                     hint="youtube.com/watch?v=… , youtu.be/… yoki shorts havolasi. Berilsa quyidagi media o‘rniga video ko‘rsatiladi."
                   />
 
+                  {/*
+                    Quyidagi maydonlar MAKETGA QARAB o'zgaradi: har
+                    ko'rinish boshqa narsani talab qiladi va keraksiz
+                    maydon adminni chalg'itadi.
+                  */}
+                  {block.layout === "split" && (
+                    <>
+                      <label className="flex items-center gap-2 text-[13px] text-espresso">
+                        <input
+                          type="checkbox"
+                          checked={Boolean(block.reverse)}
+                          onChange={(e) =>
+                            set(
+                              "story",
+                              (p.story ?? []).map((x, j) =>
+                                j === i ? { ...x, reverse: e.target.checked } : x,
+                              ),
+                            )
+                          }
+                          className="size-4 accent-[var(--color-gold-deep)]"
+                        />
+                        Media CHAP tomonda tursin (matn o‘ngda)
+                      </label>
+
+                      <fieldset className="rounded-xl border border-taupe/25 p-3">
+                        <legend className="px-1 text-[12px] font-medium text-espresso">
+                          Matn yonidagi kichik rasmlar
+                        </legend>
+                        <p className="mb-3 text-[11px] text-espresso-soft/85">
+                          Ixtiyoriy: matn ostida kichik kvadrat rasmlar qatori bo‘lib chiziladi.
+                          Faqat yuklanganlari ko‘rinadi.
+                        </p>
+
+                        <div className="grid gap-3 sm:grid-cols-3">
+                          {(block.thumbs ?? []).map((m, k) => (
+                            <ImageUpload
+                              key={k}
+                              label={`Kichik ${k + 1}`}
+                              prefix="story-thumb"
+                              media={m}
+                              recommend={{ width: 400, height: 300 }}
+                              onChange={(next) =>
+                                set(
+                                  "story",
+                                  (p.story ?? []).map((x, j) =>
+                                    j === i
+                                      ? {
+                                          ...x,
+                                          thumbs: (x.thumbs ?? []).map((y, q) =>
+                                            q === k ? next : y,
+                                          ),
+                                        }
+                                      : x,
+                                  ),
+                                )
+                              }
+                            />
+                          ))}
+                        </div>
+
+                        <div className="mt-3 flex flex-wrap gap-4">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              set(
+                                "story",
+                                (p.story ?? []).map((x, j) =>
+                                  j === i
+                                    ? {
+                                        ...x,
+                                        thumbs: [
+                                          ...(x.thumbs ?? []),
+                                          { src: "", alt: emptyLocaleString() },
+                                        ],
+                                      }
+                                    : x,
+                                ),
+                              )
+                            }
+                            className="text-[12px] text-gold-ink hover:underline"
+                          >
+                            + Kichik rasm
+                          </button>
+
+                          {(block.thumbs?.length ?? 0) > 0 && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                set(
+                                  "story",
+                                  (p.story ?? []).map((x, j) =>
+                                    j === i ? { ...x, thumbs: (x.thumbs ?? []).slice(0, -1) } : x,
+                                  ),
+                                )
+                              }
+                              className="text-[12px] text-rosewood hover:underline"
+                            >
+                              Oxirgisini o‘chirish
+                            </button>
+                          )}
+                        </div>
+                      </fieldset>
+                    </>
+                  )}
+
                   <div className="grid gap-3 sm:grid-cols-2">
                     {block.media.map((m, k) => (
                       <ImageUpload
@@ -521,7 +633,12 @@ function ProductEditor({
                   </div>
 
                   <div className="flex flex-wrap gap-4">
-                    {/* `pair` ikkita media talab qiladi — qo'shish shu uchun. */}
+                    {/*
+                      Ikkinchi media faqat `pair` da chiziladi: `wide` va
+                      `split` birinchisini oladi, qolgani e'tiborsiz
+                      qoladi. Shuning uchun tugma ham faqat o'sha yerda.
+                    */}
+                    {block.layout === "pair" && (
                     <button
                       type="button"
                       onClick={() =>
@@ -541,6 +658,7 @@ function ProductEditor({
                     >
                       + Media
                     </button>
+                    )}
 
                     <button
                       type="button"
