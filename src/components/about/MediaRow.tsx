@@ -40,7 +40,7 @@ export function MediaRow({
         </Reveal>
       )}
 
-      <ul className={`mt-7 grid gap-4 ${columns}`}>
+      <ul className={`mt-8 grid gap-5 ${columns}`}>
         {shown.map((m, i) => (
           <li key={m.src}>
             <Reveal variant="mask" delay={(i % 4) * 0.06}>
@@ -50,7 +50,7 @@ export function MediaRow({
                   yaqinlashadi. Ikkalasi `transform` da: qayta joylashuv
                   bo'lmaydi va harakat kompozitorda bajariladi.
                 */
-                className={`group relative block ${ratio} overflow-hidden rounded-2xl border border-taupe/30 bg-cream transition-[transform,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.2,0.7,0.3,1)] hover:-translate-y-1 hover:border-gold/40 hover:shadow-[0_24px_44px_-24px_rgba(41,34,30,0.4)]`}
+                className={`group relative block ${ratio} overflow-hidden rounded-2xl border border-taupe/30 bg-cream shadow-[0_10px_28px_-20px_rgba(41,34,30,0.35)] transition-[transform,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.2,0.7,0.3,1)] hover:-translate-y-1.5 hover:border-gold/45 hover:shadow-[0_28px_52px_-24px_rgba(41,34,30,0.45)]`}
               >
                 <Image
                   src={m.src}
@@ -59,7 +59,7 @@ export function MediaRow({
                   quality={IMAGE_QUALITY}
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   style={mediaFit(m).style}
-                  className={`${mediaFit(m).className} transition-transform duration-[900ms] ease-[cubic-bezier(0.2,0.7,0.3,1)] group-hover:scale-[1.06]`}
+                  className={`${mediaFit(m).className} transition-transform duration-[900ms] ease-[cubic-bezier(0.2,0.7,0.3,1)] group-hover:scale-[1.04]`}
                 />
               </span>
             </Reveal>

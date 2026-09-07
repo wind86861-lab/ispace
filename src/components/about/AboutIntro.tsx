@@ -58,8 +58,13 @@ export function AboutIntro({
   const chars = useRef<HTMLElement[]>([]);
   const shownRef = useRef(0);
   const textRef = useRef<HTMLParagraphElement>(null);
-  /** Yil to'liq o'qib bo'lindimi — nuqta shunda pulsatsiya qiladi. */
-  const [done, setDone] = useState(false);
+  /**
+   * Yil to'liq o'qib bo'lindimi — nuqta shunda pulsatsiya qiladi.
+   *
+   * Pin yo'q bo'lsa matn darrov to'liq ko'rinadi, ya'ni "o'qildi"
+   * holati boshidanoq rost.
+   */
+  const [done, setDone] = useState(true);
 
   const points = [...timeline].sort((a, b) => a.year - b.year);
   /** Nol nuqta + yillar. */
@@ -72,17 +77,45 @@ export function AboutIntro({
   const words = text.split(" ");
 
   /**
-   * Harflarni ko'rsatish/yashirish — to'g'ridan-to'g'ri DOM'da.
+   * Matnni `ratio` (0..1) gacha ochadi — to'g'ridan-to'g'ri DOM'da.
    *
-   * Faqat `from` dan `to` gacha bo'lgan oraliq yangilanadi, ya'ni bir
-   * kadrda bir-ikkita tugun. Butun ro'yxatni har safar aylanib chiqish
-   * uzun matnda sezilarli ish bo'lardi.
+   * Harf tugunlari SHU YERDA qayta topiladi, alohida effektda emas.
+   * Sabab: matn `AnimatePresence mode="wait"` ichida va yangi blok
+   * eskisi so'nib bo'lgandan KEYIN mount qilinadi. Effekt esa yil
+   * o'zgargan zahoti ishlaydi — o'sha payt yangi tugunlar hali DOM'da
+   * yo'q va ro'yxat bo'sh qolardi. Natijada harflar hech qachon
+   * ochilmasdi.
+   *
+   * Tekshiruv arzon: ro'yxatning birinchi tuguni hamon shu paragraf
+   * ichidami? Yo'q bo'lsa — matn almashgan, qayta o'qiymiz.
    */
-  const paint = (to: number) => {
-    const list = chars.current;
+  const paint = (ratio: number) => {
+    const host = textRef.current;
+    if (!host) return;
+
+    let list = chars.current;
+    if (list.length === 0 || !host.contains(list[0])) {
+      list = Array.from(host.querySelectorAll<HTMLElement>("[data-ch]"));
+      chars.current = list;
+
+      /*
+         Yangi matn NOLDAN yoziladi: barcha harflar darrov yashiriladi
+         va hisob nolga tushadi. Aks holda ular "allaqachon ochilgan"
+         deb hisoblanardi va yozilish umuman ko'rinmasdi.
+      */
+      for (const el of list) {
+        el.style.opacity = "0";
+        el.style.filter = "blur(10px)";
+      }
+      shownRef.current = 0;
+    }
+    if (list.length === 0) return;
+
+    const to = Math.round(Math.min(1, Math.max(0, ratio)) * list.length);
     const from = shownRef.current;
     if (to === from) return;
 
+    /* Faqat o'zgargan oraliq — bir kadrda odatda bir-ikkita tugun. */
     for (let i = Math.min(from, to); i < Math.max(from, to); i++) {
       const el = list[i];
       if (!el) continue;
@@ -93,13 +126,19 @@ export function AboutIntro({
     shownRef.current = to;
   };
 
-  /* Yangi yilga o'tilganda harflar qaytadan yashiriladi. */
+  /*
+   * Yangi yil kelganda harflar ro'yxati bekor qilinadi — keyingi
+   * `paint` chaqiruvi uni o'zi qayta o'qiydi.
+   *
+   * Effekt HOLATGA tegmaydi (`setState` yo'q): u faqat ref'larni
+   * tozalaydi va pin bo'lmagan holatda matnni to'liq ochadi. Aks
+   * holda har yil almashinuvida ortiqcha render zanjiri boshlanardi.
+   */
   useEffect(() => {
-    if (!textRef.current) return;
-    chars.current = Array.from(textRef.current.querySelectorAll<HTMLElement>("[data-ch]"));
-    shownRef.current = chars.current.length;
-    paint(pinned ? 0 : chars.current.length);
-    setDone(!pinned);
+    chars.current = [];
+    shownRef.current = 0;
+    // Pin yo'q (telefon, reduced-motion) — matn to'liq ko'rinadi.
+    if (!pinned) paint(1);
   }, [current?._id, pinned]);
 
   useGSAP(
@@ -129,13 +168,8 @@ export function AboutIntro({
              30% o'qish uchun tinch pauza bo'lib qoladi.
           */
           const ratio = Math.min(1, local / 0.7);
-          const total = chars.current.length;
-          const next = Math.round(ratio * total);
-          paint(next);
-          setDone((prev) => {
-            const value = total > 0 && next >= total;
-            return prev === value ? prev : value;
-          });
+          paint(ratio);
+          setDone((prev) => (prev === (ratio >= 1) ? prev : ratio >= 1));
 
           /*
              Chiziqning to'lgan qismi to'g'ridan-to'g'ri DOM'ga
@@ -165,7 +199,7 @@ export function AboutIntro({
       qoldirardi va joylashuvni o'zgartirardi.
     */
     <div ref={root}>
-      <div className="grid gap-10 lg:grid-cols-[1fr_minmax(0,36rem)] lg:items-center lg:gap-12 xl:gap-16">
+      <div className="grid gap-10 lg:grid-cols-[1fr_minmax(0,42rem)] lg:items-center lg:gap-12 xl:gap-16">
         <div>
           <p className="inline-block rounded-full border border-taupe/45 px-3.5 py-1.5 text-[11px] tracking-[0.16em] text-espresso-soft/85 uppercase">
             {pick(about.eyebrow, locale)}
@@ -184,10 +218,23 @@ export function AboutIntro({
             har almashinuvda balandligini o'zgartirib, ostidagi raqamlar
             va chiziqni sakratardi.
           */}
-          <div className="mt-7 min-h-[10.5rem]">
-            <AnimatePresence mode="wait">
+          <div className="relative mt-7 min-h-[10.5rem]">
+            {/*
+              `mode="wait"` YO'Q va bolalar ABSOLYUT.
+
+              Kutish rejimida yangi matn eskisi so'nib bo'lgandan keyin
+              DOM'ga tushardi. Foydalanuvchi shu oraliqda scroll'ni
+              to'xtatsa, harflarni ochadigan chaqiruv umuman kelmasdi va
+              matn tutunsiz, birdan to'liq paydo bo'lardi.
+
+              Endi ikkalasi bir vaqtda: eskisi tutunga qaytadi, yangisi
+              tutundan chiqadi. Absolyut joylashuv esa ular oqimda
+              ustma-ust turib blokni cho'zib yubormasligi uchun.
+            */}
+            <AnimatePresence initial={false}>
               <motion.div
                 key={current?._id ?? "intro"}
+                className="absolute inset-0"
                 initial={reduced ? false : { opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
@@ -272,7 +319,7 @@ export function AboutIntro({
         </div>
 
         {/* ---------- o'ngdagi rasm: yil bilan almashadi ---------- */}
-        <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-taupe/25 bg-cream shadow-[0_30px_60px_-28px_rgba(41,34,30,0.35)]">
+        <div className="relative aspect-[5/4] overflow-hidden rounded-3xl border border-taupe/25 bg-cream shadow-[0_34px_70px_-30px_rgba(41,34,30,0.4)]">
           <AnimatePresence initial={false}>
             {media ? (
               <motion.div
@@ -289,7 +336,7 @@ export function AboutIntro({
                   fill
                   quality={IMAGE_QUALITY}
                   priority
-                  sizes="(max-width: 1024px) 100vw, 36rem"
+                  sizes="(max-width: 1024px) 100vw, 42rem"
                   style={mediaFit(media).style}
                   className={mediaFit(media).className}
                 />
@@ -312,7 +359,7 @@ export function AboutIntro({
 
       {/* ---------- yillar chizig'i: BUTUN KENGLIKDA ---------- */}
       {points.length > 0 && (
-        <div className="relative mt-14 pb-1 lg:mt-16">
+        <div className="relative mt-10 lg:mt-12">
           {/*
             Yo'lakcha nuqtalarning MARKAZIDAN o'tadi: nuqta 20px, ya'ni
             markaz 10px da. Chiziq 2px bo'lgani uchun u `top-[9px]` ga
@@ -320,12 +367,12 @@ export function AboutIntro({
           */}
           <span
             aria-hidden="true"
-            className="absolute inset-x-0 top-[9px] h-0.5 rounded-full bg-taupe/25"
+            className="absolute inset-x-0 top-[9px] h-0.5 rounded-full bg-taupe/45"
           />
           <span
             data-fill
             aria-hidden="true"
-            className="absolute inset-x-0 top-[9px] h-0.5 origin-left rounded-full bg-gradient-to-r from-gold/60 via-gold to-gold-deep shadow-[0_0_12px_-2px_var(--color-gold)]"
+            className="absolute inset-x-0 top-[9px] h-0.5 origin-left rounded-full bg-gradient-to-r from-gold to-gold-deep shadow-[0_0_14px_-3px_var(--color-gold-deep)]"
             style={{ transform: `scaleX(${pinned ? 0 : 1})` }}
           />
 
@@ -371,8 +418,8 @@ export function AboutIntro({
                         "relative block size-5 rounded-full ring-4 ring-cream",
                         "transition-[background-color,box-shadow] duration-500",
                         passed
-                          ? "bg-gold-deep shadow-[0_0_14px_-2px_var(--color-gold)]"
-                          : "bg-taupe/45",
+                          ? "bg-gold-deep shadow-[0_0_16px_-3px_var(--color-gold-deep)]"
+                          : "bg-taupe",
                       ].join(" ")}
                     >
                       {/* Ichki oq yadro — nuqta "medalyon" bo'lib ko'rinadi. */}
@@ -380,7 +427,7 @@ export function AboutIntro({
                         aria-hidden="true"
                         className={[
                           "absolute inset-[5px] rounded-full transition-colors duration-500",
-                          passed ? "bg-warm-white/85" : "bg-cream",
+                          passed ? "bg-warm-white" : "bg-cream",
                         ].join(" ")}
                       />
                     </motion.span>
@@ -391,7 +438,7 @@ export function AboutIntro({
                     transition={{ duration: 0.55, ease: EASE_LUX }}
                     className={[
                       "font-display text-[17px] tabular-nums transition-colors duration-500",
-                      on ? "text-gold-deep" : passed ? "text-espresso" : "text-espresso-soft/60",
+                      on ? "text-gold-deep" : passed ? "text-espresso" : "text-taupe-text",
                     ].join(" ")}
                   >
                     {p.year}

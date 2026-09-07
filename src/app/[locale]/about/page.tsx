@@ -68,7 +68,7 @@ export default async function AboutPage({
         haqida» bilan bir xil sirt. Usiz sahifa tekis krem varaq bo'lib
         qolardi.
       */}
-      <section className="relative isolate pt-[calc(var(--header-h)+2rem)] pb-16">
+      <section className="relative isolate pt-[calc(var(--header-h)+2rem)] pb-8">
         {/*
           Fon: admin yuklagan rasm yoki video. Lead bandidagi bilan bir
           xil mexanizm — ekran o'lchamidagi `fixed` qatlam va bo'lim
@@ -128,7 +128,12 @@ export default async function AboutPage({
               locale={locale}
               title={t("certificates")}
               ratio="aspect-[3/4]"
-              columns="grid-cols-2 sm:grid-cols-3 lg:grid-cols-5"
+              /*
+                Beshta ustun sertifikatni pochta markasiga aylantirardi:
+                muhr ham, matn ham o'qilmasdi. To'rtta ustun har kartaga
+                sezilarli kengroq joy beradi.
+              */
+              columns="grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
               requireUploaded
             />
           </div>
