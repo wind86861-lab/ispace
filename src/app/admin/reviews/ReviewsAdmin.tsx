@@ -90,8 +90,8 @@ export function ReviewsAdmin({ items }: { items: Review[] }) {
               </span>
               <span className="mt-1 block text-[11px] text-espresso-soft/85">
                 {r.publishedAt}
-                {r.photos?.length ? ` · ${r.photos.length} ta foto` : ""}
-                {r.youtubeId ? " · video" : ""}
+                {r.photos?.length ? ` · ${r.photos.length} ta media` : ""}
+                {r.youtubeId ? " · YouTube" : ""}
               </span>
             </span>
 
@@ -205,28 +205,34 @@ function Editor({
           </div>
 
           <Field
-            label="YouTube video ID (ixtiyoriy)"
+            label="Sharhning umumiy YouTube videosi (ixtiyoriy)"
             value={r.youtubeId ?? ""}
             onChange={(v) => set("youtubeId", v || undefined)}
-            hint="Havoladagi 11 belgili qism — masalan youtu.be/XXXXXXXXXXX"
+            hint="Eski maydon: sharhga bitta video biriktiradi va ro‘yxatda birinchi bo‘lib turadi. Yangi material qo‘shayotgan bo‘lsangiz quyidagi «Mijoz materiallari» bo‘limidan foydalaning."
           />
 
-          {/* --- fotolar --- */}
+          {/* --- mijoz materiallari: foto, video yoki YouTube --- */}
           <fieldset className="rounded-xl border border-taupe/30 p-4">
             <legend className="px-1 text-[13px] font-medium text-espresso">
-              Mijoz fotolari (ixtiyoriy)
+              Mijoz materiallari (ixtiyoriy)
             </legend>
+            <p className="mb-4 text-[12px] text-espresso-soft/85">
+              Har bir uyaga rasm yoki video (MP4/WebM) yuklash mumkin. Og‘ir rolik uchun
+              fayl o‘rniga YouTube havolasini qo‘ying — u diskni band qilmaydi.
+            </p>
             <div className="grid gap-5">
               {photos.map((m, i) => (
                 <div key={i} className="grid gap-3">
                   <ImageUpload
-                    label={`Foto ${i + 1}`}
+                    label={`Material ${i + 1}`}
                     media={m}
                     prefix="review"
+                    allowVideo
+                    youtube
                     onChange={(next) => setPhoto(i, next)}
                   />
                   <LocaleField
-                    label={`Foto ${i + 1} — alt matn`}
+                    label={`Material ${i + 1} — alt matn`}
                     value={m.alt}
                     onChange={(alt) => setPhoto(i, { ...m, alt })}
                   />
@@ -235,7 +241,7 @@ function Editor({
                     onClick={() => set("photos", photos.filter((_, j) => j !== i))}
                     className="justify-self-start text-[12px] text-rosewood hover:underline"
                   >
-                    Fotoni olib tashlash
+                    Olib tashlash
                   </button>
                 </div>
               ))}
@@ -246,7 +252,7 @@ function Editor({
                 }
                 className="justify-self-start text-[12px] text-gold-ink hover:underline"
               >
-                + Foto
+                + Material
               </button>
             </div>
           </fieldset>

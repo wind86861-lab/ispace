@@ -8,7 +8,8 @@ test.describe("1 · prefiksiz manzil tilni aniqlab yo'naltiradi", () => {
   for (const [browserLocale, expected] of [
     ["ru-RU", "ru"],
     ["uz-UZ", "uz"],
-    ["en-US", "en"],
+    // Ingliz versiyasi olib tashlangan — u ham defaultLocale'ga tushadi.
+    ["en-US", "ru"],
     // Hech biri mos kelmasa — defaultLocale.
     ["de-DE", "ru"],
   ] as const) {
@@ -23,11 +24,10 @@ test.describe("1 · prefiksiz manzil tilni aniqlab yo'naltiradi", () => {
   }
 });
 
-test("2 · uchala til ochiladi va lang atributi to'g'ri", async ({ page }) => {
+test("2 · ikkala til ochiladi va lang atributi to'g'ri", async ({ page }) => {
   for (const [locale, lang, heading] of [
     ["ru", "ru-UZ", "Выберите свою категорию"],
     ["uz", "uz-UZ", "O‘z toifangizni tanlang"],
-    ["en", "en-US", "Choose your category"],
   ] as const) {
     await page.goto(`/${locale}`);
     await expect(page.locator("html")).toHaveAttribute("lang", lang);
@@ -96,9 +96,9 @@ test("7 · reduced-motion'da hech qanday kontent yashirin qolmaydi", async ({ pa
 
 test("8 · til almashtirgich sahifada qoladi", async ({ page }) => {
   await page.goto("/ru");
-  await page.getByRole("button", { name: "EN", exact: true }).click();
-  await expect(page).toHaveURL(/\/en$/);
-  await expect(page.getByRole("heading", { name: "Choose your category" })).toBeVisible();
+  await page.getByRole("button", { name: "UZ", exact: true }).click();
+  await expect(page).toHaveURL(/\/uz$/);
+  await expect(page.getByRole("heading", { name: "O‘z toifangizni tanlang" })).toBeVisible();
 });
 
 test("9 · kirish animatsiyalari ikkala yo‘nalishda ham qayta ishlaydi", async ({ page }) => {

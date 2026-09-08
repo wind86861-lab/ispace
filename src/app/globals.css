@@ -172,6 +172,25 @@
     border-radius: 2px;
   }
 
+  /*
+   * OLTIN sirtda oltin kontur ko'rinmaydi.
+   *
+   * Modal yopilganda fokus uni ochgan tugmaga qaytadi va kontur
+   * paydo bo'ladi — bu to'g'ri xatti-harakat. Lekin oltin tugmada u
+   * fon bilan qo'shilib, "iflos halqa" bo'lib turardi. To'q kontur
+   * ikkala sirtda ham aniq ko'rinadi.
+   */
+  .bg-gold-deep:focus-visible,
+  .bg-gold:focus-visible,
+  .bg-espresso:focus-visible {
+    outline-color: var(--color-espresso);
+    outline-offset: 2px;
+  }
+
+  .bg-espresso:focus-visible {
+    outline-color: var(--color-gold);
+  }
+
   /* Preloader qarori bo'yashdan oldin inline skriptda qabul qilinadi (§4). */
   html[data-preloader="skip"] .preloader { display: none; }
 

@@ -1,36 +1,29 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { LoaderCircle, Pencil, Plus, Trash2, X } from "lucide-react";
+import { Check, LoaderCircle, Pencil, Plus, Trash2, X } from "lucide-react";
 import type {
   Badge,
   Category,
-  Feature,
+  LocaleString,
   Media,
   Product,
+  ProductFeature,
+  ProductOption,
   ProductStoryBlock,
+  SpecRow,
 } from "@/content/types";
 import { Field, LocaleField, emptyLocaleString } from "../LocaleFields";
 import { MAX_BADGES } from "@/lib/limits";
 import { ImageUpload } from "../ImageUpload";
+import { FEATURE_ICONS } from "@/components/ui/icons";
 
 const HEADERS = {
   "x-requested-with": "ispace-admin",
   "content-type": "application/json",
 };
-
-const FEATURE_ICONS: Feature["icon"][] = [
-  "zero-gravity",
-  "body-scan",
-  "bluetooth",
-  "heat",
-  "sl-track",
-  "air",
-  "folding",
-  "quiet",
-];
 
 /** Yangi mahsulotning bo'sh qolipi. */
 function blank(categorySlug: string): Product {
@@ -61,10 +54,13 @@ export function ProductsAdmin({
   items,
   categories,
   badges,
+  features,
   previews,
 }: {
   items: Product[];
   categories: Category[];
+  /** Xususiyatlar katalogi — «Xususiyatlar» bo'limida yaratiladi. */
+  features: ProductFeature[];
   /** «Belgilar» bo'limida yaratilgan nishonlar — shu yerda yoqiladi. */
   badges: Badge[];
   /** `_id` → ko'rsatish uchun haqiqiy rasm URL'i (override qo'llangan). */
@@ -159,6 +155,18 @@ export function ProductsAdmin({
                   so‘m
                   {p.isNew ? " · yangi" : ""}
                 </span>
+                {/*
+                  Solishtirish jadvali `specs` va `features` dan qator
+                  yasaydi. Ular bo'sh bo'lsa mahsulot jadvalda deyarli
+                  bo'sh ustun bo'lib turadi — buni MAHSULOT ro'yxatida
+                  aytish kerak, aks holda muammo faqat saytda ko'rinadi
+                  va sababi noma'lum qoladi.
+                */}
+                {(p.specs?.length ?? 0) === 0 && p.features.length === 0 && (
+                  <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-gold/12 px-2 py-0.5 text-[11px] text-gold-ink">
+                    Solishtirish uchun xarakteristika yoki xususiyat yo‘q
+                  </span>
+                )}
               </span>
 
               <span className="flex gap-2">
@@ -181,8 +189,10 @@ export function ProductsAdmin({
       {editing && (
         <ProductEditor
           value={editing}
+          all={items}
           categories={categories}
           badges={badges}
+          features={features}
           busy={busy}
           error={error}
           onCancel={() => {
@@ -229,16 +239,29 @@ function IconButton({
 
 function ProductEditor({
   value,
+  all,
   categories,
   badges,
+  features,
   busy,
   error,
   onCancel,
   onSave,
 }: {
   value: Product;
+  /**
+   * Barcha mahsulotlar — xarakteristika QOLIPINI hisoblash uchun.
+   *
+   * Solishtirish jadvalining qatorlari yorliqlar bo'yicha
+   * birlashtiriladi. Ikki muharrir bir xil narsani «Мощность» va
+   * «Мощность, Вт» deb yozsa, jadvalda ikkita yarim bo'sh qator
+   * paydo bo'ladi. Shuning uchun forma o'sha kategoriyadagi mavjud
+   * yorliqlarni taklif qiladi.
+   */
+  all: Product[];
   categories: Category[];
   badges: Badge[];
+  features: ProductFeature[];
   busy: boolean;
   error: string | null;
   onCancel: () => void;
@@ -247,6 +270,22 @@ function ProductEditor({
   const [p, setP] = useState<Product>(value);
   const set = <K extends keyof Product>(k: K, v: Product[K]) =>
     setP((s) => ({ ...s, [k]: v }));
+
+  /*
+   * Shu kategoriyadagi BOSHQA mahsulotlarda uchragan yorliqlar —
+   * birinchi uchragan tartibda va takrorsiz.
+   */
+  const specTemplate = useMemo(() => {
+    const seen = new Map<string, LocaleString>();
+    for (const item of all) {
+      if (item.category !== p.category || item._id === p._id) continue;
+      for (const row of item.specs ?? []) {
+        const key = row.label.ru.trim().toLowerCase();
+        if (key && !seen.has(key)) seen.set(key, row.label);
+      }
+    }
+    return [...seen.values()];
+  }, [all, p.category, p._id]);
 
   const setImage = (i: number, next: Partial<Media>) =>
     set(
@@ -331,6 +370,29 @@ function ProductEditor({
               step="0.1"
               value={p.rating ?? ""}
               onChange={(v) => set("rating", v === "" ? undefined : Number(v))}
+            />
+            {/*
+              Brend SOLISHTIRISH jadvalining alohida qatori.
+
+              Ilgari bu maydon formada umuman yo'q edi: urug'dagi
+              mahsulotlarda u bor, admin qo'shganida esa hech qachon
+              to'ldirilmasdi va jadvaldagi «Бренд» qatori bo'sh
+              chiqardi.
+            */}
+            <Field
+              label="Brend (ixtiyoriy)"
+              value={p.brand ?? ""}
+              onChange={(v) => set("brand", v || undefined)}
+              hint="Solishtirish jadvalida alohida qator bo‘lib chiqadi"
+            />
+            <Field
+              label="Sharhlar soni (ixtiyoriy)"
+              type="number"
+              value={p.reviewCount ?? ""}
+              onChange={(v) =>
+                set("reviewCount", v === "" ? undefined : Number(v))
+              }
+              hint="Reyting yonida ko‘rsatiladi"
             />
           </div>
 
@@ -784,87 +846,83 @@ function ProductEditor({
             onChange={(badgeIds) => set("badgeIds", badgeIds)}
           />
 
-          {/* --- xususiyatlar --- */}
-          <fieldset className="rounded-xl border border-taupe/30 p-4">
-            <legend className="px-1 text-[13px] font-medium text-espresso">
-              Xususiyatlar
-            </legend>
-            <div className="grid gap-4">
-              {p.features.map((f, i) => (
-                <div
-                  key={i}
-                  className="grid gap-3 sm:grid-cols-[10rem_1fr_auto] sm:items-end"
-                >
-                  <div>
-                    <label className="mb-1.5 block text-[13px] font-medium text-espresso">
-                      Ikon
-                    </label>
-                    <select
-                      value={f.icon}
-                      onChange={(e) =>
-                        set(
-                          "features",
-                          p.features.map((x, j) =>
-                            j === i
-                              ? {
-                                  ...x,
-                                  icon: e.target.value as Feature["icon"],
-                                }
-                              : x,
-                          ),
-                        )
-                      }
-                      className="w-full rounded-xl border border-taupe/45 bg-cream px-3.5 py-2.5 text-sm text-espresso outline-none focus:border-gold"
-                    >
-                      {FEATURE_ICONS.map((ic) => (
-                        <option key={ic} value={ic}>
-                          {ic}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+          {/*
+            Xususiyatlar QO'LDA yozilmaydi — katalogdan belgilanadi.
 
-                  <LocaleField
-                    label="Yorliq"
-                    value={f.label}
-                    onChange={(v) =>
-                      set(
-                        "features",
-                        p.features.map((x, j) =>
-                          j === i ? { ...x, label: v } : x,
-                        ),
-                      )
-                    }
-                  />
+            Ilgari har mahsulotda yorliq qaytadan yozilardi va kichik
+            farq ham («Прогрев» / «Прогрев спины») solishtirish
+            jadvalida ikkita alohida qator berardi: matritsa umuman
+            qurilmasdi. Katalogda ta'rif bitta — qatorlar o'z-o'zidan
+            ustma-ust tushadi.
+          */}
+          <FeaturePicker
+            all={features}
+            /*
+              Eski yozuvlarda `featureIds` yo'q — tanlov ichki
+              `features` dan topiladi va saqlashda `featureIds` bo'lib
+              yoziladi, ya'ni migratsiya birinchi tahrirda o'zidan
+              bo'ladi.
 
-                  <button
-                    type="button"
-                    onClick={() =>
-                      set(
-                        "features",
-                        p.features.filter((_, j) => j !== i),
-                      )
-                    }
-                    className="pb-2.5 text-[12px] text-rosewood hover:underline"
-                  >
-                    O‘chirish
-                  </button>
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={() =>
-                  set("features", [
-                    ...p.features,
-                    { icon: "zero-gravity", label: emptyLocaleString() },
-                  ])
-                }
-                className="justify-self-start text-[12px] text-gold-ink hover:underline"
-              >
-                + Xususiyat
-              </button>
-            </div>
-          </fieldset>
+              Moslik YORLIQ bo'yicha, ikon bo'yicha EMAS.
+
+              Sabab real ma'lumotdan chiqdi: bir mahsulotda ikon
+              `heat`, yorlig'i esa «Невесомость» edi — admin ikonni
+              noto'g'ri tanlagan. Ikon bo'yicha moslashtirilsa,
+              migratsiya o'sha xususiyatni jimgina «Прогрев спины» ga
+              aylantirib yuborardi. Yorliq — foydalanuvchi ko'radigan
+              va solishtirish jadvali guruhlaydigan haqiqiy o'ziga
+              xoslik; ikon esa bezak.
+            */
+            selected={
+              p.featureIds ??
+              p.features
+                .map(
+                  (f) =>
+                    features.find(
+                      (c) => c.label.ru.trim().toLowerCase() === f.label.ru.trim().toLowerCase(),
+                    )?._id ??
+                    /* Yorliq katalogda yo'q — oxirgi chora sifatida ikon. */
+                    features.find((c) => c.icon === f.icon)?._id,
+                )
+                .filter((id): id is string => Boolean(id))
+            }
+            onChange={(featureIds) => set("featureIds", featureIds)}
+          />
+
+          <SpecsEditor
+            specs={p.specs ?? []}
+            template={specTemplate}
+            onChange={(specs) => set("specs", specs.length > 0 ? specs : undefined)}
+          />
+
+          <OptionsEditor
+            title="Ranglar"
+            itemLabel="Rang"
+            field="swatch"
+            options={p.colors ?? []}
+            onChange={(colors) => set("colors", colors.length > 0 ? colors : undefined)}
+          />
+
+          <OptionsEditor
+            title="Komplektatsiyalar"
+            itemLabel="Komplektatsiya"
+            field="extra"
+            options={p.bundles ?? []}
+            onChange={(bundles) => set("bundles", bundles.length > 0 ? bundles : undefined)}
+          />
+
+          {/*
+            Yetkazib berish sharti — mahsulot sahifasidagi alohida
+            ichki bo'lim (`ProductTabs`). U ham formada yo'q edi va
+            faqat urug' faylidagi mahsulotlarda ko'rinardi.
+          */}
+          <LocaleField
+            label="Yetkazib berish (ixtiyoriy)"
+            multiline
+            required={false}
+            value={p.delivery ?? emptyLocaleString()}
+            onChange={(v) => set("delivery", v)}
+          />
         </div>
 
         {error && (
@@ -901,6 +959,314 @@ function ProductEditor({
         </div>
       </form>
     </div>
+  );
+}
+
+/**
+ * Xarakteristikalar — SOLISHTIRISH jadvalining asosiy manbasi.
+ *
+ * Jadval qatorlari qo'lda yozilmaydi, ular shu ro'yxatdagi yorliqlar
+ * bo'yicha birlashtiriladi. Ya'ni bu yer bo'sh bo'lsa, solishtirishda
+ * narx va reytingdan boshqa hech narsa qolmaydi — aynan shu sabab
+ * admin qo'shgan mahsulotlar jadvalda "ishlamayotgandek" ko'rinardi.
+ *
+ * Yorliqlar KATEGORIYA bo'ylab bir xil bo'lishi shart: aks holda har
+ * mahsulot o'z qatorini keltirib chiqaradi va jadval yarim bo'sh
+ * kataklar to'riga aylanadi. Shu sabab qolip tugmasi bor.
+ */
+function SpecsEditor({
+  specs,
+  template,
+  onChange,
+}: {
+  specs: SpecRow[];
+  /** Shu kategoriyadagi boshqa mahsulotlarda uchragan yorliqlar. */
+  template: LocaleString[];
+  onChange: (next: SpecRow[]) => void;
+}) {
+  const used = new Set(specs.map((r) => r.label.ru.trim().toLowerCase()));
+  const missing = template.filter((l) => !used.has(l.ru.trim().toLowerCase()));
+
+  const patch = (i: number, next: Partial<SpecRow>) =>
+    onChange(specs.map((r, j) => (j === i ? { ...r, ...next } : r)));
+
+  return (
+    <fieldset className="rounded-xl border border-taupe/30 p-4">
+      <legend className="px-1 text-[13px] font-medium text-espresso">
+        Xarakteristikalar{" "}
+        <span className="text-espresso-soft">({specs.length})</span>
+      </legend>
+
+      <p className="mb-4 text-[12px] text-espresso-soft/85">
+        Solishtirish jadvalidagi qatorlar shu ro‘yxatdan hosil bo‘ladi. Yorliqlar bir
+        kategoriya ichida bir xil yozilsa, qatorlar ustma-ust tushadi.
+      </p>
+
+      {missing.length > 0 && (
+        <div className="mb-4 rounded-xl border border-gold/40 bg-gold/[0.06] p-3">
+          <p className="text-[12px] text-espresso">
+            Shu kategoriyadagi boshqa mahsulotlarda bor, bu yerda yo‘q:{" "}
+            <span className="text-espresso-soft">
+              {missing.map((l) => l.ru).join(", ")}
+            </span>
+          </p>
+          <button
+            type="button"
+            onClick={() =>
+              onChange([
+                ...specs,
+                /* Yorliq to'ldirilgan, QIYMAT bo'sh — uni admin yozadi. */
+                ...missing.map((label) => ({ label, value: emptyLocaleString() })),
+              ])
+            }
+            className="mt-2 text-[12px] font-medium text-gold-ink hover:underline"
+          >
+            Yetishmayotgan qatorlarni qo‘shish
+          </button>
+        </div>
+      )}
+
+      <div className="grid gap-5">
+        {specs.map((row, i) => (
+          <div key={i} className="grid gap-3 rounded-xl border border-taupe/25 p-3">
+            <LocaleField
+              label={`Yorliq ${i + 1}`}
+              value={row.label}
+              onChange={(label) => patch(i, { label })}
+            />
+            <LocaleField
+              label={`Qiymat ${i + 1}`}
+              value={row.value}
+              onChange={(value) => patch(i, { value })}
+            />
+            <button
+              type="button"
+              onClick={() => onChange(specs.filter((_, j) => j !== i))}
+              className="justify-self-start text-[12px] text-rosewood hover:underline"
+            >
+              Qatorni o‘chirish
+            </button>
+          </div>
+        ))}
+
+        <button
+          type="button"
+          onClick={() =>
+            onChange([...specs, { label: emptyLocaleString(), value: emptyLocaleString() }])
+          }
+          className="justify-self-start text-[12px] text-gold-ink hover:underline"
+        >
+          + Xarakteristika
+        </button>
+      </div>
+    </fieldset>
+  );
+}
+
+/**
+ * Rang va komplektatsiya muharriri.
+ *
+ * Ikkalasi ham `ProductOption`: uch tilli nom + qo'shimcha bitta
+ * maydon. Rangda bu — namuna (`hex`), komplektatsiyada narx ustamasi
+ * (`extra`). Ikki alohida komponent yozish shu farqni takrorlash
+ * bo'lardi.
+ *
+ * `_id` saqlashda nomdan hosil qilinadi — admin uni o'ylab
+ * topmasligi kerak, lekin u barqaror bo'lishi shart: savatdagi
+ * tanlov shu bo'yicha saqlanadi.
+ */
+function OptionsEditor({
+  title,
+  itemLabel,
+  options,
+  field,
+  onChange,
+}: {
+  title: string;
+  /** Bitta bandning nomi — «Rang», «Komplektatsiya». */
+  itemLabel: string;
+  options: ProductOption[];
+  /** `swatch` — rang namunasi; `extra` — narx ustamasi. */
+  field: "swatch" | "extra";
+  onChange: (next: ProductOption[]) => void;
+}) {
+  const patch = (i: number, next: Partial<ProductOption>) =>
+    onChange(options.map((c, j) => (j === i ? { ...c, ...next } : c)));
+
+  return (
+    <fieldset className="rounded-xl border border-taupe/30 p-4">
+      <legend className="px-1 text-[13px] font-medium text-espresso">
+        {title} <span className="text-espresso-soft">({options.length})</span>
+      </legend>
+
+      <div className="grid gap-5">
+        {options.map((c, i) => (
+          <div key={i} className="grid gap-3 rounded-xl border border-taupe/25 p-3">
+            <LocaleField
+              label={`${itemLabel} ${i + 1}`}
+              value={c.label}
+              onChange={(label) => patch(i, { label })}
+            />
+
+            {field === "swatch" ? (
+              <label className="flex items-center gap-3">
+                <span className="text-[13px] font-medium text-espresso">Namuna</span>
+                {/*
+                  Rang tanlagich HAR DOIM to'g'ri HEX beradi — qo'lda
+                  yozilgan qiymat noto'g'ri bo'lsa namuna buzilardi.
+                */}
+                <input
+                  type="color"
+                  value={c.hex ?? "#d8c7ac"}
+                  onChange={(e) => patch(i, { hex: e.target.value })}
+                  className="size-9 cursor-pointer rounded-lg border border-taupe/45 bg-cream"
+                />
+                <code className="text-[12px] text-espresso-soft">{c.hex ?? "—"}</code>
+                {c.hex && (
+                  <button
+                    type="button"
+                    onClick={() => patch(i, { hex: undefined })}
+                    className="text-[12px] text-espresso-soft hover:text-rosewood"
+                  >
+                    Namunasiz
+                  </button>
+                )}
+              </label>
+            ) : (
+              <Field
+                label="Narxga qo‘shimcha (so‘m, ixtiyoriy)"
+                type="number"
+                value={c.extra ?? ""}
+                onChange={(v) => patch(i, { extra: v === "" ? undefined : Number(v) })}
+                hint="Bo‘sh qoldirilsa asosiy narxdan farq qilmaydi"
+              />
+            )}
+
+            <button
+              type="button"
+              onClick={() => onChange(options.filter((_, j) => j !== i))}
+              className="justify-self-start text-[12px] text-rosewood hover:underline"
+            >
+              O‘chirish
+            </button>
+          </div>
+        ))}
+
+        <button
+          type="button"
+          onClick={() =>
+            onChange([
+              ...options,
+              /* `_id` saqlashda nomdan hosil bo'ladi. */
+              {
+                _id: "",
+                label: emptyLocaleString(),
+                ...(field === "swatch" ? { hex: "#d8c7ac" } : {}),
+              },
+            ])
+          }
+          className="justify-self-start text-[12px] text-gold-ink hover:underline"
+        >
+          + {itemLabel}
+        </button>
+      </div>
+    </fieldset>
+  );
+}
+
+/**
+ * Mahsulotga xususiyat biriktirish.
+ *
+ * Xususiyatlarning O'ZI «Xususiyatlar» bo'limida yaratiladi. Bu yerda
+ * faqat TANLASH — shu sabab yorliq matni hech qachon ikki xil
+ * yozilmaydi va solishtirish jadvalidagi qatorlar mos tushadi.
+ *
+ * Chegara — o'n ikkita: kartada ular ikon bo'lib bir qatorga tushadi
+ * va undan ko'pi shunchaki sig'maydi. Chegara serverda ham bor,
+ * chunki interfeys yagona himoya bo'la olmaydi.
+ */
+function FeaturePicker({
+  all,
+  selected,
+  onChange,
+}: {
+  all: ProductFeature[];
+  selected: string[];
+  onChange: (next: string[]) => void;
+}) {
+  const [query, setQuery] = useState("");
+
+  const found = [...all]
+    .sort((a, b) => a.rank - b.rank)
+    .filter((f) => {
+      const q = query.trim().toLowerCase();
+      if (!q) return true;
+      return Object.values(f.label).some((v) => String(v).toLowerCase().includes(q));
+    });
+
+  const full = selected.length >= 12;
+
+  return (
+    <fieldset className="rounded-xl border border-taupe/30 p-4">
+      <legend className="px-1 text-[13px] font-medium text-espresso">
+        Xususiyatlar{" "}
+        <span className={full ? "text-gold-ink" : "text-espresso-soft"}>
+          ({selected.length}/12)
+        </span>
+      </legend>
+
+      {all.length === 0 ? (
+        <p className="text-[13px] text-espresso-soft">
+          Katalog bo‘sh. Avval «Xususiyatlar» bo‘limida xususiyat yarating.
+        </p>
+      ) : (
+        <>
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Xususiyat qidirish"
+            className="mb-4 w-full rounded-xl border border-taupe/45 bg-cream px-3.5 py-2 text-[13px] text-espresso outline-none focus:border-gold"
+          />
+
+          <ul className="grid gap-2 sm:grid-cols-2">
+            {found.map((f) => {
+              const Icon = FEATURE_ICONS[f.icon];
+              const on = selected.includes(f._id);
+              /* To'lgan ro'yxatda faqat YECHISH mumkin — qo'shish emas. */
+              const locked = full && !on;
+
+              return (
+                <li key={f._id}>
+                  <button
+                    type="button"
+                    disabled={locked}
+                    onClick={() =>
+                      onChange(
+                        on ? selected.filter((id) => id !== f._id) : [...selected, f._id],
+                      )
+                    }
+                    className={[
+                      "flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-start transition-colors duration-300",
+                      on
+                        ? "border-gold-deep bg-gold/10 text-gold-ink"
+                        : "border-taupe/40 text-espresso-soft hover:border-gold/50",
+                      locked ? "cursor-not-allowed opacity-40" : "",
+                    ].join(" ")}
+                  >
+                    <span className="grid size-8 shrink-0 place-items-center rounded-lg border border-gold/25 bg-gold/[0.06] text-gold">
+                      <Icon size={16} strokeWidth={1.5} aria-hidden="true" />
+                    </span>
+                    <span className="min-w-0 flex-1 truncate text-[13px]">{f.label.ru}</span>
+                    {on && <Check size={15} strokeWidth={2.2} aria-hidden="true" />}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </>
+      )}
+    </fieldset>
   );
 }
 

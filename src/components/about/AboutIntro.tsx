@@ -57,7 +57,8 @@ export function AboutIntro({
   /** Matndagi harf tugunlari va oxirgi ochilgan harf soni. */
   const chars = useRef<HTMLElement[]>([]);
   const shownRef = useRef(0);
-  const textRef = useRef<HTMLParagraphElement>(null);
+  /** Oxirgi hisoblangan ochilish nisbati — blok mount bo'lgach kerak. */
+  const ratioRef = useRef(1);
   /**
    * Yil to'liq o'qib bo'lindimi — nuqta shunda pulsatsiya qiladi.
    *
@@ -71,6 +72,18 @@ export function AboutIntro({
   const steps = points.length + 1;
 
   const current = active >= 0 ? points[Math.min(active, points.length - 1)] : null;
+
+  /**
+   * Matn blokining kaliti — `data-year` atributi.
+   *
+   * Umumiy `ref` bu yerda ISHLAMAYDI: crossfade paytida eski va yangi
+   * bloklar bir vaqtda DOM'da turadi va bitta `ref` ni bo'lishadi —
+   * eskisi unmount bo'lganda uni `null` qilib ketadi. Shundan keyin
+   * harflarni bo'yash uchun tugun topilmasdi va matn tutunsiz, birdan
+   * to'liq chiqardi. Kalit bo'yicha qidirish doim KERAKLI blokni topadi.
+   */
+  const keyOf = (i: number) =>
+    i >= 0 && points.length > 0 ? points[Math.min(i, points.length - 1)]._id : "intro";
   const stats = current?.stats.length ? current.stats : about.stats;
 
   const text = current ? pick(current.text, locale) : "";
@@ -89,8 +102,8 @@ export function AboutIntro({
    * Tekshiruv arzon: ro'yxatning birinchi tuguni hamon shu paragraf
    * ichidami? Yo'q bo'lsa — matn almashgan, qayta o'qiymiz.
    */
-  const paint = (ratio: number) => {
-    const host = textRef.current;
+  const paint = (ratio: number, key: string) => {
+    const host = root.current?.querySelector<HTMLElement>(`[data-year="${key}"]`);
     if (!host) return;
 
     let list = chars.current;
@@ -137,8 +150,20 @@ export function AboutIntro({
   useEffect(() => {
     chars.current = [];
     shownRef.current = 0;
-    // Pin yo'q (telefon, reduced-motion) — matn to'liq ko'rinadi.
-    if (!pinned) paint(1);
+
+    /*
+       Blok endigina mount qilindi — uni DARROV bo'yaymiz.
+       `onUpdate` buni qila olmaydi: u yil almashgan lahzada
+       ishlaydi, o'shanda yangi blok hali DOM'da yo'q. Agar
+       foydalanuvchi shu oraliqda scroll'ni to'xtatsa, keyingi
+       chaqiruv umuman kelmasdi va matn tutunsiz, birdan to'liq
+       chiqib qolardi.
+
+       Pin yo'q bo'lsa (telefon, reduced-motion) nisbat 1 — matn
+       to'liq ko'rinadi.
+    */
+    paint(pinned ? ratioRef.current : 1, keyOf(active));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current?._id, pinned]);
 
   useGSAP(
@@ -147,14 +172,45 @@ export function AboutIntro({
       if (window.matchMedia("(max-width: 1023px)").matches) return;
 
       const fill = root.current.querySelector<HTMLElement>("[data-fill]");
+
+      /*
+        Sayt sarlavhasi FIXED va hamma narsaning ustida suzadi.
+        `start: "top top"` esa blokning tepasini EKRAN tepasiga
+        tenglashtiradi — natijada blokning yuqori qismi sarlavha ostiga
+        kirib ketadi va ko'rinmaydi. Shuning uchun pin sarlavha
+        balandligicha pastdan boshlanadi.
+      */
+      const headerH = () => {
+        const el = document.documentElement;
+        // O'zgaruvchi `rem` da yozilgan (`5.5rem`) — uni PIKSELGA
+        // o'girmasak, `parseFloat` 5.5 ni qaytaradi va sarlavha
+        // deyarli hisobga olinmay qolardi.
+        const css = getComputedStyle(el);
+        const raw = css.getPropertyValue("--header-h").trim();
+        const n = Number.parseFloat(raw);
+        if (!Number.isFinite(n)) return 88;
+        return raw.endsWith("rem") ? n * (Number.parseFloat(css.fontSize) || 16) : n;
+      };
+
+      /*
+        Himoya chegarasi. Blok balandligi yuqorida CSS bilan ekranga
+        bog'langani uchun odatda bu shart bajariladi. Lekin juda past
+        oynada (`max(38rem, …)` ning quyi chegarasi ishlaganda) blok
+        ekrandan baland bo'lib qoladi — o'shanda mixlash kesilgan
+        kontentni beradi. Bunday holatda mixlamaymiz: oddiy scroll
+        noqulay, ko'rinmaydigan yarim blok esa yaroqsiz.
+      */
+      if (root.current.offsetHeight > window.innerHeight - headerH()) return;
+
       setPinned(true);
 
       const st = ScrollTrigger.create({
         trigger: root.current,
-        start: "top top",
+        start: () => `top top+=${headerH()}`,
         // Har qadamga bitta ekran balandligi — o'qishga yetarli vaqt.
         end: () => `+=${window.innerHeight * steps}`,
         pin: true,
+        pinSpacing: true,
         scrub: 0.5,
         onUpdate: (self) => {
           const raw = self.progress * steps;
@@ -168,7 +224,8 @@ export function AboutIntro({
              30% o'qish uchun tinch pauza bo'lib qoladi.
           */
           const ratio = Math.min(1, local / 0.7);
-          paint(ratio);
+          ratioRef.current = ratio;
+          paint(ratio, keyOf(step - 1));
           setDone((prev) => (prev === (ratio >= 1) ? prev : ratio >= 1));
 
           /*
@@ -198,8 +255,24 @@ export function AboutIntro({
       markazlashtirish YO'Q. Ular pin paytida tepada katta bo'sh joy
       qoldirardi va joylashuvni o'zgartirardi.
     */
-    <div ref={root}>
-      <div className="grid gap-10 lg:grid-cols-[1fr_minmax(0,42rem)] lg:items-center lg:gap-12 xl:gap-16">
+    <div
+      ref={root}
+      /*
+        Katta ekranda blok balandligi EKRANGA bog'lanadi, mazmunga
+        emas. Ilgari u tabiiy balandligida o'sib ketardi va mixlanganda
+        pastki qismi — chiziq va raqamlar — ekrandan chiqib qolardi;
+        scroll esa mixlangani uchun ularni ko'rsata olmasdi.
+
+        `100svh` — telefon va planshetdagi yig'iladigan panel bilan
+        birga o'zgaradigan haqiqiy balandlik; `--header-h` — suzib
+        turgan sarlavha. `max(38rem, …)` — juda past oynada blok
+        siqilib ketmasligi uchun quyi chegara: bunday holatda u
+        ekrandan baland bo'lib qoladi va quyidagi tekshiruv mixlashni
+        umuman o'chiradi.
+      */
+      className="lg:flex lg:h-[max(38rem,calc(100svh-var(--header-h)-1.75rem))] lg:flex-col"
+    >
+      <div className="grid gap-10 lg:min-h-0 lg:flex-1 lg:grid-cols-[1fr_minmax(0,42rem)] lg:items-center lg:gap-12 xl:gap-16">
         <div>
           <p className="inline-block rounded-full border border-taupe/45 px-3.5 py-1.5 text-[11px] tracking-[0.16em] text-espresso-soft/85 uppercase">
             {pick(about.eyebrow, locale)}
@@ -218,7 +291,7 @@ export function AboutIntro({
             har almashinuvda balandligini o'zgartirib, ostidagi raqamlar
             va chiziqni sakratardi.
           */}
-          <div className="relative mt-7 min-h-[10.5rem]">
+          <div className="relative mt-6 min-h-[9rem]">
             {/*
               `mode="wait"` YO'Q va bolalar ABSOLYUT.
 
@@ -234,6 +307,7 @@ export function AboutIntro({
             <AnimatePresence initial={false}>
               <motion.div
                 key={current?._id ?? "intro"}
+                data-year={current?._id ?? "intro"}
                 className="absolute inset-0"
                 initial={reduced ? false : { opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -250,10 +324,7 @@ export function AboutIntro({
                     </h2>
 
                     {/* Harfma-harf ochilish — izohi komponent boshida. */}
-                    <p
-                      ref={textRef}
-                      className="measure mt-4 text-[18px] leading-relaxed text-espresso-soft"
-                    >
+                    <p className="measure mt-4 text-[18px] leading-relaxed text-espresso-soft">
                       {/*
                         So'z butun bo'lib o'raladi (`inline-block`):
                         harflar alohida tugun bo'lgani uchun usiz satr
@@ -289,7 +360,7 @@ export function AboutIntro({
           </div>
 
           {/* ---------- raqamlar: har yilga o'ziniki ---------- */}
-          <div className="mt-9 grid min-h-[4.75rem] grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4">
+          <div className="mt-8 grid min-h-[4.5rem] grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4">
             <AnimatePresence mode="wait">
               <motion.div
                 key={current?._id ?? "intro-stats"}
@@ -319,7 +390,14 @@ export function AboutIntro({
         </div>
 
         {/* ---------- o'ngdagi rasm: yil bilan almashadi ---------- */}
-        <div className="relative aspect-[5/4] overflow-hidden rounded-3xl border border-taupe/25 bg-cream shadow-[0_34px_70px_-30px_rgba(41,34,30,0.4)]">
+        {/*
+          Telefonda nisbat bo'yicha, katta ekranda esa ustun bo'yicha:
+          `self-stretch` `items-center` ni faqat shu katak uchun bekor
+          qiladi, matn ustuni esa markazda qolaveradi. Shu tufayli rasm
+          qancha joy qolsa — shuncha katta bo'ladi va hech qachon
+          blokni cho'zib yubormaydi.
+        */}
+        <div className="relative aspect-[4/3] overflow-hidden rounded-3xl lg:aspect-auto lg:h-full lg:self-stretch border border-taupe/25 bg-cream shadow-[0_34px_70px_-30px_rgba(41,34,30,0.4)]">
           <AnimatePresence initial={false}>
             {media ? (
               <motion.div
@@ -359,7 +437,7 @@ export function AboutIntro({
 
       {/* ---------- yillar chizig'i: BUTUN KENGLIKDA ---------- */}
       {points.length > 0 && (
-        <div className="relative mt-10 lg:mt-12">
+        <div className="relative mt-9 lg:mt-10 lg:shrink-0">
           {/*
             Yo'lakcha nuqtalarning MARKAZIDAN o'tadi: nuqta 20px, ya'ni
             markaz 10px da. Chiziq 2px bo'lgani uchun u `top-[9px]` ga

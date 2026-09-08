@@ -18,9 +18,11 @@ export const ADMIN_SECTIONS = [
   { key: "reviews", href: "/admin/reviews", label: "Sharhlar", Icon: MessageSquareQuote },
   { key: "branches", href: "/admin/branches", label: "Filiallar", Icon: MapPin },
   { key: "badges", href: "/admin/badges", label: "Belgilar", Icon: BadgeCheck },
+  { key: "features", href: "/admin/features", label: "Xususiyatlar", Icon: Sparkles },
   { key: "lead-trust", href: "/admin/lead-trust", label: "Ishonch chizig‘i", Icon: Handshake },
   { key: "timeline", href: "/admin/timeline", label: "Tarix", Icon: History },
   { key: "advantages", href: "/admin/advantages", label: "Afzalliklar", Icon: Sparkles },
+  { key: "services", href: "/admin/services", label: "Mijozlarga", Icon: Handshake },
   { key: "faq", href: "/admin/faq", label: "Savol-javob", Icon: CircleHelp },
   { key: "images", href: "/admin/images", label: "Rasmlar", Icon: ImageIcon },
 ] as const;

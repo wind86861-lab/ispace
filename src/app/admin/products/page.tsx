@@ -5,7 +5,8 @@ import { readCollection } from "@/lib/store";
 import { products as seedProducts } from "@/content/products";
 import { categories as seedCategories } from "@/content/categories";
 import { badges as seedBadges } from "@/content/badges";
-import type { Badge, Category, Product } from "@/content/types";
+import { productFeatures as seedFeatures } from "@/content/features";
+import type { Badge, Category, Product, ProductFeature } from "@/content/types";
 import { readOverrides } from "@/lib/image-overrides";
 
 export const dynamic = "force-dynamic";
@@ -13,10 +14,11 @@ export const dynamic = "force-dynamic";
 export default async function Page() {
   await requireAdmin();
 
-  const [items, categories, badges, overrides] = await Promise.all([
+  const [items, categories, badges, features, overrides] = await Promise.all([
     readCollection<Product>("products", seedProducts),
     readCollection<Category>("categories", seedCategories),
     readCollection<Badge>("badges", seedBadges),
+    readCollection<ProductFeature>("productFeatures", seedFeatures),
     readOverrides(),
   ]);
 
@@ -37,12 +39,13 @@ export default async function Page() {
     <AdminShell
       active="products"
       title="Mahsulotlar"
-      description="Katalogdagi mahsulotlar. Har bir matn uchala tilda to‘ldiriladi — sayt ru, uz va en da ishlaydi."
+      description="Katalogdagi mahsulotlar. Har matn ikkala tilda to‘ldiriladi. Xususiyatlar «Xususiyatlar» bo‘limidan, belgilar «Belgilar» bo‘limidan tanlanadi."
     >
       <ProductsAdmin
         items={items}
         categories={categories}
         badges={badges}
+      features={features}
         previews={previews}
       />
     </AdminShell>

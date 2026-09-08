@@ -127,6 +127,27 @@ export type Category = {
 export type Feature = { icon: FeatureIcon; label: LocaleString };
 
 /**
+ * Xususiyat KATALOGI — bir marta yaratiladi, ko'p mahsulotda yoqiladi.
+ *
+ * Nega alohida kolleksiya: solishtirish jadvali xususiyatlarni YORLIQ
+ * matni bo'yicha birlashtiradi. Har mahsulotda yorliq qo'lda yozilsa,
+ * «Прогрев спины» va «Прогрев» ikkita alohida qator bo'lib chiqadi va
+ * matritsa umuman qurilmaydi. Katalogdan tanlanganda yorliq ta'rifi
+ * bitta — qatorlar o'z-o'zidan ustma-ust tushadi.
+ *
+ * `Badge` bilan bir xil naqsh, farqi: nishonda admin RASM yuklaydi,
+ * bu yerda esa ikon koddagi ro'yxatdan tanlanadi (u kartada chiziq
+ * bo'lib chiziladi — `DrawIcon`).
+ */
+export type ProductFeature = {
+  _id: string;
+  icon: FeatureIcon;
+  label: LocaleString;
+  /** Ro'yxatdagi tartib. */
+  rank: number;
+};
+
+/**
  * Mahsulot belgisi — kartadagi rasm ustida turadigan nishon.
  *
  * `Feature` dan farqi: ikoni KODDA emas, admin yuklaydigan rasm.
@@ -237,6 +258,15 @@ export type Product = {
    * Admin belgilarni bir marta yaratadi va har mahsulotda yoqadi.
    */
   badgeIds?: string[];
+  /**
+   * Xususiyatlar — `ProductFeature._id` lar ro'yxati.
+   *
+   * `features` maydonini `getContent()` shundan HOSIL QILADI. Ikkalasi
+   * ham turgani ataylab: `features` — chizishga tayyor ko'rinish,
+   * `featureIds` — haqiqat manbai. Eski yozuvlarda `featureIds` yo'q,
+   * o'shanda `features` o'z holicha ishlatiladi.
+   */
+  featureIds?: string[];
 
   /* --- batafsil sahifa uchun; hammasi ixtiyoriy --- */
   brand?: string;
@@ -253,6 +283,44 @@ export type Product = {
   marketplaces?: Marketplace[];
   bundles?: ProductOption[];
   story?: ProductStoryBlock[];
+};
+
+/**
+ * «Mijozlarga» sahifasidagi bitta xizmat: test-drayv, muddatli to'lov,
+ * kafolat, yetkazib berish.
+ *
+ * Nega alohida kolleksiya, `Advantage` emas: afzallik — bitta jumla,
+ * bu esa TO'LIQ bo'lim. Unda o'z sarlavhasi, ro'yxati, raqami va
+ * mediasi bor va u sahifada alohida ekran egallaydi.
+ */
+export type ClientService = {
+  _id: string;
+  /** Langar (`#test-drive`) — sarlavha ostidagi chiplar shunga o'tadi. */
+  slug: string;
+  icon: IconName;
+  eyebrow: LocaleString;
+  title: LocaleString;
+  lead: LocaleString;
+  /** Bulletlar — har biri `DrawIcon` bilan chizilib chiqadi. */
+  points: LocaleString[];
+  /**
+   * Sahifa boshidagi raqamlar chizig'idagi katak.
+   *
+   * `value` ATAYLAB tilga bog'liq emas: «500 000», «30%», «1–3».
+   * Raqamni tarjima qilib bo'lmaydi, so'z esa `unit` va `label` da.
+   */
+  stat?: {
+    value: string;
+    unit?: LocaleString;
+    label: LocaleString;
+  };
+  /**
+   * Media uyasi. Yuklanmaguncha CHIZILMAYDI (`Media.uploaded`) — blok
+   * o'sha holatda faqat matn bilan, bo'sh ramkasiz chiqadi.
+   */
+  media: Media;
+  /** Yakuniy urg'u qatori — bo'lim oxiridagi bitta jumla. */
+  outro?: LocaleString;
 };
 
 export type Advantage = {
@@ -507,6 +575,8 @@ export type SiteContent = {
   categories: Category[];
   products: Product[];
   advantages: Advantage[];
+  services: ClientService[];
+  productFeatures: ProductFeature[];
   about: About;
   partners: Partner[];
   branches: Branch[];

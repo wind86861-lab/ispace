@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
-import { ShoppingBag, Trash2, X } from "lucide-react";
+import { Check, Minus, ShoppingBag, Sparkles, Trash2, X } from "lucide-react";
 import type { Category, LocaleString, Product } from "@/content/types";
 import type { Locale } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
@@ -32,7 +32,32 @@ type Row = {
   label: string;
   /** Har ustun uchun qiymat; `null` — bu tovarda bunday xarakteristika yo'q. */
   values: (string | null)[];
+  /**
+   * `true` — qiymatlar «bor / yo'q» juftligi.
+   *
+   * Bunday qator matn o'rniga BELGI bilan chiziladi: ko'z uni bir
+   * qarashda o'qiydi, "Есть/Нет" so'zlarining ustuni esa jadvalni
+   * shovqinga to'ldirardi.
+   */
+  boolean?: boolean;
+  /**
+   * Eng yaxshi ustun indeksi — narxda eng arzoni, reytingda eng
+   * yuqorisi. Jadvalning vazifasi ma'lumot ko'rsatish emas, QAROR
+   * qabul qilishga yordam berish: farq o'z-o'zidan ko'zga
+   * tashlanmasa, foydalanuvchi uni qidirib o'tirishi kerak bo'ladi.
+   */
+  best?: number;
 };
+
+/** Massivdagi eng yaxshi qiymatning indeksi; tenglikda — belgilanmaydi. */
+function bestIndex(values: (number | null)[], mode: "min" | "max"): number | undefined {
+  const real = values.filter((v): v is number => v != null);
+  if (real.length < 2) return undefined;
+  const target = mode === "min" ? Math.min(...real) : Math.max(...real);
+  if (real.filter((v) => v === target).length > 1) return undefined;
+  const i = values.findIndex((v) => v === target);
+  return i >= 0 ? i : undefined;
+}
 
 /**
  * Qatorlarni birlashtirish kaliti.
@@ -98,6 +123,7 @@ export function CompareBoard({
         key: "price",
         label: t("rows.price"),
         values: items.map((p) => formatPrice(p.price, locale)),
+        best: bestIndex(items.map((p) => p.price), "min"),
       },
       {
         key: "brand",
@@ -108,6 +134,7 @@ export function CompareBoard({
         key: "rating",
         label: t("rows.rating"),
         values: items.map((p) => (p.rating ? p.rating.toFixed(1) : null)),
+        best: bestIndex(items.map((p) => p.rating ?? null), "max"),
       },
       {
         key: "stock",
@@ -122,7 +149,58 @@ export function CompareBoard({
           p.colors?.length ? p.colors.map((c) => pick(c.label, locale)).join(", ") : null,
         ),
       },
+      /*
+       * Chegirma — hisoblanadigan qator.
+       *
+       * Uni admin kiritmaydi va kiritishi ham shart emas: eski narx
+       * bo'lsa, foizni jadvalning o'zi chiqaradi. Aynan shu raqam
+       * qaror qabul qilishga eng ko'p ta'sir qiladi.
+       */
+      {
+        key: "discount",
+        label: t("rows.discount"),
+        values: items.map((p) =>
+          p.oldPrice && p.oldPrice > p.price
+            ? `−${Math.round((1 - p.price / p.oldPrice) * 100)}%`
+            : null,
+        ),
+      },
+      {
+        key: "bundles",
+        label: t("rows.bundles"),
+        values: items.map((p) =>
+          p.bundles?.length ? p.bundles.map((b) => pick(b.label, locale)).join(", ") : null,
+        ),
+      },
     ];
+
+    /*
+     * XUSUSIYAT MATRITSASI — solishtirishning eng foydali qismi.
+     *
+     * Nega alohida qator: xususiyat — bu to'plam, "bor yoki yo'q".
+     * Ularni bitta katakka vergul bilan yozish ikki ustunni
+     * solishtirishni foydalanuvchining o'z zimmasiga tashlaydi.
+     * Har xususiyat o'z qatorida bo'lsa, farq ustma-ust turadi.
+     *
+     * Va eng muhimi: `features` ni forma HAR DOIM so'raydi. Ya'ni bu
+     * qatorlar admin qo'shgan yangi mahsulotda ham bo'ladi — jadval
+     * hech qachon faqat narxdan iborat bo'lib qolmaydi.
+     */
+    const featureLabels = new Map<string, LocaleString>();
+    for (const product of items) {
+      for (const f of product.features) {
+        const key = specKey(f.label);
+        if (!featureLabels.has(key)) featureLabels.set(key, f.label);
+      }
+    }
+    const featureRows: Row[] = [...featureLabels.entries()].map(([key, label]) => ({
+      key: `feat-${key}`,
+      label: pick(label, locale),
+      boolean: true,
+      values: items.map((p) =>
+        p.features.some((f) => specKey(f.label) === key) ? t("rows.yes") : t("rows.no"),
+      ),
+    }));
 
     /*
      * `specs` qatorlari BIRLASHTIRILADI: kalitlar birinchi uchragan
@@ -147,7 +225,7 @@ export function CompareBoard({
       }),
     }));
 
-    const all = [...base, ...specRows];
+    const all = [...base, ...featureRows, ...specRows];
 
     // Bo'sh qator ko'rsatilmaydi: hech bir tovarda qiymati yo'q.
     const filled = all.filter((row) => row.values.some((v) => v !== null && v !== ""));
@@ -249,6 +327,19 @@ export function CompareBoard({
         Yorliq ustuni `sticky left-0`: qator nomi ko'z oldida qoladi,
         aks holda o'ngga surilganda qaysi xarakteristika ekani yo'qoladi.
       */}
+      {/*
+        Bitta ustunli jadval solishtirish emas.
+
+        Foydalanuvchi ikki xil kategoriyadan bittadan tovar qo'shsa,
+        ekranda yolg'iz ustun turadi va bu "ishlamayapti" bo'lib
+        ko'rinardi. Endi sabab aniq aytiladi.
+      */}
+      {active.items.length < 2 && (
+        <p className="mt-6 rounded-2xl border border-gold/40 bg-gold/[0.06] px-6 py-4 text-center text-sm text-espresso">
+          {t("rows.alone")}
+        </p>
+      )}
+
       <div className="mt-6 overflow-x-auto pb-2">
         <table className="w-max border-collapse text-sm">
           <caption className="sr-only">{t("title")}</caption>
@@ -342,14 +433,43 @@ export function CompareBoard({
                 >
                   {row.label}
                 </th>
-                {row.values.map((value, i) => (
-                  <td
-                    key={`${row.key}-${active.items[i]._id}`}
-                    className="px-4 py-3.5 text-[14px] leading-snug text-espresso"
-                  >
-                    {value ?? <span className="text-taupe-text">{t("dash")}</span>}
-                  </td>
-                ))}
+                {row.values.map((value, i) => {
+                  const on = row.boolean && value === t("rows.yes");
+                  return (
+                    <td
+                      key={`${row.key}-${active.items[i]._id}`}
+                      className="px-4 py-3.5 text-[14px] leading-snug text-espresso"
+                    >
+                      {row.boolean ? (
+                        /*
+                          Belgi — matn emas: «Есть/Нет» ustuni jadvalni
+                          shovqinga to'ldirardi, belgi esa bir qarashda
+                          o'qiladi. Ekran o'quvchi uchun so'z qoladi.
+                        */
+                        <span className="flex items-center gap-2">
+                          {on ? (
+                            <Check size={16} strokeWidth={2.2} className="text-gold-deep" aria-hidden="true" />
+                          ) : (
+                            <Minus size={16} strokeWidth={2} className="text-taupe-text/70" aria-hidden="true" />
+                          )}
+                          <span className="sr-only">{value}</span>
+                        </span>
+                      ) : value ? (
+                        <span className="flex flex-wrap items-center gap-2">
+                          {value}
+                          {row.best === i && (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-gold/15 px-2 py-0.5 text-[11px] text-gold-ink">
+                              <Sparkles size={10} strokeWidth={2} aria-hidden="true" />
+                              {row.key === "price" ? t("rows.cheapest") : t("rows.topRated")}
+                            </span>
+                          )}
+                        </span>
+                      ) : (
+                        <span className="text-taupe-text">{t("dash")}</span>
+                      )}
+                    </td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>

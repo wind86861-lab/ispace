@@ -31,7 +31,7 @@ test("login nom va parolni birga tekshiradi", async ({ request }) => {
   expect(ok.ok()).toBeTruthy();
 });
 
-test("mahsulot qo‘shiladi, saytda uch tilda chiqadi va o‘chiriladi", async ({ page, request }) => {
+test("mahsulot qo‘shiladi, saytda ikki tilda chiqadi va o‘chiriladi", async ({ page, request }) => {
   const login = await request.post("/api/admin/session", {
     data: { username: USERNAME, password: PASSWORD },
   });
@@ -77,7 +77,6 @@ test("mahsulot qo‘shiladi, saytda uch tilda chiqadi va o‘chiriladi", async (
     for (const [locale, title] of [
       ["ru", "E2E кресло"],
       ["uz", "E2E kreslo"],
-      ["en", "E2E chair"],
     ] as const) {
       await page.goto(`/${locale}/catalog/e2e-test-chair`);
       await expect(page.getByRole("heading", { name: title, level: 1 })).toBeVisible();

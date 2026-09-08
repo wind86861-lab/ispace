@@ -17,6 +17,8 @@ import { faq as seedFaq } from "./faq";
 import { lead } from "./lead";
 import { leadTrust as seedLeadTrust } from "./lead-trust";
 import { timeline as seedTimeline } from "./timeline";
+import { services as seedServices } from "./services";
+import { productFeatures as seedFeatures } from "./features";
 
 /**
  * Yagona kontent kirish nuqtasi.
@@ -42,6 +44,8 @@ export async function getContent(): Promise<SiteContent> {
     badges,
     leadTrust,
     timeline,
+    services,
+    productFeatures,
   ] =
     await Promise.all([
       readOverrides(),
@@ -55,14 +59,40 @@ export async function getContent(): Promise<SiteContent> {
       readCollection("badges", seedBadges),
       readCollection("leadTrust", seedLeadTrust),
       readCollection("timeline", seedTimeline),
+      readCollection("services", seedServices),
+      readCollection("productFeatures", seedFeatures),
     ]);
+
+  /*
+   * Xususiyatlar KATALOGDAN hal qilinadi.
+   *
+   * Mahsulot faqat `_id` larni saqlaydi; yorliq va ikon bitta joyda
+   * turadi. Katalogda yorliq tuzatilsa, u hamma mahsulotda birdaniga
+   * yangilanadi — va solishtirish jadvalidagi qatorlar mos tushishda
+   * davom etadi.
+   *
+   * `featureIds` yo'q eski yozuvlarda ichki `features` o'z holicha
+   * qoladi: migratsiya talab qilinmaydi.
+   */
+  const featureById = new Map(productFeatures.map((f) => [f._id, f]));
+  const resolved = products.map((p) =>
+    p.featureIds
+      ? {
+          ...p,
+          features: p.featureIds
+            .map((id) => featureById.get(id))
+            .filter((f) => f != null)
+            .map((f) => ({ icon: f.icon, label: f.label })),
+        }
+      : p,
+  );
 
   return applyOverrides<SiteContent>({
     nav,
     hero,
     trust,
     categories,
-    products,
+    products: resolved,
     advantages,
     about,
     partners,
@@ -76,6 +106,8 @@ export async function getContent(): Promise<SiteContent> {
     lead,
     leadTrust,
     timeline,
+    services,
+    productFeatures,
   }, overrides);
 }
 

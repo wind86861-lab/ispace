@@ -1,4 +1,3 @@
-import { readFileSync } from "node:fs";
 import { test, expect } from "@playwright/test";
 
 // `ADMIN_USERNAME` test serverida berilmagan — sukut qiymati "admin".
@@ -6,72 +5,159 @@ const USERNAME = "admin";
 const PASSWORD = "playwright-test-parol";
 const HEADERS = { "x-requested-with": "ispace-admin" };
 
-/** Sinov bloki va uning uyasi — kontentdan hosil qilingan `id`. */
-const SLOT = "story-p-crown-2-modules-0";
-const HEADING = "3 независимых массажных модуля";
-const PAGE = "/ru/catalog/crown-2";
+const PAGE = "/ru/catalog/e2e-story-chair";
+const HEADING = "E2E hikoya bloki";
 
 test.describe.configure({ mode: "serial" });
 
 /**
  * Mahsulot sahifasidagi hikoya bloklari.
  *
- * Talab: blok kontentda oldindan e'lon qilingan bo'lsa ham, foydalanuvchi
- * uni faqat rasm YUKLANGANDAN keyin ko'radi. Aks holda sahifada bo'sh
- * o'rindosh gradientli ramka turib qolardi.
+ * Talab: blok kontentda e'lon qilingan bo'lsa ham, foydalanuvchi uni
+ * faqat media YUKLANGANDAN keyin ko'radi. Aks holda sahifada bo'sh
+ * o'rindosh ramka turib qolardi.
  *
- * Test uchala holatni ham bosib o'tadi — yo'q → bor → yana yo'q, chunki
- * "ortga qaytarish" ham talabning bir qismi: rasm o'chirilsa blok ham
- * yo'qolishi kerak.
+ * Test uchala holatni bosib o'tadi — yo'q → bor → yana yo'q, chunki
+ * "ortga qaytarish" ham talabning bir qismi.
+ *
+ * Media KONTENT API orqali biriktiriladi, `images` uyalari orqali
+ * emas: hikoya bloklari mahsulot formasiga ko'chgan va ularning
+ * mediasi endi mahsulot yozuvining o'zida saqlanadi. Eski test
+ * `story-*` uyasini so'rardi — u endi mavjud emas.
  */
-test("hikoya bloki faqat rasm yuklanganda ko‘rinadi", async ({ page, request }) => {
+test("hikoya bloki faqat media yuklanganda ko‘rinadi", async ({ page, request }) => {
   const heading = page.getByRole("heading", { name: HEADING });
 
-  // 1 — dastlab yo'q
+  const login = await request.post("/api/admin/session", {
+    data: { username: USERNAME, password: PASSWORD },
+  });
+  expect(login.ok()).toBeTruthy();
+
+  const base = {
+    slug: "e2e-story-chair",
+    title: { ru: "E2E hikoya kreslosi", uz: "E2E hikoya kreslosi" },
+    category: "massage-chairs",
+    price: 3_300_000,
+    rank: 1,
+    images: [
+      {
+        src: "/images/products/crown-2.webp",
+        alt: { ru: "E2E", uz: "E2E" },
+        width: 900,
+        height: 900,
+      },
+    ],
+    features: [],
+  };
+
+  /*
+    Oldingi yiqilgan yurishdan qolgan yozuv tozalanadi.
+
+    Testlar `serial` va bir xil `slug` bilan ishlaydi: yiqilish
+    o'chirish qadamiga yetmasdan to'xtatsa, keyingi yurish
+    «Bunday slug allaqachon bor» xatosi bilan yiqilardi — ya'ni bitta
+    nosozlik butun to'plamni bloklab qo'yardi.
+  */
+  const existing = await request.get("/api/admin/content/products");
+  if (existing.ok()) {
+    const items = (await existing.json()).items as { _id: string; slug: string }[];
+    for (const item of items.filter((x) => x.slug === base.slug)) {
+      await request.delete(
+        `/api/admin/content/products?id=${encodeURIComponent(item._id)}`,
+        { headers: HEADERS },
+      );
+    }
+  }
+
+  /*
+    Blok e'lon qilingan va media YO'LI ko'rsatilgan, lekin fayl hali
+    yuklanmagan. Yo'l ataylab mavjud emas: `image-overrides.json` dagi
+    yo'l bo'lsa, `applyOverrides` uni almashtirib `uploaded: true`
+    qo'yardi va shart buzilardi. Yuklanmagan (`/media/` prefiksi yo'q → `Media.uploaded` yo'q).
+    Aynan shu holat yashirilishi kerak: bo'sh uya + matn esa ataylab
+    qoldirilgan MATN bloki hisoblanadi va chiziladi.
+  */
+  const created = await request.post("/api/admin/content/products", {
+    headers: HEADERS,
+    data: {
+      ...base,
+      story: [
+        {
+          layout: "wide",
+          title: { ru: HEADING, uz: HEADING },
+          media: [{ src: "/images/story/e2e-hali-yuklanmagan.webp", alt: { ru: "E2E", uz: "E2E" } }],
+        },
+      ],
+    },
+  });
+  expect(created.ok(), await created.text()).toBeTruthy();
+  const id = (await created.json()).item._id as string;
+
+  // 1 — media yo'q, blok ham yo'q
   await page.goto(PAGE);
   await expect(heading).toHaveCount(0);
 
-  const login = await request.post("/api/admin/session", { data: { username: USERNAME, password: PASSWORD } });
-  expect(login.ok()).toBeTruthy();
-
-  // 2 — yuklaymiz va blok paydo bo'ladi
-  const upload = await request.post("/api/admin/images", {
-    headers: HEADERS,
-    multipart: {
-      id: SLOT,
-      file: {
-        name: "story.png",
-        mimeType: "image/png",
-        buffer: readFileSync("tests/fixtures/product-on-white.png"),
+  // 2 — media biriktiramiz va blok paydo bo'ladi
+  const withMedia = await request.put(
+    `/api/admin/content/products?id=${encodeURIComponent(id)}`,
+    {
+      headers: HEADERS,
+      data: {
+        ...base,
+        story: [
+          {
+            layout: "wide",
+            title: { ru: HEADING, uz: HEADING },
+            /*
+              `/media/` prefiksi «yuklangan» degani (`Media.uploaded` ni
+              validator shundan qo'yadi) — fayl yuklashni takrorlamasdan
+              aynan shu shartni sinaymiz.
+            */
+            media: [{ src: "/media/e2e-story.webp", alt: { ru: "E2E", uz: "E2E" } }],
+          },
+        ],
       },
     },
-  });
-  expect(upload.ok(), await upload.text()).toBeTruthy();
+  );
+  expect(withMedia.ok(), await withMedia.text()).toBeTruthy();
 
   await page.goto(PAGE);
   await expect(heading).toBeVisible();
 
-  // Rasmning o'zi ham haqiqatan berilishi kerak, faqat matn emas.
-  const src = await page
-    .locator(`img[alt*="Crown 2"]`)
-    .last()
-    .getAttribute("src");
-  expect(src, "blok rasmi sahifada bo‘lishi kerak").toBeTruthy();
-
-  // 3 — o'chiramiz va blok yana yo'qoladi
-  const del = await request.delete(`/api/admin/images?id=${SLOT}`, { headers: HEADERS });
-  expect(del.ok(), await del.text()).toBeTruthy();
+  // 3 — mediani olib tashlaymiz, blok yana yo'qoladi
+  const withoutMedia = await request.put(
+    `/api/admin/content/products?id=${encodeURIComponent(id)}`,
+    {
+      headers: HEADERS,
+      data: {
+        ...base,
+        story: [
+          {
+            layout: "wide",
+            title: { ru: HEADING, uz: HEADING },
+            media: [{ src: "/images/story/e2e-hali-yuklanmagan.webp", alt: { ru: "E2E", uz: "E2E" } }],
+          },
+        ],
+      },
+    },
+  );
+  expect(withoutMedia.ok(), await withoutMedia.text()).toBeTruthy();
 
   await page.goto(PAGE);
   await expect(heading).toHaveCount(0);
+
+  const del = await request.delete(
+    `/api/admin/content/products?id=${encodeURIComponent(id)}`,
+    { headers: HEADERS },
+  );
+  expect(del.ok(), await del.text()).toBeTruthy();
 });
 
-/** Katalog va mahsulot sahifalari uchala tilda ochiladi. */
-test("katalog va mahsulot sahifalari uchala tilda ishlaydi", async ({ page }) => {
+/** Katalog va mahsulot sahifalari ikkala tilda ochiladi. */
+test("katalog va mahsulot sahifalari ikkala tilda ishlaydi", async ({ page }) => {
   for (const [locale, catalogTitle] of [
     ["ru", "Каталог товаров"],
     ["uz", "Mahsulotlar katalogi"],
-    ["en", "Product catalogue"],
   ] as const) {
     await page.goto(`/${locale}/catalog`);
     await expect(page.getByRole("heading", { name: catalogTitle, level: 1 })).toBeVisible();

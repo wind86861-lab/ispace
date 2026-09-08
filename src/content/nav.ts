@@ -3,8 +3,8 @@ import type { NavItem, SiteContact } from "./types";
 export const nav: NavItem[] = [
   { _id: "catalog",  href: "/catalog",    label: { ru: "Каталог",        uz: "Katalog",       en: "Catalog" } },
   { _id: "about",    href: "/about",      label: { ru: "О компании",     uz: "Kompaniya",     en: "About" } },
-  { _id: "reviews",  href: "#reviews",    label: { ru: "Отзывы",         uz: "Sharhlar",      en: "Reviews" } },
-  { _id: "clients",  href: "#faq",        label: { ru: "Для клиентов",   uz: "Mijozlarga",    en: "For clients" } },
+  { _id: "reviews",  href: "/reviews",    label: { ru: "Отзывы",         uz: "Sharhlar",      en: "Reviews" } },
+  { _id: "clients",  href: "/clients",        label: { ru: "Для клиентов",   uz: "Mijozlarga",    en: "For clients" } },
   { _id: "branches", href: "/branches",   label: { ru: "Магазины",       uz: "Do‘konlar",     en: "Stores" } },
   { _id: "blog",     href: "/blog",       label: { ru: "Блог",           uz: "Blog",          en: "Blog" } },
 ];

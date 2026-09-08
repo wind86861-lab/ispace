@@ -246,8 +246,19 @@
       "rating": "Reyting",
       "stock": "Mavjudligi",
       "colors": "Ranglar",
+      "features": "Xususiyatlari",
+      "bundles": "Komplektatsiyalar",
       "inStock": "Mavjud",
-      "outOfStock": "Mavjud emas"
+      "outOfStock": "Mavjud emas",
+      "badges": "Belgilar",
+      "category": "Kategoriya",
+      "discount": "Chegirma",
+      "yes": "Bor",
+      "no": "Yo‘q",
+      "best": "Eng yaxshi taklif",
+      "cheapest": "Eng past narx",
+      "topRated": "Eng yuqori reyting",
+      "alone": "Bu kategoriyada bitta tovar tanlangan. Yana qo‘shing — solishtirish paydo bo‘ladi."
     },
     "dash": "—"
   },
@@ -285,6 +296,52 @@
     "title": "iSpace blogi",
     "subtitle": "Massaj, salomatlik va texnologiyalar haqida foydali maqolalar, sharhlar va maslahatlar",
     "found": "{count} ta maqola topildi"
+  },
+  "reviewsPage": {
+    "home": "Bosh sahifa",
+    "title": "Mijozlar sharhlari",
+    "subtitle": "iSpace’ni tanlagan odamlarning haqiqiy hikoyalari — foto va video bilan",
+    "found": "{count} ta sharh topildi",
+    "searchPlaceholder": "Sharhlar bo‘yicha qidirish",
+    "searchAria": "Sharhlar bo‘yicha qidirish",
+    "empty": "Hech narsa topilmadi",
+    "readMore": "To‘liq o‘qish",
+    "all": "Barcha sharhlar",
+    "tabs": {
+      "all": "Hammasi",
+      "five": "5 yulduz",
+      "four": "4 yulduz",
+      "media": "Foto va video bilan"
+    },
+    "close": "Yopish",
+    "videoCount": "{count} ta video"
+  },
+  "clientsPage": {
+    "home": "Bosh sahifa",
+    "eyebrow": "Mijozlarga",
+    "title": "Biz o‘z zimmamizga oladigan hamma narsa",
+    "subtitle": "Uyda test-drayv, to‘g‘ridan-to‘g‘ri kompaniyadan muddatli to‘lov, 3 yilgacha kafolat va O‘zbekiston bo‘ylab bepul yetkazib berish — biz ishlaydigan shartlar.",
+    "cta": "Konsultatsiya olish",
+    "ask": "Savol berish",
+    "zoom": "Ochish",
+    "calc": {
+      "title": "Muddatli to‘lovni hisoblang",
+      "subtitle": "Modelni tanlang yoki summani kiriting — to‘lov darrov hisoblanadi",
+      "amount": "Narxi",
+      "down": "Boshlang‘ich to‘lov — 30%",
+      "downNote": "Bugun to‘lanadi",
+      "monthly": "Oylik to‘lov",
+      "monthlyNote": "3 oy, 0% foiz",
+      "note": "Banksiz, ortiqcha to‘lovsiz va penyasiz. Mahsulot narxi oshmaydi.",
+      "cta": "Muddatli to‘lovni rasmiylashtirish",
+      "total": "Jami:",
+      "steps": {
+        "now": "Bugun",
+        "m1": "1-oy",
+        "m2": "2-oy",
+        "m3": "3-oy"
+      }
+    }
   },
   "post": {
     "backToBlog": "Barcha maqolalar",

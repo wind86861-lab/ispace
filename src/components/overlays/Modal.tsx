@@ -14,12 +14,29 @@ type Props = {
   title: string;
   description?: string;
   children: ReactNode;
-  /** Video uchun — keng, shaffof, ichki paddingsiz. */
+  /** Video va rasm uchun — keng, shaffof, ichki paddingsiz, sarlavhasiz. */
   wide?: boolean;
+  /**
+   * Panel kengligi (`wide` bo'lmagan holat uchun).
+   *
+   * `sm` — forma uchun bitta ustun. `lg` — matn, fotolar panjarasi va
+   * video sig'adigan kengroq varaq. Ilgari kengroq panel kerak bo'lsa
+   * `wide` ishlatilardi, lekin u panelning O'ZINI olib tashlaydi:
+   * mazmun sahifa ustida osilib qolardi.
+   */
+  size?: "sm" | "lg";
 };
 
 /** Markazdagi modal — konsultatsiya formasi va video lightbox uchun. */
-export function Modal({ open, onClose, title, description, children, wide = false }: Props) {
+export function Modal({
+  open,
+  onClose,
+  title,
+  description,
+  children,
+  wide = false,
+  size = "sm",
+}: Props) {
   const t = useTranslations("common");
   const lenis = useLenis();
 
@@ -51,12 +68,23 @@ export function Modal({ open, onClose, title, description, children, wide = fals
                 transition={{ duration: DUR.ui, ease: EASE_LUX }}
                 className={[
                   "fixed top-1/2 left-1/2 z-[80] w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2",
+                  /*
+                    Panel EKRANDAN baland bo'lolmaydi.
+
+                    `flex-col` + ichki `overflow-y-auto`: sarlavha va
+                    yopish tugmasi joyida qoladi, faqat mazmun suriladi.
+                    Butun panelni suradigan variantda yopish tugmasi
+                    ham yuqoriga chiqib ketardi.
+                  */
                   wide
                     ? "max-w-4xl"
-                    : "max-w-[26rem] rounded-2xl bg-warm-white p-7 shadow-2xl",
+                    : [
+                        "flex max-h-[85svh] flex-col rounded-2xl bg-warm-white shadow-2xl",
+                        size === "lg" ? "max-w-2xl" : "max-w-[26rem]",
+                      ].join(" "),
                 ].join(" ")}
               >
-                <div className={wide ? "sr-only" : "mb-5"}>
+                <div className={wide ? "sr-only" : "shrink-0 px-7 pt-7 pr-16"}>
                   <Dialog.Title className="font-display text-2xl text-espresso">
                     {title}
                   </Dialog.Title>
@@ -68,7 +96,7 @@ export function Modal({ open, onClose, title, description, children, wide = fals
                 </div>
                 {!description && !wide && <Dialog.Description className="sr-only">{title}</Dialog.Description>}
 
-                {children}
+                {wide ? children : <div className="min-h-0 flex-1 overflow-y-auto px-7 pt-5 pb-7">{children}</div>}
 
                 <Dialog.Close
                   aria-label={t("close")}

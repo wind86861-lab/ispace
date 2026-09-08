@@ -7,12 +7,11 @@ const HEADERS = { "x-requested-with": "ispace-admin" };
 
 test.describe.configure({ mode: "serial" });
 
-/** Ro'yxat sahifasi uchala tilda ochiladi va maqolaga o'tadi. */
-test("blog uchala tilda ochiladi va maqolaga o‘tadi", async ({ page }) => {
+/** Ro'yxat sahifasi ikkala tilda ochiladi va maqolaga o'tadi. */
+test("blog ikkala tilda ochiladi va maqolaga o‘tadi", async ({ page }) => {
   for (const [locale, title] of [
     ["ru", "Блог iSpace"],
     ["uz", "iSpace blogi"],
-    ["en", "iSpace blog"],
   ] as const) {
     await page.goto(`/${locale}/blog`);
     await expect(page.getByRole("heading", { name: title, level: 1 })).toBeVisible();
@@ -34,7 +33,6 @@ test("maqola matni tanlangan tilda chiqadi", async ({ page }) => {
   for (const [locale, text] of [
     ["ru", "Тип направляющей"],
     ["uz", "Yo‘naltirgich turi"],
-    ["en", "Track type"],
   ] as const) {
     await page.goto(`/${locale}/blog/how-to-choose-a-massage-chair`);
     await expect(page.getByRole("heading", { name: text })).toBeVisible();

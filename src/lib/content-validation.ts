@@ -8,11 +8,15 @@ import type {
   Branch,
   Category,
   FaqItem,
+  IconName,
   LocaleString,
   Media,
   Post,
   PostBlock,
+  ClientService,
   Product,
+  ProductFeature,
+  ProductOption,
   Review,
   TimelinePoint,
   TrustPoint,
@@ -138,8 +142,15 @@ function media(v: unknown, field: string, fallbackAlt?: LocaleString): Media {
 
 const FEATURE_ICONS = [
   "zero-gravity", "body-scan", "bluetooth", "heat",
-  "sl-track", "air", "folding", "quiet",
+  "sl-track", "air", "folding", "quiet", "4d",
 ] as const;
+
+/** Ikon nomi — ro'yxatdagilardan biri bo'lishi shart. */
+const iconName = (v: unknown, field: string): IconName => {
+  const name = String(v ?? "");
+  if (!ICON_NAMES.includes(name as (typeof ICON_NAMES)[number])) fail(`${field}: noma’lum ikon`);
+  return name as IconName;
+};
 
 export function validateProduct(input: unknown, existing?: Product): Product {
   if (!input || typeof input !== "object") fail("Mahsulot obyekti kutilgan");
@@ -149,6 +160,18 @@ export function validateProduct(input: unknown, existing?: Product): Product {
   if (images.length === 0) fail("Kamida bitta rasm kerak");
 
   const features = Array.isArray(p.features) ? p.features : [];
+
+  /*
+   * Xususiyatlar endi KATALOGDAN tanlanadi, `featureIds` shu tanlov.
+   * Yorliq va ikon bu yerda saqlanmaydi: ular katalogda turadi va
+   * `getContent()` ularni chizishdan oldin qo'shadi.
+   *
+   * Takrorlar tashlanadi — bitta xususiyat ikki marta yoqilsa,
+   * solishtirish jadvalida ikkita bir xil qator chiqardi.
+   */
+  const featureIds = Array.isArray(p.featureIds)
+    ? [...new Set(p.featureIds.map((id) => str(id, "featureIds", 60)))].slice(0, 12)
+    : undefined;
   const title = localeString(p.title, "title", 200);
 
   return {
@@ -174,6 +197,7 @@ export function validateProduct(input: unknown, existing?: Product): Product {
     badgeIds: Array.isArray(p.badgeIds)
       ? p.badgeIds.slice(0, MAX_BADGES).map((b, i) => str(b, `badgeIds[${i}]`, 60))
       : undefined,
+    featureIds,
     features: features.map((f, i) => {
       const o = (f ?? {}) as Record<string, unknown>;
       const icon = String(o.icon);
@@ -221,19 +245,90 @@ export function validateProduct(input: unknown, existing?: Product): Product {
     inStock: p.inStock == null ? true : Boolean(p.inStock),
     description: p.description == null ? undefined : localeString(p.description, "description", 2000),
     delivery: p.delivery == null ? undefined : localeString(p.delivery, "delivery", 2000),
+    /*
+     * Xarakteristikalar.
+     *
+     * TO'LDIRILMAGAN qator jimgina tashlanadi, xato bermaydi. Sabab
+     * ish tartibida: muharrir kategoriya qolipini bir zarb bilan
+     * qo'shadi (o'nlab qator) va qiymatlarni bilganidan boshlab
+     * to'ldiradi. Bo'sh qator uchun saqlashni butunlay to'xtatish
+     * uni har safar qolipni qo'lda tozalashga majbur qilardi.
+     *
+     * Yo'qolgan qiymat ma'lumot yo'qotmaydi: solishtirish jadvali
+     * bo'lmagan katakni "—" bilan chizadi.
+     */
     specs: Array.isArray(p.specs)
-      ? p.specs.map((r, i) => {
-          const o = (r ?? {}) as Record<string, unknown>;
-          return {
-            label: localeString(o.label, `specs[${i}].label`, 100),
-            value: localeString(o.value, `specs[${i}].value`, 200),
-          };
-        })
+      ? (() => {
+          const rows = p.specs
+            .map((r, i) => {
+              const o = (r ?? {}) as Record<string, unknown>;
+              const filled = (v: unknown) =>
+                v != null &&
+                typeof v === "object" &&
+                Object.values(v as Record<string, unknown>).some((x) => String(x ?? "").trim());
+
+              if (!filled(o.label) || !filled(o.value)) return null;
+              return {
+                label: localeString(o.label, `specs[${i}].label`, 100),
+                value: localeString(o.value, `specs[${i}].value`, 200),
+              };
+            })
+            .filter((r): r is { label: LocaleString; value: LocaleString } => r !== null);
+          return rows.length > 0 ? rows : undefined;
+        })()
       : undefined,
 
-    // Bu maydonlarni forma tahrirlamaydi — mavjud qiymat saqlanadi.
-    colors: existing?.colors,
-    bundles: existing?.bundles,
+    /*
+     * Ranglar endi ADMINDAN keladi.
+     *
+     * Ilgari bu yerda `existing?.colors` turardi, ya'ni rang faqat
+     * `src/content/products.ts` dagi urug'da bo'lardi. Admin qo'shgan
+     * mahsulotda rang HECH QACHON paydo bo'lmasdi — solishtirish
+     * jadvalidagi «Ранги» qatori esa aynan shu maydondan o'qiydi va
+     * doim bo'sh chiqardi.
+     *
+     * `undefined` kelsa mavjudi saqlanadi: eski yozuvni tahrirlash
+     * ranglarni jimgina o'chirib yubormasin.
+     */
+    colors: Array.isArray(p.colors)
+      ? (() => {
+          /* Yorlig'i bo'sh rang — hali to'ldirilmagan qator, tashlanadi. */
+          const rows = p.colors
+            .filter(
+              (c) =>
+                c != null &&
+                typeof c === "object" &&
+                Object.values((c as Record<string, unknown>).label ?? {}).some((x) =>
+                  String(x ?? "").trim(),
+                ),
+            )
+            .map((c, i) => productOption(c, `colors[${i}]`));
+          return rows.length > 0 ? rows : undefined;
+        })()
+      : existing?.colors,
+    /*
+     * Komplektatsiyalar — ranglar bilan bir xil qoida.
+     *
+     * Ular sotib olish blokida narx farqi bilan tanlanadi
+     * (`extra`), ya'ni to'g'ridan-to'g'ri narxga ta'sir qiladi.
+     * Admindan yetib bo'lmagani sabab ular ham faqat urug' faylida
+     * qolib ketgan edi.
+     */
+    bundles: Array.isArray(p.bundles)
+      ? (() => {
+          const rows = p.bundles
+            .filter(
+              (b) =>
+                b != null &&
+                typeof b === "object" &&
+                Object.values((b as Record<string, unknown>).label ?? {}).some((x) =>
+                  String(x ?? "").trim(),
+                ),
+            )
+            .map((b, i) => productOption(b, `bundles[${i}]`));
+          return rows.length > 0 ? rows : undefined;
+        })()
+      : existing?.bundles,
     /*
      * Pastki bo'limlar (hikoya) endi ADMINDAN keladi.
      *
@@ -414,11 +509,118 @@ export function validateReview(input: unknown, existing?: Review): Review {
   };
 }
 
+/**
+ * Rang yoki komplektatsiya varianti.
+ *
+ * `_id` — yorliqdan hosil qilinadi: admin uni qo'lda yozmasligi kerak,
+ * lekin u barqaror bo'lishi shart (savatdagi tanlov shu bo'yicha
+ * saqlanadi). Yorliq bo'sh bo'lsa tartib raqamiga tushamiz.
+ */
+function productOption(v: unknown, field: string): ProductOption {
+  if (!v || typeof v !== "object") fail(`${field}: obyekt kutilgan`);
+  const o = v as Record<string, unknown>;
+
+  const label = localeString(o.label, `${field}.label`, 80);
+  const id =
+    (typeof o._id === "string" && o._id.trim() ? o._id : label.ru)
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9а-яё]+/gi, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 40) || field.replace(/[^a-z0-9]+/gi, "-");
+
+  return {
+    _id: id,
+    label,
+    /* Faqat to'g'ri HEX: noto'g'ri qiymat namunani buzardi. */
+    hex:
+      typeof o.hex === "string" && /^#[0-9a-fA-F]{6}$/.test(o.hex.trim())
+        ? o.hex.trim().toLowerCase()
+        : undefined,
+    extra: o.extra == null || o.extra === "" ? undefined : num(o.extra, `${field}.extra`, 0, 1e9),
+  };
+}
+
 const ICON_NAMES = [
   "shield", "wrench", "credit-card", "truck",
   "layers", "hand", "headset", "map-pin", "award", "sparkles",
   "armchair", "sofa", "treadmill", "bike", "elliptical", "vending", "grid",
 ] as const;
+
+/**
+ * «Mijozlarga» sahifasidagi xizmat bloki.
+ *
+ * `slug` — langar (`#test-drive`), shuning uchun manzilga tushadigan
+ * qiymatlar bilan bir xil qat'iylikda tekshiriladi.
+ *
+ * Bo'sh bulletlar TASHLANADI: muharrir ro'yxatga qator qo'shib, uni
+ * keyinroq to'ldirishi normal ish tartibi va bu saqlashni to'xtatib
+ * qo'ymasligi kerak.
+ */
+export function validateService(input: unknown, existing?: ClientService): ClientService {
+  if (!input || typeof input !== "object") fail("Xizmat obyekti kutilgan");
+  const v = input as Record<string, unknown>;
+
+  const title = localeString(v.title, "title", 160);
+  const stat = (v.stat ?? null) as Record<string, unknown> | null;
+  const statValue = typeof stat?.value === "string" ? stat.value.trim().slice(0, 20) : "";
+
+  const points = Array.isArray(v.points) ? v.points : [];
+
+  return {
+    _id: existing?._id ?? `sv-${Date.now().toString(36)}`,
+    slug: slug(v.slug, "slug"),
+    icon: iconName(v.icon, "icon"),
+    eyebrow: localeString(v.eyebrow, "eyebrow", 60),
+    title,
+    lead: localeString(v.lead, "lead", 1200),
+    points: points
+      .filter((pt) =>
+        pt != null &&
+        typeof pt === "object" &&
+        Object.values(pt as Record<string, unknown>).some((x) => String(x ?? "").trim()),
+      )
+      .map((pt, i) => localeString(pt, `points[${i}]`, 200)),
+    /* Raqamsiz blok ham bo'ladi — o'shanda chiziqda katak chiqmaydi. */
+    stat: statValue
+      ? {
+          value: statValue,
+          unit:
+            stat?.unit == null || stat.unit === ""
+              ? undefined
+              : localeString(stat.unit, "stat.unit", 30),
+          label: localeString(stat?.label, "stat.label", 160),
+        }
+      : undefined,
+    media: media(v.media, "media", title),
+    outro:
+      v.outro == null ||
+      (typeof v.outro === "object" &&
+        !Object.values(v.outro as Record<string, unknown>).some((x) => String(x ?? "").trim()))
+        ? undefined
+        : localeString(v.outro, "outro", 400),
+  };
+}
+
+/** Xususiyat katalogi bandi. */
+export function validateProductFeature(
+  input: unknown,
+  existing?: ProductFeature,
+): ProductFeature {
+  if (!input || typeof input !== "object") fail("Xususiyat obyekti kutilgan");
+  const v = input as Record<string, unknown>;
+
+  const icon = String(v.icon ?? "");
+  if (!FEATURE_ICONS.includes(icon as (typeof FEATURE_ICONS)[number]))
+    fail("icon: noma’lum ikon");
+
+  return {
+    _id: existing?._id ?? `ft-${Date.now().toString(36)}`,
+    icon: icon as ProductFeature["icon"],
+    label: localeString(v.label, "label", 80),
+    rank: v.rank == null || v.rank === "" ? 100 : num(v.rank, "rank", 0, 9999),
+  };
+}
 
 export function validateBranch(input: unknown, existing?: Branch): Branch {
   if (!input || typeof input !== "object") fail("Filial obyekti kutilgan");
