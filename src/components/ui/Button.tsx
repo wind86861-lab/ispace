@@ -43,7 +43,17 @@ export const Button = forwardRef<HTMLButtonElement, Props>(function Button(
         // ham animatsiya qilib, scroll paytida keraksiz ish tug'diradi.
         "transition-[background-color,border-color,color,transform,box-shadow] duration-300",
         "ease-[cubic-bezier(0.2,0.7,0.3,1)] disabled:opacity-60 disabled:pointer-events-none",
-        "whitespace-nowrap",
+        /*
+          `min-w-0` — tugma flex/grid katagida SIQILA olsin.
+
+          `whitespace-nowrap` tugmaning ichki eng kichik kengligini
+          matnning to'liq eniga tenglashtiradi, flex va grid bolalari
+          esa sukut bo'yicha `min-width: auto`. Ikkalasi birga
+          konteynerni matn kengligidan torroq bo'lishiga yo'l
+          qo'ymasdi — natijada butun sahifa gorizontal siljib,
+          sarlavha va tugmalar ekran chetidan kesilardi.
+        */
+        "min-w-0 whitespace-nowrap",
         VARIANTS[variant],
         SIZES[size],
         className,

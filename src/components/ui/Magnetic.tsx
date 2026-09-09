@@ -73,7 +73,8 @@ export function Magnetic({ children, className, strength = 0.35, padding = 16 }:
     >
       <div
         ref={targetRef}
-        className="h-full"
+        /* `min-w-0` — ichki tugma tor katakda siqila olsin (Button izohi). */
+        className="h-full min-w-0"
         style={{ willChange: pointerFx ? "transform" : undefined }}
       >
         {children}

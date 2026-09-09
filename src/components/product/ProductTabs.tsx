@@ -46,7 +46,24 @@ export function ProductTabs({ product }: { product: Product }) {
 
   return (
     <div>
-      <div role="tablist" onKeyDown={onKeyDown} className="flex flex-wrap gap-1 border-b border-taupe/30">
+      {/*
+        Tablar BITTA qatorda qoladi.
+
+        `flex-wrap` da uchinchi tab telefonda ikkinchi qatorga tushib,
+        ostidagi faol chiziq bilan aloqasini yo'qotardi: qaysi bo'lim
+        ochiqligi ko'rinmay qolardi. Endi qator gorizontal suriladi —
+        bu telefonda tanish harakat va chiziq doim o'z tabining
+        ostida turadi.
+
+        `-mx-*`/`px-*` juftligi surish maydonini konteyner chetlarigacha
+        yoyadi: birinchi tab chetga yopishib qolmaydi, oxirgisi esa
+        surilganda to'liq ko'rinadi.
+      */}
+      <div
+        role="tablist"
+        onKeyDown={onKeyDown}
+        className="-mx-4 flex gap-1 overflow-x-auto border-b border-taupe/30 px-4 [-ms-overflow-style:none] [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden"
+      >
         {tabs.map((key) => {
           const selected = key === active;
           return (
@@ -60,7 +77,7 @@ export function ProductTabs({ product }: { product: Product }) {
               type="button"
               onClick={() => setActive(key)}
               className={[
-                "-mb-px border-b-2 px-4 py-3 text-[14px] transition-colors duration-300",
+                "-mb-px shrink-0 border-b-2 px-4 py-3 text-[14px] whitespace-nowrap transition-colors duration-300",
                 selected
                   ? "border-gold text-espresso"
                   : "border-transparent text-espresso-soft/85 hover:text-espresso",

@@ -165,6 +165,29 @@
     color: var(--color-warm-white);
   }
 
+  /*
+   * Gorizontal siljish HIMOYASI.
+   *
+   * `clip`, `hidden` EMAS — bu muhim: `hidden` elementni scroll
+   * konteyneriga aylantiradi va u ichkaridagi `position: sticky`
+   * ni ishdan chiqaradi (sharhlar sahifasi va «Mijozlarga» dagi
+   * yopishqoq media ustuni aynan shunga tayanadi). `clip` esa
+   * scroll konteyneri yaratmaydi, faqat chetga chiqqanini kesadi.
+   *
+   * Bu tashxis emas, HIMOYA: haqiqiy sabablar o'z joyida
+   * tuzatilgan. Bu yerda `Magnetic` ning ko'rinmas sezish zonasi
+   * qoladi — u ataylab element chegarasidan tashqariga chiqadi va
+   * uni kesish to'g'ri.
+   */
+  html {
+    /*
+       `body` da emas, `html` da: gorizontal scroll konteyneri —
+       ko'rish maydoni (viewport), va u xossani ildizdan oladi.
+       `body` ga qo'yilganda sahifa baribir siljishda davom etardi.
+    */
+    overflow-x: clip;
+  }
+
   /* Klaviatura fokusi hamma joyda ko'rinadi (§ a11y). */
   :focus-visible {
     outline: 2px solid var(--color-gold);

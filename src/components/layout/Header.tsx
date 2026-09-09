@@ -121,7 +121,13 @@ export function Header({
           </ul>
         </nav>
 
-        <div className="ml-auto flex items-center gap-2 sm:gap-3.5">
+        {/*
+          320px li ekranda beshta ikon `gap-2` bilan sig'masdi va
+          qator o'ngdan chiqib, butun sahifani gorizontal siljitardi.
+          Eng tor ekranda oraliq kichrayadi; 380px dan boshlab
+          avvalgi ritm qaytadi.
+        */}
+        <div className="ml-auto flex items-center gap-0.5 min-[380px]:gap-2 sm:gap-3.5">
           <a
             href={contact.phoneHref}
             className="hidden items-center gap-2 text-[14px] text-espresso-soft transition-colors duration-300 hover:text-gold xl:inline-flex"
@@ -157,7 +163,7 @@ export function Header({
           <Link
             href="/compare"
             aria-label={hydrated ? t("compareCount", { count: compareCount }) : t("compare")}
-            className="relative grid size-10 place-items-center rounded-full text-espresso-soft transition-[color,background-color] duration-300 hover:bg-warm-white hover:text-gold"
+            className="relative grid size-9 place-items-center rounded-full text-espresso-soft transition-[color,background-color] duration-300 min-[380px]:size-10 hover:bg-warm-white hover:text-gold"
           >
             <Scale size={18} strokeWidth={1.4} aria-hidden="true" />
             {hydrated && compareCount > 0 && (
@@ -208,7 +214,7 @@ function IconButton({
       onClick={onClick}
       aria-label={label}
       className={[
-        "relative grid size-10 place-items-center rounded-full text-espresso-soft",
+        "relative grid size-9 place-items-center rounded-full text-espresso-soft min-[380px]:size-10",
         "transition-[color,background-color] duration-300 hover:bg-warm-white hover:text-gold",
         className,
       ].join(" ")}

@@ -159,13 +159,17 @@ export function BuyBox({ product }: { product: BuyBoxProduct }) {
       {/*
         --- miqdor + savat ---
 
-        Qator TO'LIQ kenglikda: miqdor bloki o'z o'lchamida qoladi,
-        asosiy tugma esa qolgan joyni oladi. Ilgari `flex-wrap` va
-        `sm:flex-none` bilan u mazmuniga qarab qisqarardi va o'ng
-        tomonda tartibsiz bo'shliq qolardi.
+        Kengroq ekranda qator TO'LIQ kenglikda: miqdor bloki o'z
+        o'lchamida qoladi, asosiy tugma esa qolgan joyni oladi.
+
+        TELEFONDA esa ular ustma-ust. 360px li ekranda miqdor bloki
+        (~140px) va «Добавить в корзину» yonma-yon sig'masdi: tugma
+        ekran chetidan kesilib, butun sahifa gorizontal siljirdi.
+        Sotib olish tugmasi — sahifaning asosiy harakati, u to'liq
+        kenglikda turishi kerak.
       */}
-      <div className="mt-7 flex items-center gap-3">
-        <div className="inline-flex h-13 shrink-0 items-center rounded-full border border-taupe/40 bg-cream">
+      <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="inline-flex h-13 shrink-0 items-center self-start rounded-full border border-taupe/40 bg-cream">
           <QtyButton label="−" onClick={() => setLocalQty((q) => Math.max(1, q - 1))}>
             <Minus size={15} strokeWidth={1.8} aria-hidden="true" />
           </QtyButton>
@@ -182,7 +186,7 @@ export function BuyBox({ product }: { product: BuyBoxProduct }) {
           `Magnetic` bilan kursorga biroz tortiladi. Katalog kartasidagi
           kabi: bir xil vazifadagi element hamma joyda bir xil his bersin.
         */}
-        <Magnetic strength={0.2} className="min-w-0 flex-1">
+        <Magnetic strength={0.2} className="min-w-0 sm:flex-1">
           <Button size="lg" onClick={add} className="w-full">
             <ShoppingBag size={16} strokeWidth={1.6} aria-hidden="true" />
             {hydrated && line ? t("inCart") : t("addToCart")}
@@ -241,7 +245,14 @@ export function BuyBox({ product }: { product: BuyBoxProduct }) {
                       className="max-h-9 w-auto object-contain"
                     />
                   ) : (
-                    <span className="text-[14px] font-medium text-espresso">{mp.name}</span>
+                    /*
+                    Logotip yuklanmagan — o'shanda nom KO'RINADIGAN
+                    plitkada turadi. Chegarasiz matn krem fonda
+                    osilib qolardi va bosiladigan ekani bilinmasdi.
+                  */
+                  <span className="w-full truncate rounded-xl border border-taupe/35 px-3 py-2.5 text-center text-[14px] font-medium text-espresso">
+                    {mp.name}
+                  </span>
                   )}
                 </a>
               </li>
@@ -255,8 +266,12 @@ export function BuyBox({ product }: { product: BuyBoxProduct }) {
         harakat (sinov va solishtirish), shuning uchun kengligi ham
         bir xil bo'lishi kerak. Ilgari `flex-wrap` da ular matn
         uzunligiga qarab turlicha edi va qator tasodifiy ko'rinardi.
+
+        Telefonda esa BITTADAN: «Записаться на тест-драйв» va
+        «Добавить к сравнению» ikkalasi ham uzun va tor ekranda
+        yonma-yon sig'masdi — ikkinchisi chetdan kesilib qolardi.
       */}
-      <div className="mt-3 grid grid-cols-2 gap-3">
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <Button variant="outline" size="md" onClick={() => openOverlay("consult")}>
           {t("testDrive")}
         </Button>
