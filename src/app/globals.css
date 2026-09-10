@@ -691,6 +691,22 @@ html[data-motion="on"] .about-aura {
   }
 }
 
+/**
+ * Gorizontal surilib ketadigan qator — surish paneli KO'RINMAYDI.
+ *
+ * Panel bu yerda faqat balandlik qo'shadi va chiplar ostida ingichka
+ * kulrang chiziq bo'lib turadi. Surish mumkinligi boshqa yo'l bilan
+ * aytiladi: qator ekran chekkasidan "kesilib" turadi.
+ */
+@utility rail {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @utility measure {
   max-width: 62ch;
   /*

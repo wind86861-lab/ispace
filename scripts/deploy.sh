@@ -39,9 +39,14 @@ say() { printf "\n\033[1m▸ %s\033[0m\n" "$1"; }
 # almashtirib turardi: jonli saytda mavjud bo'lmagan rasm yo'llari
 # paydo bo'lgan va sharhlar noto'g'ri ko'rsatilgan edi.
 #
-# `data/uploads/` OLINMAYDI: u yuzlab megabayt bo'lishi mumkin va
-# prerenderga kerak emas — HTML'ga faqat YO'L tushadi, faylning o'zi
-# ishlash paytida serverdan beriladi.
+# Yuklangan fayllar ham olinadi. Prerenderning O'ZIGA ular kerak
+# emas — HTML'ga faqat yo'l tushadi. Lekin ularsiz lokal nusxa
+# yolg'onchi bo'lib qoladi: kontent `/media/...` ga ishora qiladi,
+# fayl esa yo'q va lokal sayt `/_next/image` dan 400 oladi. Aynan shu
+# konsol testini yiqitgan edi.
+#
+# Hajm hozir 3 MB atrofida. U o'nlab megabaytga chiqsa, bu qadamni
+# `DEPLOY_SKIP_UPLOADS=1` bilan o'tkazib yuborish mumkin.
 say "1/5 · Kontentni serverdan olish"
 mkdir -p data/content
 rsync -az --delete -e "${SSH[*]}" \
@@ -50,6 +55,13 @@ rsync -az --delete -e "${SSH[*]}" \
 rsync -az -e "${SSH[*]}" \
   "$HOST:$DIR/data/image-overrides.json" data/ 2>/dev/null \
   || echo "  (rasm almashtirishlari yo'q)"
+
+if [ -z "${DEPLOY_SKIP_UPLOADS:-}" ]; then
+  mkdir -p data/uploads
+  rsync -az --delete -e "${SSH[*]}" \
+    "$HOST:$DIR/data/uploads/" data/uploads/ 2>/dev/null \
+    || echo "  (yuklangan fayllar yo'q)"
+fi
 
 say "2/5 · Build (lokal)"
 npm run build

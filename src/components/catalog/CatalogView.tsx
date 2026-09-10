@@ -145,7 +145,20 @@ export function CatalogView({
         yo'qotadi.
       */}
       <Reveal>
-        <ul className="flex flex-wrap gap-2">
+        {/*
+          Tor ekranda chiplar BITTA QATORDA suriladi, o'ralmaydi.
+
+          Yorliqlar uzun («Эллиптические тренажёры») va `nowrap`
+          bo'lgani uchun tor ekranda har chip alohida qatorga tushardi:
+          yettita bo'lim ~450px egallab, mahsulotlarni ekrandan pastga
+          surib yuborardi — foydalanuvchi katalogga kirib, katalogni
+          ko'rmasdi.
+
+          `-mx-4 px-4` — qator ekran chekkasigacha yetadi va oxirgi
+          chip "kesilib" turadi: surish mumkinligi shundan bilinadi.
+          `sm:` dan boshlab joy yetarli va odatdagidek o'raladi.
+        */}
+        <ul className="rail -mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-x-visible sm:px-0 sm:pb-0">
           {chips.map((c, i) => {
             const active = category === c.id;
             const Icon = c.icon;
@@ -155,6 +168,8 @@ export function CatalogView({
                 initial={reduced ? false : { opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: i * 0.04, ease: EASE_LUX }}
+                /* Surilib ketadigan qatorda chip siqilmasligi kerak. */
+                className="shrink-0 snap-start"
               >
                 <button
                   type="button"
@@ -224,7 +239,13 @@ export function CatalogView({
 
       {/* --- boshqaruv qatori --- */}
       <Reveal delay={0.06}>
-        <div className="mt-5 flex flex-wrap items-center gap-3 border-y border-taupe/30 py-4">
+        {/*
+          Tor ekranda «Saralash» pastki qatorga tushadi va BUTUN
+          kenglikni oladi. Ilgari u `ms-auto` bilan o'ng chekkaga
+          itarilardi: yozuv va ro'yxat siqilib, ular orasidagi
+          masofa tasodifiy bo'lib qolardi.
+        */}
+        <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2.5 border-y border-taupe/30 py-4">
           <button
             type="button"
             onClick={() => setOpenFilters((v) => !v)}
@@ -250,12 +271,12 @@ export function CatalogView({
             {t("found", { count: shown.length })}
           </p>
 
-          <label className="ms-auto flex items-center gap-2 text-[14px] text-espresso-soft/85">
+          <label className="flex w-full items-center gap-2 text-[14px] text-espresso-soft/85 sm:ms-auto sm:w-auto">
             {tp("sortLabel")}
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value as Sort)}
-              className="rounded-full border border-taupe/40 bg-warm-white px-3 py-2 text-[14px] text-espresso"
+              className="min-w-0 flex-1 rounded-full border border-taupe/40 bg-warm-white px-3 py-2 text-[14px] text-espresso sm:flex-none"
             >
               {SORTS.map((s) => (
                 <option key={s} value={s}>
