@@ -16,6 +16,7 @@ import { useMediaTier } from "@/hooks/useMediaTier";
 import { Reveal } from "@/components/ui/Reveal";
 import { ProductBadges } from "./ProductBadges";
 import { useShop } from "@/store/useShop";
+import { useUi } from "@/store/useUi";
 
 /**
  * Katalog kartasi.
@@ -68,6 +69,7 @@ export function ProductCard({
   };
 
   const addToCart = useShop((s) => s.addToCart);
+  const openCart = useUi((s) => s.open);
   const toggleWishlist = useShop((s) => s.toggleWishlist);
   const toggleCompare = useShop((s) => s.toggleCompare);
   const hydrated = useShop((s) => s.hydrated);
@@ -182,7 +184,11 @@ export function ProductCard({
 
             <button
               type="button"
-              onClick={() => addToCart(product._id)}
+              onClick={() => {
+                addToCart(product._id);
+                /* Bosishga javob: savat ochilib, nima qo'shilgani ko'rinadi. */
+                openCart("cart");
+              }}
               className={[
                 "relative z-[2] inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-[14px] font-medium",
                 "transition-[background-color,color] duration-300",

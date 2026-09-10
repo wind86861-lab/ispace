@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { BadgeCheck, CircleHelp, FileText, Handshake, History, Image as ImageIcon, LayoutGrid, MapPin, MessageSquareQuote, Package, Sparkles } from "lucide-react";
+import {
+  ShoppingBag, BadgeCheck, CircleHelp, FileText, Handshake, History, Image as ImageIcon, LayoutGrid, MapPin, MessageSquareQuote, Package, Sparkles } from "lucide-react";
 import { LogoutButton } from "./LogoutButton";
 
 /**
@@ -12,6 +13,7 @@ import { LogoutButton } from "./LogoutButton";
  * bo'lmaydi.
  */
 export const ADMIN_SECTIONS = [
+  { key: "orders", href: "/admin/orders", label: "Buyurtmalar", Icon: ShoppingBag },
   { key: "products", href: "/admin/products", label: "Mahsulotlar", Icon: Package },
   { key: "categories", href: "/admin/categories", label: "Kategoriyalar", Icon: LayoutGrid },
   { key: "posts", href: "/admin/posts", label: "Maqolalar", Icon: FileText },

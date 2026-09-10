@@ -323,6 +323,41 @@ export type ClientService = {
   outro?: LocaleString;
 };
 
+/**
+ * Saytdan kelgan murojaat: savatdagi buyurtma yoki forma arizasi.
+ *
+ * Nega hammasi BITTA tipda: menejer uchun ular bir xil ish — qayta
+ * qo'ng'iroq qilish. Ularni ikki alohida ro'yxatga bo'lish uni ikkita
+ * joyni kuzatishga majbur qilardi, holbuki farq faqat `source` da.
+ *
+ * `items` faqat savat buyurtmasida bo'ladi. Mahsulot nomi va narxi
+ * NUSXA qilib saqlanadi: mahsulot keyin o'chirilishi yoki narxi
+ * o'zgarishi mumkin, buyurtma esa xarid paytidagi holatni ko'rsatishi
+ * kerak.
+ */
+export type Order = {
+  _id: string;
+  /** ISO sana-vaqt — server qo'yadi, mijozga ishonilmaydi. */
+  createdAt: string;
+  source: "cart" | "consultation" | "lead" | "test-drive";
+  name: string;
+  phone: string;
+  /** Lead formasidagi «nimani qidiryapsiz» yoki izoh. */
+  comment?: string;
+  items?: OrderItem[];
+  /** So'mda; `items` bo'lmasa 0. */
+  total: number;
+  status: "new" | "called" | "done";
+};
+
+export type OrderItem = {
+  productId: string;
+  /** Xarid paytidagi nom — mahsulot o'chirilsa ham qoladi. */
+  title: string;
+  qty: number;
+  price: number;
+};
+
 export type Advantage = {
   _id: string;
   icon: IconName;

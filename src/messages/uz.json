@@ -166,7 +166,19 @@
     "remove": "Savatdan olib tashlash",
     "increase": "Sonini oshirish",
     "decrease": "Sonini kamaytirish",
-    "quantity": "Soni"
+    "quantity": "Soni",
+    "checkoutHint": "Kontaktlaringizni qoldiring — menejer qo‘ng‘iroq qilib buyurtmani tasdiqlaydi.",
+    "name": "Ismingiz",
+    "nameError": "Ismni kiriting",
+    "phone": "Telefon raqami",
+    "phoneError": "To‘g‘ri raqam kiriting",
+    "submit": "Buyurtmani yuborish",
+    "sending": "Yuborilmoqda…",
+    "sentTitle": "Buyurtma qabul qilindi",
+    "sentText": "Menejer tez orada siz bilan bog‘lanadi.",
+    "failed": "Yuborib bo‘lmadi. Qaytadan urinib ko‘ring.",
+    "back": "Savatga qaytish",
+    "close": "Yopish"
   },
   "wishlist": {
     "title": "Saralanganlar",

@@ -9,21 +9,46 @@ const SENT_HOLD_MS = 2600;
 /**
  * Forma yuborish holatini boshqaradi (§8).
  *
- * Backend hali yo'q — bu bosqichda arizani konsolga chiqaramiz va
- * tarmoq kechikishini taqlid qilamiz. Real endpoint ulanganda faqat
- * `send` ichidagi blok almashadi, komponentlar o'zgarmaydi.
+ * Ariza `/api/order` ga ketadi va admin panelidagi «Buyurtmalar»
+ * bo'limida paydo bo'ladi — savat buyurtmalari bilan BIR ro'yxatda.
+ * Menejer uchun ular bir xil ish: qayta qo'ng'iroq qilish.
+ *
+ * Ilgari bu yerda `console.info` turardi va hech bir ariza hech
+ * qayerga yetib bormasdi.
  */
 export function useLeadSubmit<T extends object>(source: string) {
   const [status, setStatus] = useState<SubmitStatus>("idle");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const [failed, setFailed] = useState(false);
+
   const send = useCallback(
     async (payload: T) => {
       setStatus("sending");
+      setFailed(false);
 
-      // TODO(backend): POST /api/lead — hozircha stub.
-      console.info("[lead]", source, payload);
-      await new Promise((resolve) => setTimeout(resolve, 700));
+      const p = payload as Record<string, unknown>;
+      const res = await fetch("/api/order", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          source,
+          name: typeof p.name === "string" ? p.name : "",
+          phone: typeof p.phone === "string" ? p.phone : "",
+          /*
+           * Qidiruv formasidagi «nimani qidiryapsiz» izohga tushadi:
+           * menejer qo'ng'iroq qilishdan oldin mijoz nimaga
+           * qiziqqanini biladi.
+           */
+          comment: typeof p.query === "string" ? p.query : undefined,
+        }),
+      }).catch(() => null);
+
+      if (!res || !res.ok) {
+        setStatus("idle");
+        setFailed(true);
+        return;
+      }
 
       setStatus("sent");
       if (timer.current) clearTimeout(timer.current);
@@ -32,5 +57,5 @@ export function useLeadSubmit<T extends object>(source: string) {
     [source],
   );
 
-  return { status, send };
+  return { status, send, failed };
 }

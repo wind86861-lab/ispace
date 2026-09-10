@@ -77,6 +77,17 @@ export function BuyBox({
     addToCart(product._id);
     // Miqdor 1 dan katta bo'lsa qatorni darrov to'g'ri songa keltiramiz.
     if (qty > 1) setQty(product._id, (line?.qty ?? 0) + qty);
+
+    /*
+     * Savat DARROV ochiladi.
+     *
+     * Ilgari bosishga sahifada hech qanday javob yo'q edi: mahsulot
+     * savatga tushardi, lekin foydalanuvchi buni ko'rmasdi va tugmani
+     * qayta bosaverardi. Ochilgan panel bir vaqtning o'zida uch
+     * savolga javob beradi — qo'shildimi, nima bor, keyin nima
+     * qilaman.
+     */
+    openOverlay("cart");
   };
 
   return (
