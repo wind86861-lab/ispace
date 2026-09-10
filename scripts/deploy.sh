@@ -29,10 +29,32 @@ fi
 
 say() { printf "\n\033[1m▸ %s\033[0m\n" "$1"; }
 
-say "1/4 · Build (lokal)"
+# ------------------------------------------------------------------
+# 1 · Kontentni SERVERDAN olib kelish
+#
+# Nega bu MAJBURIY: sahifalarning katta qismi statik (SSG) va ular
+# BUILD paytida chiziladi. Build esa lokalda bajariladi — ya'ni
+# prerender lokal `data/` ni o'qiydi. Natijada har deploy serverning
+# haqiqiy kontentini ishlab chiquvchining eski nusxasi bilan
+# almashtirib turardi: jonli saytda mavjud bo'lmagan rasm yo'llari
+# paydo bo'lgan va sharhlar noto'g'ri ko'rsatilgan edi.
+#
+# `data/uploads/` OLINMAYDI: u yuzlab megabayt bo'lishi mumkin va
+# prerenderga kerak emas — HTML'ga faqat YO'L tushadi, faylning o'zi
+# ishlash paytida serverdan beriladi.
+say "1/5 · Kontentni serverdan olish"
+mkdir -p data/content
+rsync -az --delete -e "${SSH[*]}" \
+  "$HOST:$DIR/data/content/" data/content/ 2>/dev/null \
+  || echo "  (serverda kontent yo'q — urug' qiymatlari ishlatiladi)"
+rsync -az -e "${SSH[*]}" \
+  "$HOST:$DIR/data/image-overrides.json" data/ 2>/dev/null \
+  || echo "  (rasm almashtirishlari yo'q)"
+
+say "2/5 · Build (lokal)"
 npm run build
 
-say "2/4 · Yuborish"
+say "3/5 · Yuborish"
 # MUHIM: bu ikki narsa HECH QACHON yuborilmaydi va o'chirilmaydi —
 # ular serverda YASHAYDI, repoda esa yo'q:
 #
@@ -50,10 +72,10 @@ rsync -az --delete \
 rsync -az --delete -e "${SSH[*]}" .next/static/ "$HOST:$DIR/.next/static/"
 rsync -az --delete -e "${SSH[*]}" public/ "$HOST:$DIR/public/"
 
-say "3/4 · Qayta ishga tushirish"
+say "4/5 · Qayta ishga tushirish"
 "${SSH[@]}" "$HOST" "pm2 restart $APP --update-env >/dev/null && sleep 3 && pm2 list | grep -E '$APP|status'"
 
-say "4/4 · Tekshirish"
+say "5/5 · Tekshirish"
 code=$("${SSH[@]}" "$HOST" "curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/uz")
 if [ "$code" = "200" ]; then
   printf "\033[32mOK — sayt javob beryapti (HTTP %s)\033[0m\n" "$code"
