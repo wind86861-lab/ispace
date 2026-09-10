@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, Phone } from "lucide-react";
 import type { SiteContact } from "@/content/types";
 import { DUR, EASE_LUX } from "@/lib/motion";
 import { useLenis } from "@/components/providers/LenisProvider";
@@ -15,7 +15,15 @@ const SHOW_AFTER = 700;
 /** Scroll to'xtagach panel qaytadigan kechikish. */
 const IDLE_MS = 220;
 
-/** O'ng chekkadagi suzuvchi tugmalar: Telegram va yuqoriga qaytish. */
+/**
+ * O'ng chekkadagi suzuvchi tugmalar: qo'ng'iroq, Telegram va yuqoriga
+ * qaytish.
+ *
+ * Tartib ataylab shunday: qo'ng'iroq eng tepada va YAGONA oltin
+ * tugma. Sotuvda eng qisqa yo'l — telefon, va u boshqa ikkitasidan
+ * rang bilan ajralib turishi kerak; uchta bir xil doira orasidan
+ * kerakligini izlash noqulay bo'lardi.
+ */
 export function FloatingActions({ contact }: { contact: SiteContact }) {
   const t = useTranslations("footer");
   const lenis = useLenis();
@@ -61,6 +69,14 @@ export function FloatingActions({ contact }: { contact: SiteContact }) {
         scrolling ? "pointer-events-none translate-x-3 opacity-0" : "translate-x-0 opacity-100",
       ].join(" ")}
     >
+      <a
+        href={contact.phoneHref}
+        aria-label={contact.phone}
+        className="grid size-12 place-items-center rounded-full bg-gold-deep text-warm-white shadow-lg transition-colors duration-300 hover:bg-gold-hover"
+      >
+        <Phone size={19} strokeWidth={1.7} aria-hidden="true" />
+      </a>
+
       <a
         href={contact.telegram}
         target="_blank"

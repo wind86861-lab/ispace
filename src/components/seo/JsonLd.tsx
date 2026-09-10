@@ -4,7 +4,7 @@ import { htmlLang } from "@/i18n/routing";
 import { t as pick } from "@/lib/locale";
 import { firstImage } from "@/lib/media";
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ispace.uz";
+const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://i-space.uz";
 
 /**
  * §13 — structured data. Server komponenti, JS bundle'ga hech narsa

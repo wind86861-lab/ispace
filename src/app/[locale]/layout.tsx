@@ -49,7 +49,7 @@ export async function generateMetadata({
   if (!hasLocale(routing.locales, locale)) return {};
 
   const t = await getTranslations({ locale, namespace: "meta" });
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ispace.uz";
+  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://i-space.uz";
 
   return {
     metadataBase: new URL(base),

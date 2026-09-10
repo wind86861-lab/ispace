@@ -1,7 +1,7 @@
 import type { SiteContent } from "./types";
 import { applyOverrides, readOverrides } from "@/lib/image-overrides";
 import { readCollection } from "@/lib/store";
-import { nav, contact } from "./nav";
+import { nav, contact as seedContact } from "./nav";
 import { hero, trust } from "./hero";
 import { categories as seedCategories } from "./categories";
 import { products as seedProducts } from "./products";
@@ -46,6 +46,7 @@ export async function getContent(): Promise<SiteContent> {
     timeline,
     services,
     productFeatures,
+    contacts,
   ] =
     await Promise.all([
       readOverrides(),
@@ -61,6 +62,7 @@ export async function getContent(): Promise<SiteContent> {
       readCollection("timeline", seedTimeline),
       readCollection("services", seedServices),
       readCollection("productFeatures", seedFeatures),
+      readCollection("contact", [seedContact]),
     ]);
 
   /*
@@ -74,6 +76,12 @@ export async function getContent(): Promise<SiteContent> {
    * `featureIds` yo'q eski yozuvlarda ichki `features` o'z holicha
    * qoladi: migratsiya talab qilinmaydi.
    */
+  /*
+   * Kontakt — YAGONA yozuv, lekin ombor massiv bilan ishlaydi.
+   * Birinchisi olinadi; ombor bo'sh bo'lsa urug' qiymati qoladi.
+   */
+  const contact = contacts[0] ?? seedContact;
+
   const featureById = new Map(productFeatures.map((f) => [f._id, f]));
   const resolved = products.map((p) =>
     p.featureIds

@@ -24,6 +24,7 @@ export const ADMIN_SECTIONS = [
   { key: "advantages", href: "/admin/advantages", label: "Afzalliklar", Icon: Sparkles },
   { key: "services", href: "/admin/services", label: "Mijozlarga", Icon: Handshake },
   { key: "faq", href: "/admin/faq", label: "Savol-javob", Icon: CircleHelp },
+  { key: "contacts", href: "/admin/contacts", label: "Kontaktlar", Icon: Handshake },
   { key: "images", href: "/admin/images", label: "Rasmlar", Icon: ImageIcon },
 ] as const;
 

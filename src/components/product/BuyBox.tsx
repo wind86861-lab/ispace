@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Minus, Plus, Scale, ShoppingBag } from "lucide-react";
+import { Minus, Plus, ShoppingBag } from "lucide-react";
+import { TelegramIcon } from "@/components/ui/icons";
 import { useLocale, useTranslations } from "next-intl";
 import type { Product } from "@/content/types";
 import type { Locale } from "@/i18n/routing";
@@ -43,17 +44,25 @@ type BuyBoxProduct = Pick<
   | "marketplaces"
 >;
 
-export function BuyBox({ product }: { product: BuyBoxProduct }) {
+export function BuyBox({
+  product,
+  telegramHref,
+}: {
+  product: BuyBoxProduct;
+  /**
+   * Menejer bilan yozishuv havolasi — «Kontaktlar» bo'limidan.
+   * Bo'sh bo'lsa tugma umuman chizilmaydi: ishlamaydigan havola
+   * bo'sh va’dadan yomonroq.
+   */
+  telegramHref?: string;
+}) {
   const t = useTranslations("product");
-  const tc = useTranslations("compare");
   const locale = useLocale() as Locale;
 
   const addToCart = useShop((s) => s.addToCart);
-  const toggleCompare = useShop((s) => s.toggleCompare);
   const setQty = useShop((s) => s.setQty);
   const hydrated = useShop((s) => s.hydrated);
   const line = useShop((s) => s.cart.find((l) => l.productId === product._id));
-  const inCompare = useShop((s) => s.compare.includes(product._id));
   const openOverlay = useUi((s) => s.open);
 
   const [color, setColor] = useState(product.colors?.[0]?._id);
@@ -208,14 +217,17 @@ export function BuyBox({ product }: { product: BuyBoxProduct }) {
           </p>
 
           {/*
-            Plitkalar KENG va teng: ikkitadan qatorda, logotip esa
-            markazda. Ilgari ular mazmuniga qarab turli kenglikda
-            edi — «Alif Shop» matni tor, logotipli tugma keng — va
-            qator tartibsiz ko'rinardi.
+            Plitkalar BIR XIL: bir xil balandlik, bir xil chegara,
+            markazda joylashgan mazmun.
 
-            Tashqi havola strelkasi olib tashlandi: u har plitkada
-            takrorlanib, logotipdan diqqatni tortardi. Havola ekani
-            `target="_blank"` va `aria` matnidan baribir ma'lum.
+            Ilgari logotipli plitka chegarasiz, nomli plitka esa
+            chegarali edi — natijada «Alif Shop» yorliqqa, yonidagi
+            logotip esa qalqib turgan rasmga o'xshardi va qator
+            bir-biriga bog'lanmagan ikki narsadan iborat bo'lib
+            ko'rinardi.
+
+            Logotip bo'lmasa uning O'RNIDA nom turadi — o'sha
+            plitkaning ichida, bir xil o'lchamda.
           */}
           <ul className="mt-3 grid grid-cols-2 gap-2.5">
             {product.marketplaces.map((mp) => (
@@ -225,16 +237,7 @@ export function BuyBox({ product }: { product: BuyBoxProduct }) {
                   target="_blank"
                   rel="noreferrer noopener nofollow"
                   aria-label={mp.name}
-                  /*
-                    Na chegara, na fon: logotiplar sahifaning o'z krem
-                    sirtida turadi. Ular o'zi rangli va shaklli — oq
-                    plitka ularni "yorliq"ka aylantirib, o'ng ustundagi
-                    tinch ritmni buzardi.
-                    
-                    Bosiladigan ekani hover'da bilinadi: yengil oq
-                    sirt paydo bo'ladi.
-                  */
-                  className="flex h-16 items-center justify-center rounded-xl px-4 transition-colors duration-300 hover:bg-warm-white"
+                  className="group flex h-[4.5rem] items-center justify-center rounded-xl border border-taupe/35 bg-warm-white/50 px-4 transition-[border-color,background-color,transform] duration-300 ease-[cubic-bezier(0.2,0.7,0.3,1)] hover:-translate-y-0.5 hover:border-gold/55 hover:bg-warm-white"
                 >
                   {mp.image.src ? (
                     <Image
@@ -242,17 +245,17 @@ export function BuyBox({ product }: { product: BuyBoxProduct }) {
                       alt={mp.name}
                       width={160}
                       height={48}
-                      className="max-h-9 w-auto object-contain"
+                      /*
+                        `max-h` + `w-auto`: logotiplar turli nisbatda
+                        keladi va cho'zilmasligi kerak. Balandlik
+                        chegarasi ularni bir qatorga tenglashtiradi.
+                      */
+                      className="max-h-8 w-auto object-contain transition-transform duration-500 ease-[cubic-bezier(0.2,0.7,0.3,1)] group-hover:scale-105"
                     />
                   ) : (
-                    /*
-                    Logotip yuklanmagan — o'shanda nom KO'RINADIGAN
-                    plitkada turadi. Chegarasiz matn krem fonda
-                    osilib qolardi va bosiladigan ekani bilinmasdi.
-                  */
-                  <span className="w-full truncate rounded-xl border border-taupe/35 px-3 py-2.5 text-center text-[14px] font-medium text-espresso">
-                    {mp.name}
-                  </span>
+                    <span className="truncate text-center text-[14px] font-medium text-espresso transition-colors duration-300 group-hover:text-gold-ink">
+                      {mp.name}
+                    </span>
                   )}
                 </a>
               </li>
@@ -262,14 +265,15 @@ export function BuyBox({ product }: { product: BuyBoxProduct }) {
       )}
 
       {/*
-        Ikkilamchi tugmalar TENG ikkita ustunda: ular bir darajadagi
-        harakat (sinov va solishtirish), shuning uchun kengligi ham
-        bir xil bo'lishi kerak. Ilgari `flex-wrap` da ular matn
-        uzunligiga qarab turlicha edi va qator tasodifiy ko'rinardi.
+        Ikkita bir darajadagi harakat: sinab ko'rish va yozib so'rash.
 
-        Telefonda esa BITTADAN: «Записаться на тест-драйв» va
-        «Добавить к сравнению» ikkalasi ham uzun va tor ekranda
-        yonma-yon sig'masdi — ikkinchisi chetdan kesilib qolardi.
+        Solishtirish bu yerdan OLIB TASHLANDI — u sarlavha yonidagi
+        kichik ikonga aylandi (`CompareToggle`). Sabab: u sotuvga olib
+        boradigan qadam emas, yordamchi belgi, va teng tugma sifatida
+        diqqatni o'ziga tortib turardi.
+
+        Telefonda bittadan: ikkala yozuv ham uzun va tor ekranda
+        yonma-yon sig'masdi.
       */}
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <Button variant="outline" size="md" onClick={() => openOverlay("consult")}>
@@ -277,21 +281,24 @@ export function BuyBox({ product }: { product: BuyBoxProduct }) {
         </Button>
 
         {/*
-          Solishtirish shu yerda — sotib olish tugmasining yonida, lekin
-          `outline` ko'rinishda: bu yordamchi harakat, asosiysi emas.
-          Belgilangan holatda tugma oltin bo'lib, matni "solishtirishda"
-          ga o'zgaradi — foydalanuvchi ikkinchi marta bosib bekor
-          qilishi mumkinligi shundan ko'rinadi.
+          Telegram — eng qisqa yo'l.
+
+          Bu YAGONA havola, hamma mahsulotda bir xil va admin uni
+          «Kontaktlar» bo'limida qo'yadi. Mahsulot nomi havolaga
+          qo'shilmaydi: menejer suhbatni o'zi boshlaydi va tayyor matn
+          bilan kelgan xabar ko'pincha o'chirib yuboriladi.
         */}
-        <Button
-          variant={hydrated && inCompare ? "gold" : "outline"}
-          size="md"
-          onClick={() => toggleCompare(product._id)}
-          aria-pressed={hydrated && inCompare}
-        >
-          <Scale size={15} strokeWidth={1.7} aria-hidden="true" />
-          {hydrated && inCompare ? tc("inCompare") : tc("add")}
-        </Button>
+        {telegramHref && (
+          <a
+            href={telegramHref}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="group inline-flex h-11 items-center justify-center gap-2 rounded-full border border-taupe/70 bg-warm-white/60 px-5 text-sm font-medium text-espresso transition-[background-color,border-color,color,transform] duration-300 ease-[cubic-bezier(0.2,0.7,0.3,1)] hover:border-gold hover:text-gold-deep active:scale-[0.98]"
+          >
+            <TelegramIcon className="size-[15px]" />
+            {t("telegram")}
+          </a>
+        )}
       </div>
 
     </div>

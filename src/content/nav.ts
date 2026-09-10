@@ -9,11 +9,21 @@ export const nav: NavItem[] = [
   { _id: "blog",     href: "/blog",       label: { ru: "Блог",           uz: "Blog",          en: "Blog" } },
 ];
 
+/**
+ * Kontaktlarning DASTLABKI qiymati.
+ *
+ * Admin «Kontaktlar» bo'limida ularni tahrirlaydi va natija
+ * `data/content/contact.json` ga tushadi. Bu yerdagi ro'yxat esa fayl
+ * hali yo'q bo'lganda ishlatiladi — sayt hech qachon kontaktsiz
+ * chiqmaydi.
+ */
 export const contact: SiteContact = {
+  _id: "contact",
   phone: "+998 (98) 810-10-90",
   phoneHref: "tel:+998988101090",
   email: "info@ispace.uz",
   telegram: "https://t.me/ispace_uz",
+  telegramChat: "https://t.me/ispace_uz",
   instagram: "https://instagram.com/ispace.uz",
   facebook: "https://facebook.com/ispace.uz",
   youtube: "https://youtube.com/@ispace_uz",

@@ -652,6 +652,45 @@ html[data-motion="on"] .about-aura {
   }
 }
 
+/**
+ * Filiallar ro'yxatining ichki scroll'i.
+ *
+ * Pastki chekkada matn asta so'nadi — ro'yxat DAVOM etayotgani shundan
+ * ko'rinadi. Surish paneli ingichka va sokin: u kartalar ritmini
+ * buzmasligi kerak.
+ *
+ * Maska faqat scroll BOR bo'lganda ma'noli, lekin CSS buni bilmaydi;
+ * ro'yxat kalta bo'lsa oxirgi karta pastki chegaraga yetmaydi va
+ * maska ko'zga tashlanmaydi.
+ */
+@utility branch-list {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-taupe) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: color-mix(in srgb, var(--color-taupe) 70%, transparent);
+    border-radius: 999px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /*
+     Maska faqat ro'yxat HAQIQATAN surilganda.
+
+     Uni doim qo'llash kalta ro'yxatda oxirgi kartani sababsiz
+     so'ndirardi: konteyner balandligi mazmunga teng bo'lgani uchun
+     oxirgi karta pastki chegarada yotadi. `data-scrollable` ni
+     komponent o'lchab qo'yadi — CSS o'zi buni bila olmaydi.
+  */
+  &[data-scrollable] {
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 2.5rem), transparent 100%);
+  }
+}
+
 @utility measure {
   max-width: 62ch;
   /*

@@ -14,6 +14,7 @@ import { Reveal } from "@/components/ui/Reveal";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { ProductFeatures } from "@/components/product/ProductFeatures";
 import { BuyBox } from "@/components/product/BuyBox";
+import { CompareToggle } from "@/components/product/CompareToggle";
 import { ProductTabs } from "@/components/product/ProductTabs";
 import { ProductStory } from "@/components/product/ProductStory";
 import { ProductCard } from "@/components/catalog/ProductCard";
@@ -134,16 +135,29 @@ export default async function ProductPage({
                 </Reveal>
               )}
 
-              <SplitHeading
-                as="h1"
-                label={pick(product.title, locale)}
-                className="mt-3 text-[clamp(1.5rem,3vw,2.25rem)] leading-[1.15]"
-              >
-                {pick(product.title, locale)}
-              </SplitHeading>
+              {/*
+                Solishtirish belgisi sarlavha bilan BIR QATORDA.
+
+                `items-start` va `mt-*` bilan tekislangan: sarlavha ikki
+                qatorga tushsa ham ikon birinchi qator balandligida
+                qoladi, o'rtaga suzib ketmaydi.
+              */}
+              <div className="mt-3 flex items-start gap-3">
+                <SplitHeading
+                  as="h1"
+                  label={pick(product.title, locale)}
+                  className="min-w-0 flex-1 text-[clamp(1.5rem,3vw,2.25rem)] leading-[1.15]"
+                >
+                  {pick(product.title, locale)}
+                </SplitHeading>
+                <span className="mt-1.5 shrink-0">
+                  <CompareToggle productId={product._id} />
+                </span>
+              </div>
 
               <Reveal delay={0.1} className="mt-6 block">
                 <BuyBox
+                  telegramHref={content.contact.telegramChat ?? content.contact.telegram}
                   product={{
                     _id: product._id,
                     price: product.price,

@@ -289,7 +289,8 @@
     "related": "O‘xshash modellar",
     "notFound": "Mahsulot topilmadi",
     "notFoundText": "Ehtimol, model sotuvdan olingan. Katalogni ko‘ring — mos keladigani albatta bor.",
-    "buyOnMarketplaces": "Savdo maydonchalarida sotib olish"
+    "buyOnMarketplaces": "Savdo maydonchalarida sotib olish",
+    "telegram": "Telegram orqali bog‘lanish"
   },
   "blogPage": {
     "home": "Bosh sahifa",

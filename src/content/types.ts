@@ -440,11 +440,21 @@ export type Branch = {
   mapsUrl: string;
   geo: { lat: number; lng: number };
   /**
-   * Filial fotosi — «Магазины» sahifasidagi karta uchun.
-   * Yuklanmagani chizilmaydi (`Media.uploaded`), o'rniga karta faqat
-   * ma'lumot bilan qoladi.
+   * Filial fotosi — ESKI, bitta rasmli maydon.
+   *
+   * Yangi yozuvlarda `photos` ishlatiladi; bu saqlanadi, chunki
+   * mavjud filiallarda rasm aynan shu yerda yotibdi va uni
+   * yo'qotmaslik kerak. Chizishda ikkalasi birlashtiriladi.
    */
   photo?: Media;
+  /**
+   * Filial fotolari — sahifada slayder bo'lib chiqadi.
+   *
+   * Yuklanmagani chizilmaydi (`Media.uploaded`); bittasi ham
+   * yuklanmagan bo'lsa ustun umuman ko'rsatilmaydi va ma'lumot
+   * bilan xarita butun kenglikni oladi.
+   */
+  photos?: Media[];
   /** Qo'shimcha izoh — masalan qavat yoki mo'ljal. */
   note?: LocaleString;
 };
@@ -522,10 +532,26 @@ export type NavItem = {
 export type Lead = { image: Media };
 
 export type SiteContact = {
+  /**
+   * Ombor uchun kalit. Kontakt — YAGONA yozuv, lekin u boshqa
+   * kolleksiyalar bilan bir xil mexanizmda saqlanadi (`data/content`),
+   * shuning uchun unga ham `_id` kerak.
+   */
+  _id: string;
   phone: string;
   phoneHref: string;
   email: string;
+  /** Ijtimoiy tarmoq havolasi — pastki qismdagi ikon uchun. */
   telegram: string;
+  /**
+   * Menejer bilan TO'G'RIDAN-TO'G'RI yozishuv havolasi.
+   *
+   * Mahsulot sahifasidagi «Telegram orqali bog'lanish» tugmasi shunga
+   * olib boradi va u hamma mahsulotda bitta. `telegram` dan alohida,
+   * chunki pastki qismdagi havola kanal bo'lishi mumkin, bu yerda esa
+   * javob beradigan odam kerak. Bo'sh bo'lsa `telegram` ishlatiladi.
+   */
+  telegramChat?: string;
   instagram: string;
   facebook: string;
   youtube: string;

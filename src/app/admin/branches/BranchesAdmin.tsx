@@ -69,14 +69,82 @@ export function BranchesAdmin({ items }: { items: Branch[] }) {
             />
           </div>
 
-          <ImageUpload
-            label="Filial fotosi (ixtiyoriy)"
-            prefix="branch"
-            recommend={{ width: 1200, height: 800 }}
-            media={d.photo ?? { src: "", alt: emptyLocaleString() }}
-            onChange={(photo) => set({ ...d, photo })}
-            hint="Yuklanmasa kartada faqat ma’lumot qoladi"
-          />
+          {/*
+            Filial fotolari — sahifada slayder bo'lib chiqadi.
+
+            Eski bitta rasmli maydon (`photo`) saqlanadi va ro'yxatning
+            BOSHIDA ko'rsatiladi: mavjud filiallarda rasm o'sha yerda
+            yotibdi, uni yo'qotib bo'lmaydi. Yangi rasm shu ro'yxatga
+            qo'shiladi.
+          */}
+          <fieldset className="rounded-xl border border-taupe/30 p-4">
+            <legend className="px-1 text-[13px] font-medium text-espresso">
+              Filial fotolari{" "}
+              <span className="text-espresso-soft">
+                ({(d.photo?.src ? 1 : 0) + (d.photos?.length ?? 0)})
+              </span>
+            </legend>
+            <p className="mb-4 text-[12px] text-espresso-soft/85">
+              Bir nechta rasm yuklansa sahifada slayder bo‘ladi. Bittasi ham yuklanmasa
+              ustun ko‘rsatilmaydi — ma’lumot va xarita butun kenglikni oladi.
+            </p>
+
+            <div className="grid gap-5">
+              <ImageUpload
+                label="Asosiy foto"
+                prefix="branch"
+                recommend={{ width: 1200, height: 800 }}
+                media={d.photo ?? { src: "", alt: emptyLocaleString() }}
+                onChange={(photo) => set({ ...d, photo })}
+              />
+
+              {(d.photos ?? []).map((m, i) => (
+                <div key={i} className="grid gap-3 rounded-xl border border-taupe/25 p-3">
+                  <ImageUpload
+                    label={`Foto ${i + 2}`}
+                    prefix="branch"
+                    recommend={{ width: 1200, height: 800 }}
+                    media={m}
+                    onChange={(next) =>
+                      set({ ...d, photos: (d.photos ?? []).map((x, j) => (j === i ? next : x)) })
+                    }
+                  />
+                  <LocaleField
+                    label={`Foto ${i + 2} — alt matn`}
+                    value={m.alt}
+                    onChange={(alt) =>
+                      set({
+                        ...d,
+                        photos: (d.photos ?? []).map((x, j) => (j === i ? { ...x, alt } : x)),
+                      })
+                    }
+                  />
+                  <button
+                    type="button"
+                    onClick={() =>
+                      set({ ...d, photos: (d.photos ?? []).filter((_, j) => j !== i) })
+                    }
+                    className="justify-self-start text-[12px] text-rosewood hover:underline"
+                  >
+                    Olib tashlash
+                  </button>
+                </div>
+              ))}
+
+              <button
+                type="button"
+                onClick={() =>
+                  set({
+                    ...d,
+                    photos: [...(d.photos ?? []), { src: "", alt: emptyLocaleString() }],
+                  })
+                }
+                className="justify-self-start text-[12px] text-gold-ink hover:underline"
+              >
+                + Foto
+              </button>
+            </div>
+          </fieldset>
         </>
       )}
     />

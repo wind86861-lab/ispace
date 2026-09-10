@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowUpRight, Clock, MapPin, Phone } from "lucide-react";
@@ -63,6 +63,30 @@ export function Branches({ branches }: { branches: Branch[] }) {
   const reduced = useReducedMotion();
 
   const [activeId, setActiveId] = useState(branches[0]._id);
+
+  /*
+   * Ro'yxat o'z chegarasidan oshib ketdimi.
+   *
+   * Bu FAQAT pastdagi so'nish maskasi uchun: uni doim qo'llash kalta
+   * ro'yxatda oxirgi kartani sababsiz so'ndirardi. O'lchov `lg` da
+   * ma'noli, chunki chegara ham o'sha yerda.
+   */
+  const listRef = useRef<HTMLDivElement>(null);
+  const [scrollable, setScrollable] = useState(false);
+
+  useEffect(() => {
+    const el = listRef.current;
+    if (!el) return;
+
+    const measure = () => setScrollable(el.scrollHeight > el.clientHeight + 1);
+    measure();
+
+    /* Filial qo'shilsa ham, oyna o'lchami o'zgarsa ham qayta o'lchanadi. */
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    for (const child of el.children) ro.observe(child);
+    return () => ro.disconnect();
+  }, [branches.length]);
   const svgRef = useRef<SVGSVGElement>(null);
 
   const pins = useMemo(() => layoutPins(branches), [branches]);
@@ -143,7 +167,27 @@ export function Branches({ branches }: { branches: Branch[] }) {
               {t("chooseCity")}
             </Reveal>
 
-            {/* Filiallar ketma-ket chiqadi — ro'yxat "to'ldirilayotgandek". */}
+            {/*
+              Ro'yxat O'Z ICHIDA suriladi.
+
+              Filiallar soni oshgani sari ustun cho'zilib, xaritadan
+              ancha uzun bo'lib ketardi: o'ngda katta bo'sh joy
+              qolardi va foydalanuvchi xaritani ko'rish uchun butun
+              ro'yxatdan o'tishi kerak edi. Balandlik xarita bilan
+              taxminan tenglashtirildi.
+
+              Chegara faqat `lg` da: telefonda ustunlar ustma-ust
+              turadi va u yerda ichki scroll — "scroll ichida scroll"
+              degani, bu esa sensorli ekranda noqulay.
+
+              `pe-1` — surish paneli uchun joy, aks holda u kartalar
+              ustiga tushardi.
+            */}
+            <div
+              ref={listRef}
+              data-scrollable={scrollable || undefined}
+              className="branch-list lg:max-h-[34rem] lg:overflow-y-auto lg:pe-1"
+            >
             <Reveal as="ul" stagger={0.07} className="space-y-2">
               {branches.map((branch) => {
                 const selected = branch._id === activeId;
@@ -188,6 +232,7 @@ export function Branches({ branches }: { branches: Branch[] }) {
                 );
               })}
             </Reveal>
+            </div>
           </div>
 
           {/* ---- xarita ---- */}

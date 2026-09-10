@@ -5,7 +5,7 @@ import { posts as seedPosts } from "@/content/posts";
 import { readCollection } from "@/lib/store";
 import type { Post, Product } from "@/content/types";
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ispace.uz";
+const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://i-space.uz";
 
 /**
  * Bitta manzil uchun uch tildagi yozuv + o'zaro `hreflang` havolalari.

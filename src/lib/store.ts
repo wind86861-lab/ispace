@@ -31,7 +31,8 @@ export type CollectionName =
   | "leadTrust"
   | "timeline"
   | "services"
-  | "productFeatures";
+  | "productFeatures"
+  | "contact";
 
 const file = (name: CollectionName) => path.join(DIR, `${name}.json`);
 

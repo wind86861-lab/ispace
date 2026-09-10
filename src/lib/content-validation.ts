@@ -18,6 +18,7 @@ import type {
   ProductFeature,
   ProductOption,
   Review,
+  SiteContact,
   TimelinePoint,
   TrustPoint,
 } from "@/content/types";
@@ -622,6 +623,49 @@ export function validateProductFeature(
   };
 }
 
+/**
+ * Sayt kontaktlari — yagona yozuv.
+ *
+ * Havolalar faqat `https://` yoki `tel:`/`mailto:` bo'lishi mumkin:
+ * bu maydonlar sayt bo'ylab bosiladigan havolaga aylanadi va ixtiyoriy
+ * sxema (`javascript:`) kiritish imkoni bo'lmasligi kerak.
+ */
+export function validateContact(input: unknown, existing?: SiteContact): SiteContact {
+  if (!input || typeof input !== "object") fail("Kontakt obyekti kutilgan");
+  const c = input as Record<string, unknown>;
+
+  const link = (v: unknown, field: string, required: boolean): string => {
+    const raw = String(v ?? "").trim();
+    if (!raw) {
+      if (required) fail(`${field}: to‘ldirilishi shart`);
+      return "";
+    }
+    if (!/^https:\/\//.test(raw)) fail(`${field}: "https://" bilan boshlanishi kerak`);
+    return raw.slice(0, 300);
+  };
+
+  const phone = str(c.phone, "phone", 40);
+  /* Raqamdan `tel:` ni O'ZIMIZ yasaymiz — admin ikkinchi maydonni
+     to'ldirib, uni telefon raqamiga mos qilib turishi shart emas. */
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length < 7) fail("phone: to‘liq raqam kiriting");
+
+  const email = str(c.email, "email", 120);
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) fail("email: noto‘g‘ri manzil");
+
+  return {
+    _id: existing?._id ?? "contact",
+    phone,
+    phoneHref: `tel:+${digits}`,
+    email,
+    telegram: link(c.telegram, "telegram", true),
+    telegramChat: link(c.telegramChat, "telegramChat", false) || undefined,
+    instagram: link(c.instagram, "instagram", true),
+    facebook: link(c.facebook, "facebook", true),
+    youtube: link(c.youtube, "youtube", true),
+  };
+}
+
 export function validateBranch(input: unknown, existing?: Branch): Branch {
   if (!input || typeof input !== "object") fail("Filial obyekti kutilgan");
   const b = input as Record<string, unknown>;
@@ -645,6 +689,15 @@ export function validateBranch(input: unknown, existing?: Branch): Branch {
       lat: num(geo.lat, "geo.lat", -90, 90),
       lng: num(geo.lng, "geo.lng", -180, 180),
     },
+    /* Bo'sh uya tashlanadi — muharrir qatorni oldindan qo'shishi normal. */
+    photos: Array.isArray(b.photos)
+      ? (() => {
+          const rows = b.photos
+            .filter((m) => m != null && typeof m === "object" && String((m as Record<string, unknown>).src ?? "").trim())
+            .map((m, i) => media(m, `photos[${i}]`, localeString(b.city, "city", 80)));
+          return rows.length > 0 ? rows : undefined;
+        })()
+      : undefined,
     photo:
       b.photo == null || !(b.photo as Record<string, unknown>).src
         ? undefined
