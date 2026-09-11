@@ -24,12 +24,12 @@ type ShopState = {
   hydrated: boolean;
 
   addToCart: (productId: string) => void;
-  /** Bir nechta mahsulotni BIR marta qo'shadi (saralanganlardan). */
-  addManyToCart: (productIds: string[]) => void;
   setQty: (productId: string, qty: number) => void;
   removeFromCart: (productId: string) => void;
   toggleWishlist: (productId: string) => void;
   removeFromWishlist: (productId: string) => void;
+  /** Saralanganlarni savatga KO'CHIRADI — qo'shib, ro'yxatdan oladi. */
+  moveWishlistToCart: () => void;
   toggleCompare: (productId: string) => void;
   removeFromCompare: (productId: string) => void;
   /** Bitta kategoriyani tozalash uchun — jadvaldagi "×" tugmasi. */
@@ -60,23 +60,6 @@ export const useShop = create<ShopState>()(
           };
         }),
 
-      /*
-       * Ko'p mahsulot BITTA yangilanishda qo'shiladi.
-       *
-       * `addToCart` ni siklda chaqirish har mahsulot uchun alohida
-       * render keltirib chiqarardi; bundan tashqari savatda allaqachon
-       * bor mahsulot miqdori oshib ketardi — saralanganlardan
-       * qo'shishda esa kutilgani "bor bo'lsa tegmaslik".
-       */
-      addManyToCart: (productIds) =>
-        set((s) => {
-          const have = new Set(s.cart.map((l) => l.productId));
-          const fresh = productIds
-            .filter((id) => !have.has(id))
-            .map((productId) => ({ productId, qty: 1 }));
-          return fresh.length ? { cart: [...s.cart, ...fresh] } : {};
-        }),
-
       setQty: (productId, qty) =>
         set((s) => ({
           // 0 ga tushsa qator o'chadi — alohida "remove" chaqirish shart emas.
@@ -100,6 +83,26 @@ export const useShop = create<ShopState>()(
 
       removeFromWishlist: (productId) =>
         set((s) => ({ wishlist: s.wishlist.filter((id) => id !== productId) })),
+
+      /*
+       * Saralanganlarni savatga KO'CHIRISH.
+       *
+       * Nusxa olish emas, ko'chirish: mahsulot savatga tushgandan
+       * keyin uni saralanganlarda ham ushlab turish ikki xil holat
+       * yaratadi — foydalanuvchi ro'yxat tozalanmaganini ko'rib,
+       * qo'shilmadi deb o'ylaydi.
+       *
+       * Savatda allaqachon bor mahsulot miqdori OSHMAYDI: bu yerda
+       * niyat "shu narsalar savatda bo'lsin", "yana bitta" emas.
+       */
+      moveWishlistToCart: () =>
+        set((s) => {
+          const have = new Set(s.cart.map((l) => l.productId));
+          const fresh = s.wishlist
+            .filter((id) => !have.has(id))
+            .map((productId) => ({ productId, qty: 1 }));
+          return { cart: [...s.cart, ...fresh], wishlist: [] };
+        }),
 
       toggleCompare: (productId) =>
         set((s) => {

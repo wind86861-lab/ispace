@@ -25,7 +25,7 @@ export function WishlistDrawer({ products }: { products: Product[] }) {
   const wishlist = useShop((s) => s.wishlist);
   const removeFromWishlist = useShop((s) => s.removeFromWishlist);
   const addToCart = useShop((s) => s.addToCart);
-  const addManyToCart = useShop((s) => s.addManyToCart);
+  const moveWishlistToCart = useShop((s) => s.moveWishlistToCart);
   const cart = useShop((s) => s.cart);
   const openOverlay = useUi((s) => s.open);
 
@@ -41,15 +41,16 @@ export function WishlistDrawer({ products }: { products: Product[] }) {
       meta={items.length ? t("items", { count: items.length }) : undefined}
       footer={
         /*
-          Hammasini birdaniga savatga.
+          Hammasini savatga KO'CHIRADI.
 
           Saralanganlar — "keyin olaman" ro'yxati, ya'ni qaror qabul
           qilingan lahzada foydalanuvchi ularni bittalab bosishni
-          xohlamaydi. Savatda allaqachon bor mahsulot QAYTA
-          qo'shilmaydi va miqdori oshmaydi.
+          xohlamaydi.
 
-          Tugma savatni ham ochadi: bu "yig'ish tugadi, endi
-          rasmiylashtiraman" qadami.
+          Nusxa olish emas, ko'chirish: mahsulot savatga tushgandan
+          keyin uni saralanganlarda ham ushlab turish ikki xil holat
+          yaratadi va ro'yxat tozalanmagani "qo'shilmadi" degan
+          taassurot berardi.
         */
         items.length ? (
           <Button
@@ -57,7 +58,7 @@ export function WishlistDrawer({ products }: { products: Product[] }) {
             size="lg"
             className="w-full"
             onClick={() => {
-              addManyToCart(items.map((p) => p._id));
+              moveWishlistToCart();
               openOverlay("cart");
             }}
           >
@@ -113,14 +114,20 @@ export function WishlistDrawer({ products }: { products: Product[] }) {
                     Alohida tugma savatni OCHMAYDI: bu yerda
                     foydalanuvchi ro'yxatni ko'zdan kechiryapti va
                     har bosishda panel almashsa, ish uzilib qolardi.
-                    Javob joyida beriladi — tugma "Savatda" ga
+                    Javob joyida beriladi — yozuv "Savatda" ga
                     aylanadi.
+
+                    Tugma O'CHIRILMAYDI. Ilgari u savatda bor
+                    mahsulotda `disabled` bo'lardi va "hammasini
+                    savatga" bosilgandan keyin hamma tugma bir vaqtda
+                    o'lik bo'lib qolardi — bu ishlamayotgandek
+                    ko'rinardi. Mahsulot sahifasidagi tugma ham
+                    shunday: yozuvi o'zgaradi, o'zi ishlayveradi.
                   */}
                   <Button
                     variant="outline"
                     size="sm"
                     className="mt-2"
-                    disabled={cart.some((l) => l.productId === product._id)}
                     onClick={() => addToCart(product._id)}
                   >
                     {cart.some((l) => l.productId === product._id)
