@@ -184,9 +184,21 @@ export function Header({
             {hydrated && compareCount > 0 && (
               <span
                 aria-hidden="true"
-                className="absolute top-1 right-1 grid min-w-4 place-items-center rounded-full bg-gold px-1 text-[11px] leading-4 font-semibold text-warm-white"
+                className={[
+            /*
+              Hisoblagich tugmaning CHEKKASIDA, ichida emas.
+
+              Ilgari u `top-1 right-1` da — ya'ni 36px li tugma ichida
+              turardi va ikon chiziqlari bilan qo'shilib ketardi:
+              raqam o'qilmasdi. Endi u burchakdan biroz tashqariga
+              chiqadi va fon rangidagi halqa uni ikondan ajratadi.
+            */
+            "absolute -top-1 -right-1 grid min-w-[18px] place-items-center rounded-full",
+            "bg-gold-deep px-1.5 text-[10px] leading-[18px] font-semibold text-warm-white",
+            "ring-2 ring-cream tabular-nums",
+          ].join(" ")}
               >
-                {compareCount}
+                {compareCount > 99 ? "99+" : compareCount}
               </span>
             )}
           </Link>
@@ -238,9 +250,21 @@ function IconButton({
       {badge > 0 && (
         <span
           aria-hidden="true"
-          className="absolute top-1 right-1 grid min-w-4 place-items-center rounded-full bg-gold px-1 text-[11px] leading-4 font-semibold text-warm-white"
+          className={[
+            /*
+              Hisoblagich tugmaning CHEKKASIDA, ichida emas.
+
+              Ilgari u `top-1 right-1` da — ya'ni 36px li tugma ichida
+              turardi va ikon chiziqlari bilan qo'shilib ketardi:
+              raqam o'qilmasdi. Endi u burchakdan biroz tashqariga
+              chiqadi va fon rangidagi halqa uni ikondan ajratadi.
+            */
+            "absolute -top-1 -right-1 grid min-w-[18px] place-items-center rounded-full",
+            "bg-gold-deep px-1.5 text-[10px] leading-[18px] font-semibold text-warm-white",
+            "ring-2 ring-cream tabular-nums",
+          ].join(" ")}
         >
-          {badge}
+          {badge > 99 ? "99+" : badge}
         </span>
       )}
     </button>
