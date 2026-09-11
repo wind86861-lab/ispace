@@ -9,7 +9,7 @@ import Fade from "embla-carousel-fade";
 import type { HeroSlide, TrustItem } from "@/content/types";
 import type { Locale } from "@/i18n/routing";
 import { t as pick } from "@/lib/locale";
-import { mediaFit, IMAGE_QUALITY } from "@/lib/media";
+import { IMAGE_QUALITY } from "@/lib/media";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { DUR, STAGGER } from "@/lib/motion";
 import { useMediaTier } from "@/hooks/useMediaTier";
@@ -327,8 +327,14 @@ export function Hero({ slides, trust }: { slides: HeroSlide[]; trust: TrustItem[
                           fetchPriority={i === 0 ? "high" : "auto"}
                           {...(i === 0 ? { "data-hero-lcp": "" } : {})}
                           sizes="100vw"
-                          {...mediaFit(s.image)}
-                          style={mediaFit(s.image).style}
+                          /*
+                            Hero rasmi ekranni TO'LDIRADI — ustida
+                            sarlavha va tugmalar turadi. `mediaFit`
+                            oq fonli fotoni `contain` deb belgilaydi
+                            va u yerda rasm o'rtada kichrayib,
+                            atrofida bo'sh chiziqlar qolardi.
+                          */
+                          className="object-cover"
                         />
                       </div>
                     </div>

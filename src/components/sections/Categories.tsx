@@ -7,7 +7,7 @@ import { ArrowRight } from "lucide-react";
 import type { Category } from "@/content/types";
 import type { Locale } from "@/i18n/routing";
 import { t as pick } from "@/lib/locale";
-import { mediaFit, IMAGE_QUALITY } from "@/lib/media";
+import { IMAGE_QUALITY } from "@/lib/media";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { DUR, STAGGER, TRIGGER_START } from "@/lib/motion";
 import { useMediaTier } from "@/hooks/useMediaTier";
@@ -196,21 +196,23 @@ function CategoryCard({
               quality={IMAGE_QUALITY}
               sizes={sizes}
               /*
-                Keng bannerda rasm o'ng tomonga suriladi — matn chapda,
-                og'irlik o'ngda.
+                Kategoriya kartasi RAMKANI TO'LDIRADI — har doim.
 
-                `right` EMAS, `78%`: oq fonli mahsulot fotosi `contain`
-                bilan chiziladi va keng kadrda tor kvadrat bo'lib qoladi.
-                `right` uni chekkaga yopishtirib, yumaloq burchak bilan
-                kesib tashlardi. 78% uni o'ng uchdan birga qo'yadi va
-                nafas oladigan joy qoldiradi.
+                `mediaFit` bu yerda ATAYLAB ishlatilmaydi. U yuklashda
+                aniqlangan qoidani qaytaradi va oq fonli fotoni
+                `contain` deb belgilaydi. Mahsulot galereyasida bu
+                to'g'ri — u yerda buyum butunlay ko'rinishi kerak.
+                Lekin kategoriya kartasi — ustida SARLAVHA turgan
+                manzara plitkasi: `contain` da rasm kartaga sig'may,
+                tepasi va pastida bo'sh chiziqlar qolardi va matn
+                o'sha bo'sh joyda osilib turardi.
+
+                `objectPosition` keng bannerda o'ngga suriladi — matn
+                chapda, og'irlik o'ngda.
               */
-              style={{
-                ...mediaFit(category.image).style,
-                objectPosition: wide ? "78% center" : undefined,
-              }}
+              style={{ objectPosition: wide ? "78% center" : undefined }}
               className={[
-                mediaFit(category.image).className,
+                "object-cover",
                 "transition-[filter,opacity] duration-700 ease-[cubic-bezier(0.2,0.7,0.3,1)]",
                 // Kichik kartalar biroz rangsiz turadi va hover'da jonlanadi;
                 // asosiy karta doim to'liq rangda.

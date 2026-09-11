@@ -8,7 +8,7 @@ import { Expand, Play } from "lucide-react";
 import type { About as AboutContent } from "@/content/types";
 import type { Locale } from "@/i18n/routing";
 import { t as pick } from "@/lib/locale";
-import { mediaFit, IMAGE_QUALITY } from "@/lib/media";
+import { IMAGE_QUALITY } from "@/lib/media";
 import { useUi } from "@/store/useUi";
 import { useMediaTier } from "@/hooks/useMediaTier";
 import { SplitHeading } from "@/components/ui/SplitHeading";
@@ -152,8 +152,17 @@ export function About({ about }: { about: AboutContent }) {
                     fill
                     quality={IMAGE_QUALITY}
                     sizes="(max-width: 1024px) 100vw, 55vw"
-                    style={mediaFit(stage).style}
-                    className={`${mediaFit(stage).className} transition-transform duration-[900ms] ease-[cubic-bezier(0.2,0.7,0.3,1)] group-hover:scale-105`}
+                    /*
+                      Sahna RAMKANI TO'LDIRADI.
+
+                      `mediaFit` yuklashda aniqlangan qoidani
+                      qaytaradi va oq fonli fotoni `contain` deb
+                      belgilaydi. Katta sahna kadrida bu rasmni
+                      o'rtada kichkina qoldirib, tepasi va pastida
+                      bo'sh chiziqlar berardi. Bu yer manzara uyasi —
+                      buyum kesilishi muammo emas.
+                    */
+                    className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.2,0.7,0.3,1)] group-hover:scale-105"
                   />
                 </motion.span>
               </AnimatePresence>
@@ -220,9 +229,9 @@ export function About({ about }: { about: AboutContent }) {
                         fill
                         quality={IMAGE_QUALITY}
                         sizes="(max-width: 1024px) 20vw, 10vw"
-                        style={mediaFit(media).style}
                         className={[
-                          mediaFit(media).className,
+                          /* Kichik kadr ham manzara — izohi sahnada. */
+                          "object-cover",
                           "transition-transform duration-700 ease-[cubic-bezier(0.2,0.7,0.3,1)] group-hover:scale-110",
                           // Faol bo'lmagan kadr biroz orqaga chekinadi.
                           on ? "" : "opacity-80 group-hover:opacity-100",
