@@ -144,7 +144,8 @@ export function BranchDetail({ branches }: { branches: Branch[] }) {
           {photos.length > 0 && <MapFrame branch={active} locale={locale} title={t("onMap")} />}
         </div>
 
-        <div className="min-w-0">
+        {/* `lg:h-full` — galereya ustun balandligini to'ldirishi uchun. */}
+        <div className="min-w-0 lg:h-full">
           {photos.length > 0 ? (
             <BranchGallery
               key={active._id}

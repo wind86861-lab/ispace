@@ -69,18 +69,30 @@ export function BranchGallery({
   const single = photos.length === 1;
 
   return (
-    <div className="group relative">
+    /*
+      Galereya USTUN BALANDLIGINI to'ldiradi.
+
+      Ilgari ramka `aspect-[4/3]` bilan qat'iy edi va chap ustun
+      (ma'lumot + xarita) undan ancha baland bo'lardi: o'lchov 653px
+      ga qarshi 377px ko'rsatdi, ya'ni rasm ostida 275px bo'sh joy
+      qolardi. Endi ramka qolgan balandlikni oladi, nuqtalar esa
+      pastda o'z joyida turadi.
+
+      Telefonda ustunlar ustma-ust, shuning uchun u yerda nisbat
+      saqlanadi — aks holda rasm cho'zilib ketardi.
+    */
+    <div className="group relative lg:flex lg:h-full lg:flex-col">
       <div
-        className="overflow-hidden rounded-2xl border border-taupe/30 bg-cream"
+        className="overflow-hidden rounded-2xl border border-taupe/30 bg-cream lg:min-h-0 lg:flex-1"
         ref={single ? undefined : emblaRef}
         aria-label={label}
       >
-        <div className={single ? "" : "flex"}>
+        <div className={single ? "lg:h-full" : "flex lg:h-full"}>
           {photos.map((m, i) => (
             <div
               key={m.src || i}
               className={[
-                "relative aspect-[4/3] min-w-0",
+                "relative aspect-[4/3] min-w-0 lg:aspect-auto lg:h-full",
                 single ? "" : "flex-[0_0_100%]",
               ].join(" ")}
             >
@@ -112,7 +124,7 @@ export function BranchGallery({
             <ChevronRight size={18} strokeWidth={1.7} aria-hidden="true" />
           </NavButton>
 
-          <div className="mt-3 flex items-center justify-between gap-4">
+          <div className="mt-3 flex shrink-0 items-center justify-between gap-4">
             {/* Nuqtalar — bosiladigan: to'g'ridan-to'g'ri kerakli fotoga. */}
             <ul className="flex items-center gap-1.5">
               {photos.map((m, i) => (

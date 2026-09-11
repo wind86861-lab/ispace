@@ -291,24 +291,29 @@ export function AboutIntro({
             har almashinuvda balandligini o'zgartirib, ostidagi raqamlar
             va chiziqni sakratardi.
           */}
-          <div className="relative mt-6 min-h-[9rem]">
-            {/*
-              `mode="wait"` YO'Q va bolalar ABSOLYUT.
+          {/*
+            Ikki matn BITTA grid katagida turadi.
 
-              Kutish rejimida yangi matn eskisi so'nib bo'lgandan keyin
-              DOM'ga tushardi. Foydalanuvchi shu oraliqda scroll'ni
-              to'xtatsa, harflarni ochadigan chaqiruv umuman kelmasdi va
-              matn tutunsiz, birdan to'liq paydo bo'lardi.
+            `mode="wait"` YO'Q: kutish rejimida yangi matn eskisi
+            so'nib bo'lgandan keyin DOM'ga tushardi va foydalanuvchi
+            shu oraliqda scroll'ni to'xtatsa, harflarni ochadigan
+            chaqiruv umuman kelmasdi — matn tutunsiz, birdan to'liq
+            paydo bo'lardi. Endi ikkalasi bir vaqtda: eskisi tutunga
+            qaytadi, yangisi tutundan chiqadi.
 
-              Endi ikkalasi bir vaqtda: eskisi tutunga qaytadi, yangisi
-              tutundan chiqadi. Absolyut joylashuv esa ular oqimda
-              ustma-ust turib blokni cho'zib yubormasligi uchun.
-            */}
+            ABSOLYUT joylashuv emas, GRID. Ilgari bolalar
+            `absolute inset-0` edi va `min-h` dan uzun matn blokdan
+            oshib, pastdagi RAQAMLAR ustiga chiqib turardi — o'lchov
+            buni tasdiqladi. Bitta grid katagi ham ustma-ust
+            joylashtiradi, ham konteynerni eng baland bolaga qarab
+            cho'zadi: matn hech qachon tashqariga chiqmaydi.
+          */}
+          <div className="mt-6 grid min-h-[9rem] grid-cols-1">
             <AnimatePresence initial={false}>
               <motion.div
                 key={current?._id ?? "intro"}
                 data-year={current?._id ?? "intro"}
-                className="absolute inset-0"
+                className="col-start-1 row-start-1"
                 initial={reduced ? false : { opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
