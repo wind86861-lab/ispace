@@ -12,6 +12,7 @@ import { formatPrice } from "@/lib/format";
 import { DUR, EASE_LUX } from "@/lib/motion";
 import { useShop } from "@/store/useShop";
 import { useUi } from "@/store/useUi";
+import { useToast } from "@/store/useToast";
 import { Drawer } from "./Drawer";
 import { EmptyState } from "./CartDrawer";
 import { Button } from "@/components/ui/Button";
@@ -28,6 +29,8 @@ export function WishlistDrawer({ products }: { products: Product[] }) {
   const moveWishlistToCart = useShop((s) => s.moveWishlistToCart);
   const cart = useShop((s) => s.cart);
   const openOverlay = useUi((s) => s.open);
+  const toast = useToast();
+  const tt = useTranslations("toast");
 
   const items = wishlist
     .map((id) => products.find((p) => p._id === id))
@@ -58,8 +61,15 @@ export function WishlistDrawer({ products }: { products: Product[] }) {
             size="lg"
             className="w-full"
             onClick={() => {
+              const count = items.length;
               moveWishlistToCart();
+              /*
+                Bu yerda savat ATAYLAB ochiladi: bu "yig'ish tugadi"
+                qadami va foydalanuvchi keyingi harakatni savatda
+                qiladi. Alohida qo'shishda esa faqat xabarnoma.
+              */
               openOverlay("cart");
+              toast.push({ message: tt("movedToCart", { count }), tone: "success" });
             }}
           >
             <ShoppingBag size={17} strokeWidth={1.6} aria-hidden="true" />
@@ -128,7 +138,10 @@ export function WishlistDrawer({ products }: { products: Product[] }) {
                     variant="outline"
                     size="sm"
                     className="mt-2"
-                    onClick={() => addToCart(product._id)}
+                    onClick={() => {
+                      addToCart(product._id);
+                      toast.push({ message: tt("addedToCart"), tone: "success" });
+                    }}
                   >
                     {cart.some((l) => l.productId === product._id)
                       ? t("inCart")

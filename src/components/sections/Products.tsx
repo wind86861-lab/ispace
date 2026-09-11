@@ -14,6 +14,9 @@ import { formatPrice } from "@/lib/format";
 import { DUR, EASE_LUX, SPRING } from "@/lib/motion";
 import { useMediaTier } from "@/hooks/useMediaTier";
 import { useShop, selectInCart, selectInWishlist, selectInCompare } from "@/store/useShop";
+import { useRouter } from "@/i18n/navigation";
+import { useToast } from "@/store/useToast";
+import { useUi } from "@/store/useUi";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
 import { ProductBadges } from "@/components/catalog/ProductBadges";
@@ -172,6 +175,10 @@ function ProductCard({
   const hydrated = useShop((s) => s.hydrated);
   const addToCart = useShop((s) => s.addToCart);
   const toggleWishlist = useShop((s) => s.toggleWishlist);
+  const toast = useToast();
+  const router = useRouter();
+  const openCart = useUi((s) => s.open);
+  const tt = useTranslations("toast");
   const toggleCompare = useShop((s) => s.toggleCompare);
 
   /* ---- 3D tilt (§2 — faqat fine pointer) ---- */
@@ -254,7 +261,13 @@ function ProductCard({
             <RoundButton
               active={hydrated && inWishlist}
               label={inWishlist ? t("removeFromWishlist") : t("addToWishlist")}
-              onClick={() => toggleWishlist(product._id)}
+              onClick={() => {
+                toggleWishlist(product._id);
+                toast.push({
+                  message: inWishlist ? tt("removedFromWishlist") : tt("addedToWishlist"),
+                  tone: inWishlist ? "default" : "success",
+                });
+              }}
             >
               {(on) => (
                 <Heart
@@ -270,7 +283,16 @@ function ProductCard({
             <RoundButton
               active={hydrated && inCompare}
               label={hydrated && inCompare ? tc("remove") : tc("add")}
-              onClick={() => toggleCompare(product._id)}
+              onClick={() => {
+                toggleCompare(product._id);
+                toast.push({
+                  message: inCompare ? tt("removedFromCompare") : tt("addedToCompare"),
+                  tone: inCompare ? "default" : "success",
+                  action: inCompare
+                    ? undefined
+                    : { label: tt("openCompare"), run: () => router.push("/compare") },
+                });
+              }}
               activeClassName="bg-gold-deep hover:bg-gold-hover"
             >
               {(on) => (
@@ -333,7 +355,14 @@ function ProductCard({
               variant={hydrated && inCart ? "dark" : "gold"}
               size="sm"
               className="relative z-[2]"
-              onClick={() => addToCart(product._id)}
+              onClick={() => {
+                addToCart(product._id);
+                toast.push({
+                  message: tt("addedToCart"),
+                  tone: "success",
+                  action: { label: tt("openCart"), run: () => openCart("cart") },
+                });
+              }}
             >
               <ShoppingBag size={14} strokeWidth={1.6} aria-hidden="true" />
               {hydrated && inCart ? t("inCart") : t("addToCart")}

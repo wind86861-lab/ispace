@@ -17,6 +17,8 @@ import { Reveal } from "@/components/ui/Reveal";
 import { ProductBadges } from "./ProductBadges";
 import { useShop } from "@/store/useShop";
 import { useUi } from "@/store/useUi";
+import { useRouter } from "@/i18n/navigation";
+import { useToast } from "@/store/useToast";
 
 /**
  * Katalog kartasi.
@@ -70,6 +72,10 @@ export function ProductCard({
 
   const addToCart = useShop((s) => s.addToCart);
   const openCart = useUi((s) => s.open);
+  const toast = useToast();
+  /* Til prefiksini saqlaydigan router — `/compare` emas, `/uz/compare`. */
+  const router = useRouter();
+  const tt = useTranslations("toast");
   const toggleWishlist = useShop((s) => s.toggleWishlist);
   const toggleCompare = useShop((s) => s.toggleCompare);
   const hydrated = useShop((s) => s.hydrated);
@@ -123,7 +129,13 @@ export function ProductCard({
           <span className="absolute top-3 right-3 z-[2] flex flex-col gap-2">
             <button
               type="button"
-              onClick={() => toggleWishlist(product._id)}
+              onClick={() => {
+                toggleWishlist(product._id);
+                toast.push({
+                  message: inWishlist ? tt("removedFromWishlist") : tt("addedToWishlist"),
+                  tone: inWishlist ? "default" : "success",
+                });
+              }}
               aria-label={hydrated && inWishlist ? t("removeFromWishlist") : t("addToWishlist")}
               aria-pressed={hydrated && inWishlist}
               className="grid size-9 place-items-center rounded-full bg-warm-white/85 backdrop-blur-sm transition-colors duration-300 hover:bg-warm-white"
@@ -139,7 +151,16 @@ export function ProductCard({
 
             <button
               type="button"
-              onClick={() => toggleCompare(product._id)}
+              onClick={() => {
+                toggleCompare(product._id);
+                toast.push({
+                  message: inCompare ? tt("removedFromCompare") : tt("addedToCompare"),
+                  tone: inCompare ? "default" : "success",
+                  action: inCompare
+                    ? undefined
+                    : { label: tt("openCompare"), run: () => router.push("/compare") },
+                });
+              }}
               aria-label={hydrated && inCompare ? tc("remove") : tc("add")}
               aria-pressed={hydrated && inCompare}
               className={[
@@ -186,8 +207,12 @@ export function ProductCard({
               type="button"
               onClick={() => {
                 addToCart(product._id);
-                /* Bosishga javob: savat ochilib, nima qo'shilgani ko'rinadi. */
-                openCart("cart");
+                /* Javob xabarnoma bilan — katalogni ko'rish uzilmaydi. */
+                toast.push({
+                  message: tt("addedToCart"),
+                  tone: "success",
+                  action: { label: tt("openCart"), run: () => openCart("cart") },
+                });
               }}
               className={[
                 "relative z-[2] inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-[14px] font-medium",

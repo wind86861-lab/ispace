@@ -3,6 +3,8 @@
 import { Scale } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useShop } from "@/store/useShop";
+import { useToast } from "@/store/useToast";
+import { useRouter } from "@/i18n/navigation";
 
 /**
  * Solishtirishga qo'shish — sarlavha yonidagi KICHIK ikon.
@@ -21,6 +23,9 @@ export function CompareToggle({ productId }: { productId: string }) {
   const toggle = useShop((s) => s.toggleCompare);
   const hydrated = useShop((s) => s.hydrated);
   const inCompare = useShop((s) => s.compare.includes(productId));
+  const toast = useToast();
+  const tt = useTranslations("toast");
+  const router = useRouter();
 
   /*
    * `hydrated` gacha holat NEUTRAL chiziladi: server `localStorage` ni
@@ -32,7 +37,14 @@ export function CompareToggle({ productId }: { productId: string }) {
   return (
     <button
       type="button"
-      onClick={() => toggle(productId)}
+      onClick={() => {
+        toggle(productId);
+        toast.push({
+          message: on ? tt("removedFromCompare") : tt("addedToCompare"),
+          tone: on ? "default" : "success",
+          action: on ? undefined : { label: tt("openCompare"), run: () => router.push("/compare") },
+        });
+      }}
       aria-pressed={on}
       aria-label={on ? t("inCompare") : t("add")}
       title={on ? t("inCompare") : t("add")}

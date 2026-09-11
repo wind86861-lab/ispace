@@ -15,6 +15,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Preloader } from "@/components/layout/Preloader";
 import { FloatingActions } from "@/components/layout/FloatingActions";
 import { Overlays } from "@/components/overlays/Overlays";
+import { Toaster } from "@/components/ui/Toaster";
 import { JsonLd } from "@/components/seo/JsonLd";
 import "../globals.css";
 
@@ -141,6 +142,13 @@ export default async function LocaleLayout({
               <main id="main">{children}</main>
               <Footer nav={content.nav} contact={content.contact} branches={content.branches} />
               <FloatingActions contact={content.contact} />
+              {/*
+                Xabarnomalar qatlamlardan TASHQARIDA: savat paneli
+                yopilganda ham «Savatga qo'shildi» ko'rinib turishi
+                kerak.
+              */}
+              <Toaster />
+
               <Overlays
                 products={content.products}
                 /* Yuklanmagan bo'lsa `undefined` — lightbox YouTube'ga tushadi. */

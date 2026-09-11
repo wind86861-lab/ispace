@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/Button";
 import { Magnetic } from "@/components/ui/Magnetic";
 import { useShop } from "@/store/useShop";
 import { useUi } from "@/store/useUi";
+import { useToast } from "@/store/useToast";
 
 /**
  * Sotib olish bloki: variantlar, miqdor va savat.
@@ -64,6 +65,8 @@ export function BuyBox({
   const hydrated = useShop((s) => s.hydrated);
   const line = useShop((s) => s.cart.find((l) => l.productId === product._id));
   const openOverlay = useUi((s) => s.open);
+  const toast = useToast();
+  const tt = useTranslations("toast");
 
   const [color, setColor] = useState(product.colors?.[0]?._id);
   const [bundle, setBundle] = useState(product.bundles?.[0]?._id);
@@ -79,15 +82,19 @@ export function BuyBox({
     if (qty > 1) setQty(product._id, (line?.qty ?? 0) + qty);
 
     /*
-     * Savat DARROV ochiladi.
+     * Javob — XABARNOMA, panel emas.
      *
-     * Ilgari bosishga sahifada hech qanday javob yo'q edi: mahsulot
-     * savatga tushardi, lekin foydalanuvchi buni ko'rmasdi va tugmani
-     * qayta bosaverardi. Ochilgan panel bir vaqtning o'zida uch
-     * savolga javob beradi — qo'shildimi, nima bor, keyin nima
-     * qilaman.
+     * Ilgari bu yerda savat paneli ochilardi. U javob berardi, lekin
+     * ishni uzib qo'yardi: foydalanuvchi mahsulotni ko'rishda davom
+     * etmoqchi bo'lsa ham, har bosishda panel yopib turardi. Toster
+     * esa xabarni beradi va yo'lni to'smaydi — savatga o'tish kerak
+     * bo'lsa, o'zida tugmasi bor.
      */
-    openOverlay("cart");
+    toast.push({
+      message: tt("addedToCart"),
+      tone: "success",
+      action: { label: tt("openCart"), run: () => openOverlay("cart") },
+    });
   };
 
   return (

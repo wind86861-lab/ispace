@@ -13,6 +13,16 @@
     "toHome": "На главную",
     "skipToContent": "Перейти к содержимому"
   },
+  "toast": {
+    "addedToCart": "Добавлено в корзину",
+    "openCart": "Открыть",
+    "movedToCart": "{count, plural, other {# товара перенесено в корзину}}",
+    "addedToWishlist": "В избранном",
+    "removedFromWishlist": "Убрано из избранного",
+    "addedToCompare": "Добавлено к сравнению",
+    "removedFromCompare": "Убрано из сравнения",
+    "openCompare": "Сравнить"
+  },
   "header": {
     "logoAria": "iSpace — на главную",
     "menuAria": "Основная навигация",

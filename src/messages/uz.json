@@ -13,6 +13,16 @@
     "toHome": "Bosh sahifaga",
     "skipToContent": "Asosiy qismga o‘tish"
   },
+  "toast": {
+    "addedToCart": "Savatga qo‘shildi",
+    "openCart": "Ochish",
+    "movedToCart": "{count, plural, other {# ta mahsulot savatga ko‘chirildi}}",
+    "addedToWishlist": "Saralanganlarda",
+    "removedFromWishlist": "Saralanganlardan olindi",
+    "addedToCompare": "Solishtirishga qo‘shildi",
+    "removedFromCompare": "Solishtirishdan olindi",
+    "openCompare": "Solishtirish"
+  },
   "header": {
     "logoAria": "iSpace — bosh sahifaga",
     "menuAria": "Asosiy navigatsiya",

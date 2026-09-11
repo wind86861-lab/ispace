@@ -12,6 +12,7 @@ import { formatPrice } from "@/lib/format";
 import { IMAGE_QUALITY, firstImage, mediaFit } from "@/lib/media";
 import { useShop } from "@/store/useShop";
 import { useUi } from "@/store/useUi";
+import { useToast } from "@/store/useToast";
 
 /**
  * Solishtirish jadvali.
@@ -87,6 +88,8 @@ export function CompareBoard({
   const clearCompare = useShop((s) => s.clearCompare);
   const addToCart = useShop((s) => s.addToCart);
   const openCart = useUi((s) => s.open);
+  const toast = useToast();
+  const tt = useTranslations("toast");
 
   const [onlyDiff, setOnlyDiff] = useState(false);
   /** `null` — hali tanlanmagan; birinchi guruh o'zidan faollashadi. */
@@ -414,7 +417,11 @@ export function CompareBoard({
                           type="button"
                           onClick={() => {
                             addToCart(product._id);
-                            openCart("cart");
+                            toast.push({
+                              message: tt("addedToCart"),
+                              tone: "success",
+                              action: { label: tt("openCart"), run: () => openCart("cart") },
+                            });
                           }}
                           aria-label={tp("addToCart")}
                           className="grid size-9 shrink-0 place-items-center rounded-full bg-gold-deep text-warm-white transition-colors duration-300 hover:bg-gold-hover"
