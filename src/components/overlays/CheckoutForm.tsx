@@ -105,7 +105,6 @@ export function CheckoutForm({ onDone }: { onDone: () => void }) {
         error={errors.phone?.message}
         icon={<Phone size={16} strokeWidth={1.5} />}
         autoComplete="tel"
-        placeholder="+998 __ ___ __ __"
         {...register("phone", uzPhoneRules<{ name: string; phone: string }, "phone">(t("phoneError")))}
       />
 

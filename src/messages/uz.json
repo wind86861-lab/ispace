@@ -186,7 +186,9 @@
     "empty": "Saralanganlar hozircha bo‘sh",
     "emptyHint": "Saqlash uchun model yonidagi yurakchani bosing",
     "addToCart": "Savatga qo‘shish",
-    "remove": "Saralanganlardan olib tashlash"
+    "remove": "Saralanganlardan olib tashlash",
+    "addAll": "Hammasini savatga",
+    "inCart": "Savatda"
   },
   "consult": {
     "title": "Konsultatsiya olish",

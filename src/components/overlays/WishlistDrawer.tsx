@@ -3,11 +3,11 @@
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { AnimatePresence, motion } from "motion/react";
-import { Heart } from "lucide-react";
+import { Heart, ShoppingBag } from "lucide-react";
 import type { Product } from "@/content/types";
 import type { Locale } from "@/i18n/routing";
 import { t as pick } from "@/lib/locale";
-import { firstImage } from "@/lib/media";
+import { firstImage, mediaFit, IMAGE_QUALITY } from "@/lib/media";
 import { formatPrice } from "@/lib/format";
 import { DUR, EASE_LUX } from "@/lib/motion";
 import { useShop } from "@/store/useShop";
@@ -25,6 +25,9 @@ export function WishlistDrawer({ products }: { products: Product[] }) {
   const wishlist = useShop((s) => s.wishlist);
   const removeFromWishlist = useShop((s) => s.removeFromWishlist);
   const addToCart = useShop((s) => s.addToCart);
+  const addManyToCart = useShop((s) => s.addManyToCart);
+  const cart = useShop((s) => s.cart);
+  const openOverlay = useUi((s) => s.open);
 
   const items = wishlist
     .map((id) => products.find((p) => p._id === id))
@@ -36,6 +39,33 @@ export function WishlistDrawer({ products }: { products: Product[] }) {
       onClose={close}
       title={t("title")}
       meta={items.length ? t("items", { count: items.length }) : undefined}
+      footer={
+        /*
+          Hammasini birdaniga savatga.
+
+          Saralanganlar — "keyin olaman" ro'yxati, ya'ni qaror qabul
+          qilingan lahzada foydalanuvchi ularni bittalab bosishni
+          xohlamaydi. Savatda allaqachon bor mahsulot QAYTA
+          qo'shilmaydi va miqdori oshmaydi.
+
+          Tugma savatni ham ochadi: bu "yig'ish tugadi, endi
+          rasmiylashtiraman" qadami.
+        */
+        items.length ? (
+          <Button
+            variant="gold"
+            size="lg"
+            className="w-full"
+            onClick={() => {
+              addManyToCart(items.map((p) => p._id));
+              openOverlay("cart");
+            }}
+          >
+            <ShoppingBag size={17} strokeWidth={1.6} aria-hidden="true" />
+            {t("addAll")}
+          </Button>
+        ) : undefined
+      }
     >
       {items.length === 0 ? (
         <EmptyState title={t("empty")} hint={t("emptyHint")} />
@@ -52,14 +82,24 @@ export function WishlistDrawer({ products }: { products: Product[] }) {
                 transition={{ duration: DUR.ui, ease: EASE_LUX }}
                 className="flex gap-3"
               >
+                {/* Rasm `mediaFit` bo'yicha — qattiq `cover` buyumni kesardi. */}
                 <div className="relative size-20 shrink-0 overflow-hidden rounded-lg bg-cream">
-                  <Image
-                    src={(firstImage(product.images)?.src ?? "")}
-                    alt={pick((firstImage(product.images)?.alt ?? { ru: "", uz: "" }), locale)}
-                    fill
-                    sizes="80px"
-                    className="object-cover"
-                  />
+                  {(() => {
+                    const media = firstImage(product.images) ?? product.images[0];
+                    if (!media) return null;
+                    const fit = mediaFit(media);
+                    return (
+                      <Image
+                        src={media.src}
+                        alt={pick(media.alt, locale)}
+                        fill
+                        quality={IMAGE_QUALITY}
+                        sizes="80px"
+                        style={fit.style}
+                        className={fit.className}
+                      />
+                    );
+                  })()}
                 </div>
 
                 <div className="min-w-0 flex-1">
@@ -69,13 +109,23 @@ export function WishlistDrawer({ products }: { products: Product[] }) {
                   <p className="mt-1 text-sm font-semibold text-gold-deep">
                     {formatPrice(product.price, locale)}
                   </p>
+                  {/*
+                    Alohida tugma savatni OCHMAYDI: bu yerda
+                    foydalanuvchi ro'yxatni ko'zdan kechiryapti va
+                    har bosishda panel almashsa, ish uzilib qolardi.
+                    Javob joyida beriladi — tugma "Savatda" ga
+                    aylanadi.
+                  */}
                   <Button
                     variant="outline"
                     size="sm"
                     className="mt-2"
+                    disabled={cart.some((l) => l.productId === product._id)}
                     onClick={() => addToCart(product._id)}
                   >
-                    {t("addToCart")}
+                    {cart.some((l) => l.productId === product._id)
+                      ? t("inCart")
+                      : t("addToCart")}
                   </Button>
                 </div>
 

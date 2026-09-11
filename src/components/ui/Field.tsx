@@ -42,8 +42,6 @@ export const Field = forwardRef<HTMLInputElement, Props>(function Field(
           id={inputId}
           aria-invalid={error ? "true" : undefined}
           aria-describedby={error ? errorId : undefined}
-          // `placeholder=" "` — suzuvchi label `:placeholder-shown` ga tayanadi.
-          placeholder=" "
           className={[
             "peer h-14 w-full rounded-xl border bg-warm-white pt-5 pb-2 text-sm text-espresso",
             "transition-colors duration-300 outline-none",
@@ -53,6 +51,18 @@ export const Field = forwardRef<HTMLInputElement, Props>(function Field(
               : "border-taupe/45 hover:border-taupe focus:border-gold",
           ].join(" ")}
           {...rest}
+          /*
+            `placeholder=" "` — suzuvchi label `:placeholder-shown` ga
+            tayanadi.
+
+            U ATAYLAB `{...rest}` DAN KEYIN turadi: ilgari oldinda edi
+            va chaqiruvchi o'z `placeholder` ini bersa uni bosib
+            ketardi. Natijada matn markazda turgan label bilan ustma-ust
+            tushardi — savatdagi telefon maydonida aynan shunday
+            bo'lgan edi. Bu maketda ko'rinadigan yozuv — LABEL, shuning
+            uchun placeholder umuman bo'lmasligi kerak.
+          */
+          placeholder=" "
         />
 
         <label

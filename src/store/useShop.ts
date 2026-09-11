@@ -24,6 +24,8 @@ type ShopState = {
   hydrated: boolean;
 
   addToCart: (productId: string) => void;
+  /** Bir nechta mahsulotni BIR marta qo'shadi (saralanganlardan). */
+  addManyToCart: (productIds: string[]) => void;
   setQty: (productId: string, qty: number) => void;
   removeFromCart: (productId: string) => void;
   toggleWishlist: (productId: string) => void;
@@ -56,6 +58,23 @@ export const useShop = create<ShopState>()(
               l.productId === productId ? { ...l, qty: Math.min(l.qty + 1, MAX_QTY) } : l,
             ),
           };
+        }),
+
+      /*
+       * Ko'p mahsulot BITTA yangilanishda qo'shiladi.
+       *
+       * `addToCart` ni siklda chaqirish har mahsulot uchun alohida
+       * render keltirib chiqarardi; bundan tashqari savatda allaqachon
+       * bor mahsulot miqdori oshib ketardi — saralanganlardan
+       * qo'shishda esa kutilgani "bor bo'lsa tegmaslik".
+       */
+      addManyToCart: (productIds) =>
+        set((s) => {
+          const have = new Set(s.cart.map((l) => l.productId));
+          const fresh = productIds
+            .filter((id) => !have.has(id))
+            .map((productId) => ({ productId, qty: 1 }));
+          return fresh.length ? { cart: [...s.cart, ...fresh] } : {};
         }),
 
       setQty: (productId, qty) =>

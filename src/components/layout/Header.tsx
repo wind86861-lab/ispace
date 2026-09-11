@@ -15,6 +15,7 @@ import {
   selectCompareCount,
 } from "@/store/useShop";
 import { useUi } from "@/store/useUi";
+import { usePathname } from "@/i18n/navigation";
 import { useLenis } from "@/components/providers/LenisProvider";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { MobileNav } from "./MobileNav";
@@ -42,6 +43,8 @@ export function Header({
   const t = useTranslations("header");
   const locale = useLocale() as Locale;
   const lenis = useLenis();
+  /* `next-intl` varianti til prefiksisiz yo'lni beradi: `/ru` — `/`. */
+  const pathname = usePathname();
   const open = useUi((s) => s.open);
   const [menu, setMenu] = useState(false);
 
@@ -77,9 +80,21 @@ export function Header({
       ].join(" ")}
     >
       <div className="container-lux flex items-center gap-4">
+        {/*
+          Logotip — bosh sahifaning ENG TEPASIGA.
+
+          Boshqa sahifadan bosilsa oddiy o'tish bo'ladi va
+          `ScrollReset` sahifani tepadan ochadi. Lekin BOSH SAHIFADA
+          turib bosilganda manzil o'zgarmaydi — Next hech qayerga
+          o'tmaydi va sahifa o'z joyida qolardi. Shu holatda scroll'ni
+          o'zimiz tepaga olib chiqamiz.
+        */}
         <Link
           href="/"
           aria-label={t("logoAria")}
+          onClick={() => {
+            if (pathname === "/") lenis.scrollTo(0, 0);
+          }}
           className="font-display text-[1.45rem] tracking-[0.08em] text-espresso"
         >
           i<span className="text-gold-deep">Space</span>
