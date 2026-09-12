@@ -432,16 +432,18 @@ html[data-motion="on"] .about-aura {
  * Pastki chekkada yengil qalinlashish qoladi: karusel o'qlari va
  * "Barcha maqolalar" tugmasi shu yerda turadi.
  */
+/*
+ * Blog fonidagi parda — TEKIS.
+ *
+ * Ilgari u gradient edi: tepada 66%, o'rtada 20%, pastda 46%.
+ * Natijada bo'limning tepasi va pasti ochroq, o'rtasi to'qroq
+ * ko'rinardi — rasm mixlangan bo'lgani uchun scroll paytida bu
+ * "yorug'lik dog'i" bo'lim ichida yurgandek tuyulardi va fon
+ * notekis ko'rinardi. Bir xil qalinlikdagi parda rasmni ko'rsatib
+ * turadi, matn esa hamma joyda bir xil o'qiladi.
+ */
 @utility blog-veil {
-  background-image: linear-gradient(
-    to bottom,
-    rgba(241, 236, 230, 0.66) 0%,
-    rgba(241, 236, 230, 0.44) 10%,
-    rgba(241, 236, 230, 0.26) 22%,
-    rgba(241, 236, 230, 0.2) 55%,
-    rgba(241, 236, 230, 0.28) 84%,
-    rgba(241, 236, 230, 0.46) 100%
-  );
+  background-color: rgba(241, 236, 230, 0.42);
 }
 
 /*
